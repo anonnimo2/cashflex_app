@@ -22,6 +22,17 @@
     {% endfor %}
   </div>
 
+  <!-- IBANs para transferência -->
+<div class="alert alert-info shadow-sm rounded">
+  <h6 class="fw-bold mb-2">IBANs para Transferência:</h6>
+  <ul class="mb-0">
+    <li><strong>BAI:</strong> 0040 0000 5185 5656 1019 3</li>
+    <li><strong>BCI:</strong> 0005 0000 0118 6521 1011 5</li>
+  </ul>
+  <small class="text-muted">Faça a transferência e anexe o comprovativo abaixo.</small>
+</div>
+
+
   <!-- Formulário -->
   <form method="POST" enctype="multipart/form-data" class="bg-white p-3 rounded shadow-sm border">
     {{ form.hidden_tag() }}
