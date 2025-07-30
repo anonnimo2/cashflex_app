@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+
+  <!-- Cabeçalho -->
+  <div class="text-center mb-4">
+    <h4 class="fw-bold text-primary">Minha Carteira</h4>
+    <p class="text-muted small mb-0">Resumo do seu saldo e ações rápidas</p>
+  </div>
+
+  <!-- SALDO ATUAL -->
+  <div class="rounded-4 shadow-sm mb-4 p-4 text-white position-relative overflow-hidden"
+       style="background: linear-gradient(to bottom right, #60aaf0, #007bff);">
+    <h6 class="mb-1">Saldo Atual</h6>
+    <h2 class="fw-bold mb-2">{{ current_user.balance | round(2) }} AOA</h2>
+    <p class="small mb-2">
+      <i class="bi bi-bar-chart-line-fill me-1" aria-hidden="true"></i>
+    <div class="border-top border-light-subtle pt-2 mt-2 small text-white-50">
+      Usuário: {{ current_user.phone }} | ID: {{ current_user.id }}
+    </div>
+  </div>
+
+  <!-- ESTATÍSTICAS -->
+  <div class="row g-3 mb-4">
+    <div class="col-6">
+      <div class="p-3 rounded-4 shadow-sm bg-white text-center">
+        <p class="small text-muted mb-1">Investido Total</p>
+        <h6 class="fw-bold text-dark">
+          {{ total_investido | round(2) if total_investido else '0.00' }} AOA
+        </h6>
+      </div>
+    </div>
+    <div class="col-6">
+      <div class="p-3 rounded-4 shadow-sm bg-white text-center">
+        <p class="small text-muted mb-1">Lucro Acumulado</p>
+        <h6 class="fw-bold text-dark">
+          {{ total_lucro | round(2) if total_lucro else '0.00' }} AOA
+        </h6>
+      </div>
+    </div>
+  </div>
+
+  <!-- AÇÕES -->
+  <div class="list-group rounded-4 shadow-sm mb-4 overflow-hidden">
+    <a href="{{ url_for('plan.invest') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-arrow-up-circle text-primary me-2 fs-5" aria-hidden="true"></i> Investir</span>
+      <i class="bi bi-chevron-right text-muted" aria-hidden="true"></i>
+    </a>
+    <a href="{{ url_for('main.withdraw') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-arrow-down-circle text-danger me-2 fs-5" aria-hidden="true"></i> Sacar</span>
+      <i class="bi bi-chevron-right text-muted" aria-hidden="true"></i>
+    </a>
+    <a href="{{ url_for('main.history') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-clock-history text-secondary me-2 fs-5" aria-hidden="true"></i> Histórico</span>
+      <i class="bi bi-chevron-right text-muted" aria-hidden="true"></i>
+    </a>
+    <a href="{{ url_for('main.logout') }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-box-arrow-right text-dark me-2 fs-5" aria-hidden="true"></i> Sair</span>
+      <i class="bi bi-chevron-right text-muted" aria-hidden="true"></i>
+    </a>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <a href="{{ url_for('main.dashboard') }}">
+    <i class="bi bi-house-door-fill"></i> Início
+  </a>
+  <a href="{{ url_for('main.history') }}">
+    <i class="bi bi-clock-history"></i> Histórico
+  </a>
+  <a href="{{ url_for('main.referrals') }}">
+    <i class="bi bi-people-fill"></i> Equipa
+  </a>
+  <a href="{{ url_for('main.wallet') }}" class="active">
+    <i class="bi bi-wallet2"></i> Carteira
+  </a>
+</div>
+{% endblock %}

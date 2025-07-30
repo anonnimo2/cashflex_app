@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cash Flex</title>
+  <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <!-- Estilo customizado -->
+  <style>
+    body {
+      background: linear-gradient(to bottom, #e4f0ff, #6959CD); /* Azul claro para branco */
+      min-height: 100vh;
+      padding-bottom: 80px;
+    }
+    .tab-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #ffffff;
+      border-top: 1px solid #ddd;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 60px;
+      z-index: 1000;
+    }
+
+    .tab-bar a {
+      text-decoration: none;
+      color: #555;
+      font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .tab-bar a i {
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+
+    .tab-bar a.active {
+      color: #007bff;
+      font-weight: bold;
+    }
+
+    .tab-bar a.active i {
+      color: #007bff;
+    }
+
+    .card {
+      border-radius: 1rem;
+    }
+
+    .rounded-top-4 {
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+    }
+
+
+    .btn-primary {
+
+       background-color: #6959CD;
+  color: #fff;
+
+    }
+
+    .btn-primary:hover {
+
+       background-color: #5848b0;
+
+    }
+  </style>
+</head>
+<body>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="container mt-3">
+        {% for msg in messages %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+</body>
+</html>

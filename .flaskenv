@@ -1,0 +1,2 @@
+FLASK_APP=cashflex_app.run:create_app_cli
+FLASK_ENV=development

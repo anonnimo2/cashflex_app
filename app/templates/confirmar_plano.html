@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4">
+  <h4 class="text-primary fw-bold mb-3">Confirmar Compra</h4>
+
+  <div class="card border-0 shadow rounded-4 mb-3">
+    <div class="card-body">
+      <h5 class="card-title">{{ nome }}</h5>
+      <p><strong>Investimento:</strong> {{ plano.invest }} AOA</p>
+      <p><strong>Rendimento diário:</strong> {{ plano.rendimento }} AOA</p>
+      <p><strong>Retorno total:</strong> {{ plano.retorno }} AOA</p>
+      <form method="POST">
+        <div class="d-grid gap-2 mt-4">
+          <button type="submit" class="btn btn-success rounded-3">Confirmar Compra</button>
+          <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-secondary rounded-3">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

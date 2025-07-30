@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4 mb-5">
+  <!-- Título -->
+  <div class="text-center mb-4">
+    <h4 class="fw-bold text-primary">Histórico de Transações</h4>
+    <p class="text-muted small mb-0">Veja seus investimentos, saques e comissões</p>
+  </div>
+
+  {% if investments or withdrawals or commissions or active_plans %}
+
+    {% if investments %}
+    <div class="mb-4">
+      <h6 class="fw-bold text-primary mb-2">📈 Investimentos</h6>
+      <div class="list-group shadow-sm rounded-4 overflow-hidden">
+        {% for inv in investments %}
+          <div class="list-group-item d-flex justify-content-between align-items-center bg-light">
+            <div>
+              <strong>{{ inv.amount }} AOA</strong>
+              <span class="text-muted small ms-2">{{ inv.status or "ativo" }}</span>
+            </div>
+            <small class="text-muted">{{ inv.timestamp.strftime("%d/%m/%Y %H:%M") }}</small>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if withdrawals %}
+    <div class="mb-4">
+      <h6 class="fw-bold text-danger mb-2">💸 Saques</h6>
+      <div class="list-group shadow-sm rounded-4 overflow-hidden">
+        {% for wd in withdrawals %}
+          <div class="list-group-item d-flex justify-content-between align-items-center bg-light">
+            <div>
+              <strong>{{ wd.amount }} AOA</strong>
+              {% if wd.status == 'Aprovado' %}
+                <span class="badge bg-success-subtle text-success ms-2">Aprovado</span>
+              {% elif wd.status == 'Rejeitado' %}
+                <span class="badge bg-danger-subtle text-danger ms-2">Rejeitado</span>
+              {% else %}
+                <span class="badge bg-primary-subtle text-primary ms-2">Em processo</span>
+              {% endif %}
+            </div>
+            <small class="text-muted">{{ wd.timestamp.strftime("%d/%m/%Y %H:%M") }}</small>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if commissions %}
+    <div class="mb-4">
+      <h6 class="fw-bold text-success mb-2">🎁 Comissões</h6>
+      <div class="list-group shadow-sm rounded-4 overflow-hidden">
+        {% for cm in commissions %}
+          <div class="list-group-item d-flex justify-content-between align-items-center bg-light">
+            <div>
+              +<strong>{{ cm.amount }} AOA</strong>
+              <span class="text-muted small ms-1">(Nível {{ cm.level }})</span>
+            </div>
+            <small class="text-muted">{{ cm.timestamp.strftime("%d/%m/%Y %H:%M") }}</small>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if active_plans %}
+    <div class="mb-4">
+      <h6 class="fw-bold text-info mb-2">📦 Planos Ativos</h6>
+      <div class="list-group shadow-sm rounded-4 overflow-hidden">
+        {% for plano in active_plans %}
+          <div class="list-group-item d-flex justify-content-between align-items-start bg-light flex-column">
+            <div class="w-100 mb-1">
+              <strong>{{ plano.nome }}</strong>
+              <span class="badge bg-success-subtle text-success ms-2">Ativo ✅</span>
+            </div>
+            <div class="w-100 small text-muted">
+              Investimento: {{ plano.investimento }} AOA |
+              Rendimento diário: {{ plano.rendimento_diario }} AOA |
+              Desde: {{ plano.criado_em.strftime("%d/%m/%Y") }}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+  {% else %}
+    <div class="alert alert-info text-center shadow-sm rounded-4">
+      Nenhuma transação encontrada.
+    </div>
+  {% endif %}
+</div>
+
+<!-- Rodapé Tab Bar -->
+<div class="tab-bar">
+  <a href="{{ url_for('main.dashboard') }}">
+    <i class="bi bi-house-door-fill"></i> Início
+  </a>
+  <a href="{{ url_for('main.history') }}" class="active">
+    <i class="bi bi-clock-history"></i> Histórico
+  </a>
+  <a href="{{ url_for('main.referrals') }}">
+    <i class="bi bi-people-fill"></i> Equipa
+  </a>
+  <a href="{{ url_for('main.wallet') }}">
+    <i class="bi bi-wallet2"></i> Carteira
+  </a>
+</div>
+{% endblock %}

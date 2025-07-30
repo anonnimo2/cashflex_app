@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-3">
+
+  <!-- SALDO ATUAL -->
+  <div class="rounded-4 shadow-sm mb-4 p-4 text-white position-relative overflow-hidden"
+       style="background: linear-gradient(135deg, #2563eb, #1e40af);">
+    <h6 class="mb-1">Saldo Atual</h6>
+    <h2 class="fw-bold mb-0">Kz {{ current_user.balance or "5000.00" }}</h2>
+  </div>
+
+  <!-- ATALHOS RÁPIDOS -->
+  <div class="row g-3 text-center mb-4">
+    <div class="col-3">
+      <a href="{{ url_for('plan.invest') }}" class="text-decoration-none">
+        <div class="bg-white border rounded-3 py-3 shadow-sm">
+          <i class="bi bi-arrow-up-circle-fill text-primary fs-4"></i>
+          <div class="small mt-1">Depósito</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-3">
+      <a href="{{ url_for('main.withdraw') }}" class="text-decoration-none">
+        <div class="bg-white border rounded-3 py-3 shadow-sm">
+          <i class="bi bi-arrow-down-circle-fill text-danger fs-4"></i>
+          <div class="small mt-1">Sacar</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-3">
+      <a href="{{ url_for('main.referrals') }}" class="text-decoration-none">
+        <div class="bg-white border rounded-3 py-3 shadow-sm">
+          <i class="bi bi-people-fill text-success fs-4"></i>
+          <div class="small mt-1">Equipa</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-3">
+      <a href="#" class="text-decoration-none">
+        <div class="bg-white border rounded-3 py-3 shadow-sm">
+          <i class="bi bi-question-circle-fill text-info fs-4"></i>
+          <div class="small mt-1">Ajuda</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- PLANOS DE INVESTIMENTO -->
+  <div class="mb-3">
+    <h6 class="fw-bold">Planos de Investimento</h6>
+    <p class="text-muted small mb-2">Escolha um plano e comece a lucrar</p>
+  </div>
+
+  {% for plano in planos %}
+  {% set roi = ((plano.retorno_total - plano.invest) / plano.invest * 100)|round(0) %}
+  <div class="card mb-3 shadow-sm border-0 rounded-4">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <strong>{{ plano.nome }}</strong>
+        <span class="badge bg-success">+{{ roi }}% ROI</span>
+      </div>
+      <ul class="list-unstyled small mb-3">
+        <li><i class="bi bi-cash-coin me-1"></i> Investimento: <strong>{{ plano.invest }} AOA</strong></li>
+        <li><i class="bi bi-graph-up-arrow me-1"></i> Rendimento diário: <strong>{{ plano.rendimento_diario }} AOA</strong></li>
+        <li><i class="bi bi-piggy-bank me-1"></i> Retorno total: <strong>{{ plano.retorno_total }} AOA</strong></li>
+      </ul>
+      <a href="{{ url_for('plan.confirmar_plano', plano_id=plano.id, nome=plano.nome, invest=plano.invest, rendimento=plano.rendimento, retorno=plano.retorno) }}"
+         class="btn btn-primary w-100 rounded-pill">
+        Comprar Plano
+      </a>
+    </div>
+  </div>
+{% endfor %}
+
+
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <a href="{{ url_for('main.dashboard') }}" class="active">
+    <i class="bi bi-house-door-fill"></i> Início
+  </a>
+  <a href="{{ url_for('main.history') }}">
+    <i class="bi bi-clock-history"></i> Histórico
+  </a>
+  <a href="{{ url_for('main.referrals') }}">
+    <i class="bi bi-people-fill"></i> Equipa
+  </a>
+  <a href="{{ url_for('main.wallet') }}">
+    <i class="bi bi-wallet2"></i> Carteira
+  </a>
+</div>
+{% endblock %}

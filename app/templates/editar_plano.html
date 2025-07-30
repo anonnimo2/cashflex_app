@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-4 mb-5">
+  <h2 class="text-center text-primary mb-4">Editar Plano de Investimento</h2>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="nome" class="form-label">{{ form.nome.label }}</label>
+        {{ form.nome(class="form-control", id="nome") }}
+      </div>
+      <div class="col-md-6">
+        <label for="invest" class="form-label">{{ form.invest.label }}</label>
+        {{ form.invest(class="form-control", id="invest") }}
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="rendimento" class="form-label">{{ form.rendimento.label }}</label>
+        {{ form.rendimento(class="form-control", id="rendimento") }}
+      </div>
+      <div class="col-md-6">
+        <label for="retorno" class="form-label">{{ form.retorno.label }}</label>
+        {{ form.retorno(class="form-control", id="retorno") }}
+      </div>
+    </div>
+
+    <div class="form-check form-switch mb-4">
+      {{ form.ativo(class="form-check-input", id="ativo") }}
+      <label class="form-check-label" for="ativo">Plano Ativo?</label>
+    </div>
+
+    <div class="d-flex justify-content-between">
+      <a href="{{ url_for('admin.gerenciar_planos') }}" class="btn btn-secondary">Voltar</a>
+      {{ form.submit(class="btn btn-success") }}
+    </div>
+  </form>
+</div>
+
+{% endblock %}

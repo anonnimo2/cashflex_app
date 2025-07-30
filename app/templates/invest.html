@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4 mb-5">
+
+  <!-- Saldo dinâmico -->
+  <div class="p-3 mb-4 text-white rounded shadow" style="background: linear-gradient(135deg, #007bff, #0056b3);">
+    <h5 class="mb-0">Saldo Atual</h5>
+ <h2 class="fw-bold">Kz {{ current_user.balance }}</h2>
+  </div>
+
+  <!-- Título -->
+  <h5 class="text-center fw-semibold mb-2">Selecionar valor do investimento</h5>
+
+  <!-- Valores pré-definidos -->
+  <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+    {% for valor in [5000, 15000, 30000, 90000, 200000, 500000, 1000000, 1600000] %}
+      <button type="button" class="btn btn-outline-primary px-4 py-2"
+              onclick="document.getElementById('valor_input').value = '{{ valor }}'">
+        {{ valor | int }} Kz
+      </button>
+    {% endfor %}
+  </div>
+
+  <!-- Formulário -->
+  <form method="POST" enctype="multipart/form-data" class="bg-white p-3 rounded shadow-sm border">
+    {{ form.hidden_tag() }}
+
+    <!-- Valor -->
+    <div class="mb-3">
+      <label for="valor_input" class="form-label fw-semibold">Valor do Investimento (Kz)</label>
+      {{ form.amount(class="form-control", id="valor_input", placeholder="Ex: 5000") }}
+      {% if form.amount.errors %}
+        <div class="text-danger small mt-1">{{ form.amount.errors[0] }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Método de pagamento -->
+    <div class="mb-3">
+      {{ form.payment_method.label(class="form-label fw-semibold") }}
+      {{ form.payment_method(class="form-select") }}
+      {% if form.payment_method.errors %}
+        <div class="text-danger small mt-1">{{ form.payment_method.errors[0] }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Banco -->
+    <div class="mb-3">
+      {{ form.bank.label(class="form-label fw-semibold") }}
+      {{ form.bank(class="form-select") }}
+      {% if form.bank.errors %}
+        <div class="text-danger small mt-1">{{ form.bank.errors[0] }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Comprovativo -->
+    <div class="mb-3">
+      {{ form.proof.label(class="form-label fw-semibold") }}
+      {{ form.proof(class="form-control") }}
+      <small class="text-muted">Formatos aceitos: JPG, PNG ou PDF</small>
+      {% if form.proof.errors %}
+        <div class="text-danger small mt-1">{{ form.proof.errors[0] }}</div>
+      {% endif %}
+    </div>
+
+    <!-- Botão -->
+    <div class="d-grid">
+      {{ form.submit(class="btn btn-primary btn-lg rounded-pill") }}
+    </div>
+  </form>
+
+  <!-- Dicas -->
+  <div class="mt-4">
+    <h6 class="fw-semibold"><i class="bi bi-info-circle"></i> Dicas úteis</h6>
+    <ol class="small text-muted mt-2">
+      <li><strong class="text-danger">Valor mínimo de investimento: 5000 Kz.</strong></li>
+      <li>O saldo é creditado após a confirmação do comprovativo.</li>
+      <li>Se houver erro no canal de pagamento, troque o método selecionado.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <a href="{{ url_for('main.dashboard') }}">
+    <i class="bi bi-house-door-fill"></i> Início
+  </a>
+  <a href="{{ url_for('main.history') }}">
+    <i class="bi bi-clock-history"></i> Histórico
+  </a>
+  <a href="{{ url_for('main.referrals') }}">
+    <i class="bi bi-people-fill"></i> Equipa
+  </a>
+  <a href="{{ url_for('main.wallet') }}">
+    <i class="bi bi-wallet2"></i> Carteira
+  </a>
+</div>
+
+{% endblock %}

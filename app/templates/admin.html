@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container mt-3 mb-5">
+  <h2 class="text-center text-danger mb-4">Painel Administrativo</h2>
+
+  <!-- Estatísticas -->
+  <div class="row text-center mb-4">
+    <div class="col-6 col-md-3 mb-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Usuários</h6>
+          <h4 class="fw-bold">{{ total_users }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 mb-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Investido</h6>
+          <h4 class="fw-bold">{{ total_investido }} AOA</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 mb-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Sacado</h6>
+          <h4 class="fw-bold">{{ total_sacado }} AOA</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3 mb-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Em Circulação</h6>
+          <h4 class="fw-bold">{{ saldo_total }} AOA</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs" id="adminTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link active" data-bs-toggle="tab" href="#users" role="tab">Usuários</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" data-bs-toggle="tab" href="#withdrawals" role="tab">Saques</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" data-bs-toggle="tab" href="#investments" role="tab">Investimentos Pendentes</a>
+    </li>
+    <li class="nav-item" role="presentation">
+  <a class="nav-link" data-bs-toggle="tab" href="#plans" role="tab">Planos</a>
+</li>
+
+  </ul>
+
+  <div class="tab-content mt-3">
+
+    <!-- Aba: Usuários -->
+    <div class="tab-pane fade show active" id="users" role="tabpanel">
+      <form method="GET" class="mb-3 d-flex" role="search">
+        <input type="text" name="search" class="form-control me-2" placeholder="Buscar por telefone" value="{{ request.args.get('search', '') }}">
+        <button class="btn btn-outline-primary" type="submit">Buscar</button>
+      </form>
+      <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th><th>Telefone</th><th>Saldo</th><th>Código</th>
+              <th>Banco</th><th>IBAN</th><th>Titular</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>{{ u.id }}</td>
+              <td>{{ u.phone }}</td>
+              <td>{{ u.balance }}</td>
+              <td>{{ u.invite_code }}</td>
+              <td>{{ u.bank or 'N/A' }}</td>
+              <td>{{ u.iban or 'N/A' }}</td>
+              <td>{{ u.iban_owner or 'N/A' }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aba: Saques -->
+    <div class="tab-pane fade" id="withdrawals" role="tabpanel">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th><th>Usuário</th><th>Valor</th><th>Status</th>
+              <th>Banco</th><th>IBAN</th><th>Titular</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for w in withdrawals %}
+            <tr>
+              <td>{{ w.id }}</td>
+              <td>{{ w.user_id }}</td>
+              <td>{{ w.amount }} AOA</td>
+              <td>{{ w.status }}</td>
+              <td>{{ w.user.bank or 'N/A' }}</td>
+              <td>{{ w.user.iban or 'N/A' }}</td>
+              <td>{{ w.user.iban_owner or 'N/A' }}</td>
+              <td>
+                {% if w.status == "Pendente" %}
+                  <a href="{{ url_for('admin.approve_withdraw', id=w.id) }}" class="btn btn-success btn-sm">Aprovar</a>
+                  <a href="{{ url_for('admin.reject_withdraw', id=w.id) }}" class="btn btn-danger btn-sm">Rejeitar</a>
+                {% else %}
+                  <span class="text-muted">--</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Aba: Investimentos Pendentes -->
+    <div class="tab-pane fade" id="investments" role="tabpanel">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th><th>Usuário</th><th>Valor</th><th>Comprovativo</th><th>Status</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in investments %}
+              {% if i.status == 'Pendente' and i.amount >= 5000 %}
+              <tr>
+                <td>{{ i.id }}</td>
+                <td>{{ i.user_id }}</td>
+                <td>{{ i.amount }} AOA</td>
+                <td>
+                  {% if i.proof %}
+                    <a href="{{ url_for('static', filename='proofs/' ~ i.proof) }}" target="_blank">Ver</a>
+                  {% else %}
+                    <span class="text-muted">N/A</span>
+                  {% endif %}
+                </td>
+                <td>{{ i.status }}</td>
+                <td>
+                  <a href="{{ url_for('admin.approve_investment', id=i.id) }}" class="btn btn-success btn-sm">Aprovar</a>
+                  <a href="{{ url_for('admin.reject_investment', id=i.id) }}" class="btn btn-danger btn-sm">Rejeitar</a>
+                </td>
+              </tr>
+              {% endif %}
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+<div class="tab-pane fade" id="plans" role="tabpanel">
+  <h5>Cadastrar Novo Plano</h5>
+  <form method="POST" action="{{ url_for('admin.gerenciar_planos') }}">
+    {{ form.hidden_tag() }}
+    <div class="row">
+      <div class="col-md-3">{{ form.nome.label }} {{ form.nome(class="form-control") }}</div>
+      <div class="col-md-2">{{ form.invest.label }} {{ form.invest(class="form-control") }}</div>
+      <div class="col-md-2">{{ form.rendimento.label }} {{ form.rendimento(class="form-control") }}</div>
+      <div class="col-md-2">{{ form.retorno.label }} {{ form.retorno(class="form-control") }}</div>
+      <div class="col-md-2">{{ form.ativo.label }} {{ form.ativo() }}</div>
+      <div class="col-md-1 mt-4">{{ form.submit(class="btn btn-success btn-sm") }}</div>
+    </div>
+  </form>
+
+  <hr>
+  <h5 class="mt-3">Planos Existentes</h5>
+  <table class="table table-sm table-bordered mt-2">
+    <thead class="table-light">
+      <tr>
+        <th>ID</th><th>Nome</th><th>Invest</th><th>Rendimento</th><th>Retorno</th><th>Status</th><th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in planos %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.nome }}</td>
+        <td>{{ p.invest }}</td>
+        <td>{{ p.rendimento }}</td>
+        <td>{{ p.retorno }}</td>
+        <td>{{ 'Ativo' if p.ativo else 'Inativo' }}</td>
+        <td>
+          <a href="{{ url_for('admin.editar_plano', id=p.id) }}" class="btn btn-primary btn-sm">Editar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+
+  </div>
+
+
+
+</div>
+
+
+
+{% endblock %}

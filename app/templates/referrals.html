@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4 mb-5">
+
+  <!-- Cabeçalho -->
+  <div class="text-center mb-4">
+    <h4 class="fw-bold text-primary">Minha Equipa</h4>
+    <p class="text-muted small">Convide amigos e ganhe comissões em 3 níveis!</p>
+  </div>
+
+  <!-- Link e Código de Convite -->
+  <div class="mb-4 p-3 bg-light rounded shadow-sm">
+    <p class="mb-1 small fw-semibold">Seu link de convite:</p>
+    <div class="input-group">
+      <input type="text" id="invite-link" class="form-control form-control-sm" readonly
+             value="{{ url_for('main.register', ref=current_user.invite_code, _external=True) }}">
+      <button class="btn btn-outline-primary btn-sm" onclick="copiarLink()">Copiar</button>
+    </div>
+    <p class="mt-2 small">Código de convite: <strong>{{ current_user.invite_code }}</strong></p>
+  </div>
+
+  <!-- Lista por Níveis -->
+  <div class="accordion" id="accordionReferrals">
+    <!-- Nível 1 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingOne">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#nivel1" aria-expanded="true">
+          <i class="bi bi-1-circle me-2"></i> Nível 1 <span class="ms-auto text-muted small">25%</span>
+        </button>
+      </h2>
+      <div id="nivel1" class="accordion-collapse collapse show" data-bs-parent="#accordionReferrals">
+        <div class="accordion-body">
+          {% if nivel1 %}
+            <ul class="list-group">
+              {% for r in nivel1 %}
+                <li class="list-group-item">ID {{ r.id }} — {{ r.phone }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="text-muted">Nenhum convidado no nível 1.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Nível 2 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingTwo">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nivel2">
+          <i class="bi bi-2-circle me-2"></i> Nível 2 <span class="ms-auto text-muted small">3%</span>
+        </button>
+      </h2>
+      <div id="nivel2" class="accordion-collapse collapse" data-bs-parent="#accordionReferrals">
+        <div class="accordion-body">
+          {% if nivel2 %}
+            <ul class="list-group">
+              {% for r in nivel2 %}
+                <li class="list-group-item">ID {{ r.id }} — {{ r.phone }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="text-muted">Nenhum convidado no nível 2.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Nível 3 -->
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingThree">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nivel3">
+          <i class="bi bi-3-circle me-2"></i> Nível 3 <span class="ms-auto text-muted small">1%</span>
+        </button>
+      </h2>
+      <div id="nivel3" class="accordion-collapse collapse" data-bs-parent="#accordionReferrals">
+        <div class="accordion-body">
+          {% if nivel3 %}
+            <ul class="list-group">
+              {% for r in nivel3 %}
+                <li class="list-group-item">ID {{ r.id }} — {{ r.phone }}</li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="text-muted">Nenhum convidado no nível 3.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar">
+  <a href="{{ url_for('main.dashboard') }}">
+    <i class="bi bi-house-door-fill"></i> Início
+  </a>
+  <a href="{{ url_for('main.history') }}">
+    <i class="bi bi-clock-history"></i> Histórico
+  </a>
+  <a href="{{ url_for('main.referrals') }}" class="active">
+    <i class="bi bi-people-fill"></i> Equipa
+  </a>
+  <a href="{{ url_for('main.wallet') }}">
+    <i class="bi bi-wallet2"></i> Carteira
+  </a>
+</div>
+
+<!-- Script para copiar link -->
+<script>
+  function copiarLink() {
+    const link = document.getElementById('invite-link');
+    link.select();
+    link.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+
+    const btn = event.target;
+    btn.innerText = "Copiado!";
+    setTimeout(() => btn.innerText = "Copiar", 1500);
+  }
+</script>
+{% endblock %}
