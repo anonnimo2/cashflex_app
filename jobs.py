@@ -1,8 +1,8 @@
 # jobs.py
 
 from datetime import datetime, timedelta
-from cashflex_app.app import db
-from cashflex_app.app.models import UserPlan, User
+from app import db
+from app.models import UserPlan, User
 
 def distribuir_rendimentos():
     planos = UserPlan.query.filter_by(ativo=True).all()

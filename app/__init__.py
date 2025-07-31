@@ -4,7 +4,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
-from cashflex_app.config import Config
+from config import Config
 from datetime import datetime
 import os
 
@@ -32,9 +32,9 @@ def create_app():
     csrf.init_app(app)
 
     # Blueprints
-    from cashflex_app.app.routes.main import main
-    from cashflex_app.app.routes.admin import admin
-    from cashflex_app.app.routes.plan import plan
+    from app.routes.main import main
+    from app.routes.admin import admin
+    from app.routes.plan import plan
 
     app.register_blueprint(main)
     app.register_blueprint(admin, url_prefix='/admin')

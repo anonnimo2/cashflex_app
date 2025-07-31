@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
-from ..models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan
-from .. import db
+from app.models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan
+from app import db
 from datetime import datetime
-from ..forms import PlanForm
+from app.forms import PlanForm
 
 
 
