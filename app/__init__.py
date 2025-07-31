@@ -49,7 +49,7 @@ def create_app():
     # Carregador de usuários
     @login_manager.user_loader
     def load_user(user_id):
-        from cashflex_app.app.models import User
+        from app.models import User
         return User.query.get(int(user_id))
 
     return app
