@@ -1,6 +1,6 @@
-from .app import create_app
+from app import create_app
 from apscheduler.schedulers.background import BackgroundScheduler
-from .jobs import distribuir_rendimentos
+from jobs import distribuir_rendimentos
 
 
 # Cria o app
