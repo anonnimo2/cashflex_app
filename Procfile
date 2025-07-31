@@ -1,1 +1,1 @@
-web: gunicorn cashflex_app:app
+web: gunicorn run:app
