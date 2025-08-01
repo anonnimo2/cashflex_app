@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
 from flask_login import login_required, current_user
-from cashflex_app.app.models import Investment, UserPlan, Commission, User, InvestmentPlan
-from cashflex_app.app.forms import InvestForm
-from cashflex_app.app import db
+from app.models import Investment, UserPlan, Commission, User, InvestmentPlan
+from app.forms import InvestForm
+from app import db
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
