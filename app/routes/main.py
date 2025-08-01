@@ -1,9 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
-from cashflex_app.app import db
-from cashflex_app.app.forms import LoginForm, RegisterForm, WithdrawalForm, ProfileForm
-from cashflex_app.app.models import User, Withdrawal,generate_unique_code, UserPlan, Investment, Commission, InvestmentPlan
+from app import db
+from app.forms import LoginForm, RegisterForm, WithdrawalForm, ProfileForm
+from app.models import User, Withdrawal,generate_unique_code, UserPlan, Investment, Commission, InvestmentPlan
 
 main = Blueprint('main', __name__)
 
