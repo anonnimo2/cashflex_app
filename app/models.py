@@ -135,8 +135,12 @@ class InvestmentPlan(db.Model):
         retorno_total = db.Column(db.Float, nullable=False)
         ativo = db.Column(db.Boolean, default=True)
         valor = db.Column(db.Float, nullable=False)
+        valor_minimo = db.Column(db.Float, nullable=False, default=5000)
+
+
         def __repr__(self):
             return f'<Plano {self.nome}>'
+
 
 
 

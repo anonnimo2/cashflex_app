@@ -37,16 +37,6 @@
       {% endif %}
     </div>
 
-    <!-- Multicaixa Express -->
-<div class="mb-3">
-  {{ form.multicaixa.label(class="form-label") }}
-  {{ form.multicaixa(class="form-control", placeholder="Ex: 923456789") }}
-  {% if form.multicaixa.errors %}
-    <div class="text-danger small mt-1">{{ form.multicaixa.errors[0] }}</div>
-  {% endif %}
-</div>
-
-
     <!-- Botão -->
     <div class="d-grid">
       <button type="submit" class="btn btn-primary w-100 py-2">Salvar Alterações</button>
