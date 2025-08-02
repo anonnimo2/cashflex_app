@@ -8,6 +8,9 @@ on:
 jobs:
   run-cron:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: cashflex_app  # 👉 Certifica-se de que tudo roda no diretório correto
 
     steps:
       - name: Checkout do código
@@ -34,3 +37,4 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python cron.py
+
