@@ -9,7 +9,7 @@ def distribuir_rendimentos():
     count = 0
 
     for plano in planos:
-        if plano.ultima_distribuicao is None or (agora - plano.ultima_distribuicao) >= timedelta(seconds=10):
+        if plano.ultima_distribuicao is None or (agora - plano.ultima_distribuicao) >= timedelta(hours=20):
             user = User.query.get(plano.user_id)
             if not user:
                 continue
