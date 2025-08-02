@@ -22,6 +22,14 @@ jobs:
         run: |
           pip install -r requirements.txt
 
+      - name: Definir FLASK_APP
+        run: echo "FLASK_APP=app:create_app()" >> $GITHUB_ENV
+
+      - name: Executar migrações do banco de dados
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: flask db upgrade
+
       - name: Executar cron.py
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
