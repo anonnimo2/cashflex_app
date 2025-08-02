@@ -2,8 +2,8 @@ name: Rendimento Diário
 
 on:
   schedule:
-    - cron: "0 0 * * *"  # Roda todos os dias às 00h UTC
-  workflow_dispatch:       # Permite rodar manualmente se quiser
+    - cron: "0 0 * * *"  # Roda todos os dias à meia-noite UTC
+  workflow_dispatch:       # Permite execução manual
 
 jobs:
   run-cron:
@@ -16,7 +16,7 @@ jobs:
       - name: Configurar Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"  # Ou a versão que você usa
+          python-version: "3.10"
 
       - name: Instalar dependências
         run: |
@@ -27,14 +27,3 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: python cron.py
 
-  jobs:
-
-  jobs:
-
-  jobs:
-
-  jobs:
-
-  jobs:
-
-  jobs:
