@@ -25,5 +25,4 @@ jobs:
       - name: Executar cron.py
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: python cron.yml
-
+        run: python cron.py
