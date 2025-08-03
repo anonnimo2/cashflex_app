@@ -8,9 +8,6 @@ from config import Config
 from datetime import datetime
 import os
 
-
-
-# Extensões
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
@@ -31,34 +28,29 @@ def create_app():
     mail.init_app(app)
     csrf.init_app(app)
 
-    # Blueprints
+    # Registrar blueprints
     from app.routes.main import main
     from app.routes.admin import admin
     from app.routes.plan import plan
     from app.routes.utils.task import tasks_bp
-
 
     app.register_blueprint(main)
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(plan)
     app.register_blueprint(tasks_bp)
 
-
     # Config pasta de upload
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'proofs')
-    
+
     # Variável global
     @app.context_processor
     def inject_current_year():
         return {'current_year': datetime.now().year}
 
-    # Login loader
+    # Carregamento de usuário
     @login_manager.user_loader
     def load_user(user_id):
         from app.models import User
         return User.query.get(int(user_id))
-
-        __all__ = ['create_app']
-
 
     return app
