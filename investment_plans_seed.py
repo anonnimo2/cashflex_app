@@ -1,5 +1,5 @@
-from cashflex_app.app import create_app, db
-from cashflex_app.app.models import InvestmentPlan
+from cashflex import create_app, db
+from cashflex.models import InvestmentPlan
 
 app = create_app()
 

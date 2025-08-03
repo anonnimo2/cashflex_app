@@ -8,7 +8,7 @@ def executar_creditos(token):
     if token != TOKEN_ESPERADO:
         abort(403)
 
-    from cashflex_app.jobs import distribuir_rendimentos
+    from jobs import distribuir_rendimentos
     distribuir_rendimentos()
     return "Rendimentos distribuídos com sucesso."
 

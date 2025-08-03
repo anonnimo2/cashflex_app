@@ -29,10 +29,10 @@ def create_app():
     csrf.init_app(app)
 
     # Registrar blueprints
-    from app.routes.main import main
-    from app.routes.admin import admin
-    from app.routes.plan import plan
-    from app.routes.utils.task import tasks_bp
+    from cashflex.routes.main import main
+    from cashflex.routes.admin import admin
+    from cashflex.routes.plan import plan
+    from cashflex.routes.utils.task import tasks_bp
 
     app.register_blueprint(main)
     app.register_blueprint(admin, url_prefix='/admin')
