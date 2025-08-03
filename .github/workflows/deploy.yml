@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: cashflex_app  # 👉 Certifica-se de que tudo roda no diretório correto
 
     steps:
       - name: Checkout do código
