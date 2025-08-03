@@ -35,12 +35,13 @@ def create_app():
     from app.routes.main import main
     from app.routes.admin import admin
     from app.routes.plan import plan
-
+    from app.routes.utils import tasks
     app.register_blueprint(main)
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(plan)
+    register_blueprint(tasks)
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'proofs')
-
+    
     # Variável global
     @app.context_processor
     def inject_current_year():
