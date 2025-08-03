@@ -6,6 +6,7 @@ from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
 from app.config import Config
 from datetime import datetime
+from app import create_app
 import os
 
 db = SQLAlchemy()
