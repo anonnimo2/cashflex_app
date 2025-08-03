@@ -24,7 +24,7 @@ def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Inicializar extensões com app
+    # Inicializar extensões
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
@@ -36,10 +36,13 @@ def create_app():
     from app.routes.admin import admin
     from app.routes.plan import plan
     from app.routes.utils import tasks
+
     app.register_blueprint(main)
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(plan)
-    register_blueprint(tasks)
+    app.register_blueprint(tasks)  # <-- CORRIGIDO AQUI
+
+    # Config pasta de upload
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'proofs')
     
     # Variável global
@@ -47,7 +50,7 @@ def create_app():
     def inject_current_year():
         return {'current_year': datetime.now().year}
 
-    # Carregador de usuários
+    # Login loader
     @login_manager.user_loader
     def load_user(user_id):
         from app.models import User
