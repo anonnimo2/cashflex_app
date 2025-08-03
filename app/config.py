@@ -6,12 +6,18 @@ class Config:
     # Segurança
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'sua-chave-secreta-aqui'
 
-    # Banco de dados (usando SQLite na pasta instance/)
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'instance', 'cashflex.db')
+    # Banco de dados
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    if DATABASE_URL:
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    else:
+        SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:iIGkeYGNrtiuAaMtWAoMPNSeFZpsEUFV@postgres.railway.internal:5432/railway'
+
+    print(f"[INFO] Banco de dados usado: {SQLALCHEMY_DATABASE_URI}")
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # E-mail (ajuste conforme seu provedor)
+    # E-mail
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
