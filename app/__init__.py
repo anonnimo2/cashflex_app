@@ -35,12 +35,14 @@ def create_app():
     from app.routes.main import main
     from app.routes.admin import admin
     from app.routes.plan import plan
-    from app.routes.utils import tasks
+    from app.routes.utils.task import tasks_bp
+
 
     app.register_blueprint(main)
     app.register_blueprint(admin, url_prefix='/admin')
     app.register_blueprint(plan)
-    app.register_blueprint(tasks)  # <-- CORRIGIDO AQUI
+    app.register_blueprint(tasks_bp)
+
 
     # Config pasta de upload
     app.config['UPLOAD_FOLDER'] = os.path.join(app.root_path, 'static', 'proofs')
@@ -55,5 +57,8 @@ def create_app():
     def load_user(user_id):
         from app.models import User
         return User.query.get(int(user_id))
+
+        __all__ = ['create_app']
+
 
     return app
