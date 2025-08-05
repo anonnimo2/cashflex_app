@@ -125,7 +125,7 @@ class InvestmentPlan(db.Model):
     min_amount = db.Column(db.Float, nullable=False)
     daily_return_percent = db.Column(db.Float, nullable=False)
     duration_days = db.Column(db.Integer, nullable=False)
-    is_active = db.Column(db.Boolean, default=True)
+    ativo = db.Column(db.Boolean, default=True)
 
     def __repr__(self):
         return f'<Plan {self.name}>' 
