@@ -1,11 +1,13 @@
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
 from flask_wtf.csrf import CSRFProtect
-from .config import Config
 from datetime import datetime
+from cashflex.config import Config
+
 import os
 
 db = SQLAlchemy()
@@ -50,7 +52,7 @@ def create_app():
     # Carregamento de usuário
     @login_manager.user_loader
     def load_user(user_id):
-        from app.models import User
+        from cashflex.models import User
         return User.query.get(int(user_id))
 
     return app

@@ -2,7 +2,7 @@
 import random
 import string
 from datetime import datetime
-from app import db
+from cashflex import db  # usa o db criado em __init__.py
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -20,7 +20,6 @@ class User(db.Model, UserMixin):
     bank = db.Column(db.String(50), nullable=True)
     iban = db.Column(db.String(25))  # IBAN angolano tem 23-25 caracteres
     iban_owner = db.Column(db.String(100))  # Nome do titular da conta
-
 
     # Relacionamentos
     investments = db.relationship('Investment', backref='user', lazy=True)
@@ -73,7 +72,6 @@ class UserPlan(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-
     nome = db.Column(db.String(50), nullable=False)
     investimento = db.Column(db.Float, nullable=False)
     rendimento_diario = db.Column(db.Float, nullable=False)  # 10% do investimento
@@ -81,12 +79,9 @@ class UserPlan(db.Model):
 
     data_inicio = db.Column(db.DateTime, default=datetime.utcnow)
     criado_em = db.Column(db.DateTime, default=datetime.utcnow)
-    ultima_distribuicao = db.Column(db.DateTime, default=datetime.utcnow)
     ultimo_credito = db.Column(db.DateTime)
     ativo = db.Column(db.Boolean, default=True)
     dias_pagamentos = db.Column(db.Integer, default=0)
-    recebido = db.Column(db.Float, default=0.0, nullable=False)
-
 
     @property
     def profit(self):
@@ -122,34 +117,18 @@ class Withdrawal(db.Model):
     def __repr__(self):
         return f"<Saque {self.amount} de {self.user_id}>"
 
-
-
-
-# ------------------- MODELO: PLANO DISPONÍVEL NO SISTEMA -------------------
-
-class InvestmentPlan(db.Model):
-        id = db.Column(db.Integer, primary_key=True)
-        nome = db.Column(db.String(50), nullable=False, unique=True)
-        invest = db.Column(db.Float, nullable=False)
-        rendimento_diario = db.Column(db.Float, nullable=False)
-        retorno_total = db.Column(db.Float, nullable=False)
-        ativo = db.Column(db.Boolean, default=True)
-        valor = db.Column(db.Float, nullable=False)
-        valor_minimo = db.Column(db.Float, nullable=False, default=5000)
-
-
-        def __repr__(self):
-            return f'<Plano {self.nome}>'
-
-
-
-
-
-
 # ------------------- MODELO: COMISSÃO -------------------
 
-    
+class InvestmentPlan(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False)
+    min_amount = db.Column(db.Float, nullable=False)
+    daily_return_percent = db.Column(db.Float, nullable=False)
+    duration_days = db.Column(db.Integer, nullable=False)
+    is_active = db.Column(db.Boolean, default=True)
 
+    def __repr__(self):
+        return f'<Plan {self.name}>' 
 
 class Commission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -189,9 +168,8 @@ def distribuir_comissao(investimento):
                 level=nivel + 1,
                 amount=valor_comissao
             )
+            
             db.session.add(com)
             db.session.add(padrinho)
-            ref_code = padrinho.referred_by
-
-
-    db.session.commit()
+            ref_code = padrinho
+           

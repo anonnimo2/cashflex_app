@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-from app import create_app, db
-from app.models import UserPlan, User
+from cashflex import create_app, db
+from cashflex.models import UserPlan, User
 
 # Cria o app
 app = create_app()
