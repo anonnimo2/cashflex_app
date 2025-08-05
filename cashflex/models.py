@@ -121,7 +121,7 @@ class Withdrawal(db.Model):
 
 class InvestmentPlan(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
+    nome = db.Column(db.String(50), nullable=False)
     valor = db.Column(db.Float, nullable=False)
     daily_return_percent = db.Column(db.Float, nullable=False)
     duration_days = db.Column(db.Integer, nullable=False)
