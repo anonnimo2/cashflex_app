@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from cashflexapp import create_app, db
+from cashflex import create_app, db
 from cashflex.models import UserPlan
 
 app = create_app()
