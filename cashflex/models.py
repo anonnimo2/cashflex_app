@@ -119,16 +119,28 @@ class Withdrawal(db.Model):
 
 # ------------------- MODELO: COMISSÃO -------------------
 
+
+
 class InvestmentPlan(db.Model):
+    __tablename__ = 'investment_plan'
+
     id = db.Column(db.Integer, primary_key=True)
-    nome = db.Column(db.String(50), nullable=False)
-    valor = db.Column(db.Float, nullable=False)
-    daily_return_percent = db.Column(db.Float, nullable=False)
-    duration_days = db.Column(db.Integer, nullable=False)
-    ativo = db.Column(db.Boolean, default=True)
+    nome = db.Column(db.String(50), nullable=False)                # Nome do plano (ex: VIP-1)
+    valor = db.Column(db.Float, nullable=False)                    # Novo campo "valor"
+    invest = db.Column(db.Float, nullable=False)                   # Valor de investimento inicial
+    rendimento_diario = db.Column(db.Float, nullable=False)        # Lucro diário
+    retorno_total = db.Column(db.Float, nullable=False)            # Valor total a receber
 
     def __repr__(self):
-        return f'<Plan {self.name}>' 
+        return f"<InvestmentPlan {self.nome}>"
+
+    @property
+    def rendimento(self):
+        return self.rendimento_diario
+
+    @property
+    def retorno(self):
+        return self.retorno_total
 
 class Commission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
