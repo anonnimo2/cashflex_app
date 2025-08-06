@@ -9,7 +9,7 @@
   </div>
 
   <!-- Link e Código de Convite -->
-  <div class="mb-4 p-3 bg-light rounded shadow-sm">
+  <div class="mb-4 p-3 bg-light rounded shadow-sm border">
     <p class="mb-1 small fw-semibold">Seu link de convite:</p>
     <div class="input-group">
       <input type="text" id="invite-link" class="form-control form-control-sm" readonly
@@ -19,75 +19,97 @@
     <p class="mt-2 small">Código de convite: <strong>{{ current_user.invite_code }}</strong></p>
   </div>
 
-  <!-- Lista por Níveis -->
-  <div class="accordion" id="accordionReferrals">
+  <!-- Estatísticas dos Níveis -->
+  <div class="row g-3">
+    
     <!-- Nível 1 -->
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingOne">
-        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#nivel1" aria-expanded="true">
-          <i class="bi bi-1-circle me-2"></i> Nível 1 <span class="ms-auto text-muted small">25%</span>
-        </button>
-      </h2>
-      <div id="nivel1" class="accordion-collapse collapse show" data-bs-parent="#accordionReferrals">
-        <div class="accordion-body">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0 text-warning"><i class="bi bi-1-circle me-2"></i> Equipe de Nível 1</h6>
+            <span class="badge bg-dark">25%</span>
+          </div>
+          <div class="row text-center text-muted small mb-3">
+           
+            <div class="col">Comissão<br><strong>Kz0.00</strong></div>
+            <div class="col">Tamanho<br><strong>{{ nivel1|length }}</strong></div>
+          </div>
           {% if nivel1 %}
-            <ul class="list-group">
+            <ul class="list-group list-group-sm">
               {% for r in nivel1 %}
-                <li class="list-group-item">ID {{ r.id }} — {{ r.phone }}</li>
+                <li class="list-group-item small">ID {{ r.id }} — {{ r.phone }}</li>
               {% endfor %}
             </ul>
           {% else %}
-            <div class="text-muted">Nenhum convidado no nível 1.</div>
+            <div class="text-muted small">Nenhum convidado no nível 1.</div>
           {% endif %}
         </div>
       </div>
     </div>
 
     <!-- Nível 2 -->
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingTwo">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nivel2">
-          <i class="bi bi-2-circle me-2"></i> Nível 2 <span class="ms-auto text-muted small">3%</span>
-        </button>
-      </h2>
-      <div id="nivel2" class="accordion-collapse collapse" data-bs-parent="#accordionReferrals">
-        <div class="accordion-body">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0 text-secondary"><i class="bi bi-2-circle me-2"></i> Equipe de Nível 2</h6>
+            <span class="badge bg-dark">3%</span>
+          </div>
+          <div class="row text-center text-muted small mb-3">
+            <div class="col">Comissão<br><strong>Kz0.00</strong></div>
+            <div class="col">Tamanho<br><strong>{{ nivel2|length }}</strong></div>
+          </div>
           {% if nivel2 %}
-            <ul class="list-group">
+            <ul class="list-group list-group-sm">
               {% for r in nivel2 %}
-                <li class="list-group-item">ID {{ r.id }} — {{ r.phone }}</li>
+                <li class="list-group-item small">ID {{ r.id }} — {{ r.phone }}</li>
               {% endfor %}
             </ul>
           {% else %}
-            <div class="text-muted">Nenhum convidado no nível 2.</div>
+            <div class="text-muted small">Nenhum convidado no nível 2.</div>
           {% endif %}
         </div>
       </div>
     </div>
 
     <!-- Nível 3 -->
-    <div class="accordion-item">
-      <h2 class="accordion-header" id="headingThree">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#nivel3">
-          <i class="bi bi-3-circle me-2"></i> Nível 3 <span class="ms-auto text-muted small">1%</span>
-        </button>
-      </h2>
-      <div id="nivel3" class="accordion-collapse collapse" data-bs-parent="#accordionReferrals">
-        <div class="accordion-body">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0 text-info"><i class="bi bi-3-circle me-2"></i> Equipe de Nível 3</h6>
+            <span class="badge bg-dark">2%</span>
+          </div>
+          <div class="row text-center text-muted small mb-3">
+            <div class="col">Comissão<br><strong>Kz0.00</strong></div>
+            <div class="col">Tamanho<br><strong>{{ nivel3|length }}</strong></div>
+          </div>
           {% if nivel3 %}
-            <ul class="list-group">
+            <ul class="list-group list-group-sm">
               {% for r in nivel3 %}
-                <li class="list-group-item">ID {{ r.id }} — {{ r.phone }}</li>
+                <li class="list-group-item small">ID {{ r.id }} — {{ r.phone }}</li>
               {% endfor %}
             </ul>
           {% else %}
-            <div class="text-muted">Nenhum convidado no nível 3.</div>
+            <div class="text-muted small">Nenhum convidado no nível 3.</div>
           {% endif %}
         </div>
       </div>
     </div>
+
   </div>
 
+  <!-- Benefício -->
+  <div class="alert alert-secondary mt-4 small">
+    <strong>Por que criar uma equipe?</strong><br>
+    Convide amigos com seu link ou código. Você receberá comissão sobre os investimentos deles:
+    <ul class="mb-0">
+      <li>Nível 1: 25%</li>
+      <li>Nível 2: 3%</li>
+      <li>Nível 3: 1%</li>
+    </ul>
+  </div>
 </div>
 
 <!-- Tab Bar -->
