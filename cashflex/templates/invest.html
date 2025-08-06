@@ -15,18 +15,13 @@
 <!-- Valores pré-definidos -->
 <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
   {% for plano in planos %}
-      {{ plano.valor | int }} Kz
-  {% endfor %}
-</div>
-
-
-
-      <button type="button" class="btn btn-outline-primary px-4 py-2"
+  <button type="button" class="btn btn-outline-primary px-4 py-2"
               onclick="document.getElementById('valor_input').value = '{{ valor }}'">
         {{ valor | int }} Kz
       </button>
-      
-  </div>
+      {{ plano.valor | int }} Kz
+  {% endfor %}
+  
 
   <!-- IBANs para transferência -->
 <div class="alert alert-info shadow-sm rounded">
