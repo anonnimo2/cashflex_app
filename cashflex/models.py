@@ -120,7 +120,6 @@ class Withdrawal(db.Model):
 # ------------------- MODELO: COMISSÃO -------------------
 
 
-
 class InvestmentPlan(db.Model):
     __tablename__ = 'investment_plan'
 
@@ -130,6 +129,7 @@ class InvestmentPlan(db.Model):
     invest = db.Column(db.Float, nullable=False)                   # Valor de investimento inicial
     rendimento_diario = db.Column(db.Float, nullable=False)        # Lucro diário
     retorno_total = db.Column(db.Float, nullable=False)            # Valor total a receber
+    ativo = db.Column(db.Boolean, nullable=False, default=True) 
 
     def __repr__(self):
         return f"<InvestmentPlan {self.nome}>"
