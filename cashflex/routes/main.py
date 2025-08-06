@@ -124,15 +124,27 @@ def withdraw():
 @main.route('/referrals')
 @login_required
 def referrals():
+    # Referidos por nível
     nivel1 = current_user.get_referrals(level=1)
     nivel2 = current_user.get_referrals(level=2)
     nivel3 = current_user.get_referrals(level=3)
+
+    # Comissões por nível
+    nivel1_total = db.session.query(db.func.sum(Commission.amount)).filter_by(user_id=current_user.id, level=1).scalar() or 0.0
+    nivel2_total = db.session.query(db.func.sum(Commission.amount)).filter_by(user_id=current_user.id, level=2).scalar() or 0.0
+    nivel3_total = db.session.query(db.func.sum(Commission.amount)).filter_by(user_id=current_user.id, level=3).scalar() or 0.0
+
+    comissao_total = nivel1_total + nivel2_total + nivel3_total
 
     return render_template(
         'referrals.html',
         nivel1=nivel1,
         nivel2=nivel2,
-        nivel3=nivel3
+        nivel3=nivel3,
+        nivel1_total=nivel1_total,
+        nivel2_total=nivel2_total,
+        nivel3_total=nivel3_total,
+        comissao_total=comissao_total
     )
 
 @main.route('/wallet')
