@@ -130,7 +130,7 @@ class InvestmentPlan(db.Model):
     rendimento_diario = db.Column(db.Float, nullable=False)        # Lucro diário
     retorno_total = db.Column(db.Float, nullable=False)            # Valor total a receber
     ativo = db.Column(db.Boolean, nullable=False, default=True) 
-
+    valor_minimo = db.Column(db.Float, nullable=False)
     def __repr__(self):
         return f"<InvestmentPlan {self.nome}>"
 
