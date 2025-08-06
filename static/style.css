@@ -1,1 +1,10 @@
 body { background: #f8f9fa; }
+
+.saldo-banner {
+  background-image: url("/static/img/img.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  position: relative;
+  color: white;
+}
