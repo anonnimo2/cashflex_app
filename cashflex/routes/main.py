@@ -169,7 +169,6 @@ def profile():
         current_user.bank = form.bank.data
         current_user.iban = form.iban.data
         current_user.iban_owner = form.iban_owner.data
-        current_user.multicaixa = form.multicaixa.data
         db.session.commit()
         flash('Informações atualizadas com sucesso!', 'success')
         return redirect(url_for('main.withdraw'))
