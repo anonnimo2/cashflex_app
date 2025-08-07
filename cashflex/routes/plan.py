@@ -38,9 +38,11 @@ def invest():
             if not allowed_file(filename):
                 flash('Formato de arquivo não permitido. Envie JPG, PNG ou PDF.', 'danger')
                 return redirect(url_for('plan.invest'))
+        
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        file.save(filepath)-*
 
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            file.save(filepath)
 
         # 🕓 Cria investimento pendente
         investment = Investment(
