@@ -165,7 +165,7 @@
                 <td>{{ i.amount }} AOA</td>
                 <td>
                   {% if i.proof %}
-                    <a href="{{ url_for('static', filename='proofs/' ~ i.proof) }}" target="_blank">Ver</a>
+                    <a href="{{ url_for('static', filename='proofs/' + i.proof) }}" target="_blank">Ver</a>
                   {% else %}
                     <span class="text-muted">N/A</span>
                   {% endif %}

@@ -179,9 +179,15 @@ def history():
 def deposit():
     form = DepositForm()
     if form.validate_on_submit():
+        # Cria a pasta se não existir
+        folder = os.path.join(current_app.root_path, 'static', 'proofs')
+        os.makedirs(folder, exist_ok=True)
+
         file = form.proof.data
         filename = secure_filename(file.filename)
-        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+
+        # Usa a pasta correta criada acima
+        filepath = os.path.join(folder, filename)
         file.save(filepath)
 
         deposito = Deposit(
@@ -197,6 +203,7 @@ def deposit():
         return redirect(url_for('main.dashboard'))
 
     return render_template('deposit.html', form=form)
+
 
 @main.route('/profile', methods=['GET', 'POST'])
 @login_required
