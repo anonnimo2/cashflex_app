@@ -139,7 +139,7 @@
         <td>{{ d.id }}</td>
         <td>{{ d.user_id }}</td>
         <td>{{ d.amount }} AOA</td>
-        <td><a href="{{ url_for('static', filename='proofs/' ~ d.proof) }}" target="_blank">Ver</a></td>
+        <td><a href="{{ url_for('static', filename='proofs/' + i.proof) }}" target="_blank">Ver</a></td>
         <td>{{ d.status }}</td>
         <td>
           <a href="{{ url_for('admin.aprovar_deposito', id=d.id) }}" class="btn btn-success btn-sm">Aprovar</a>
