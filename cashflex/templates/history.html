@@ -4,10 +4,10 @@
   <!-- Título -->
   <div class="text-center mb-4">
     <h4 class="fw-bold text-primary">Histórico de Transações</h4>
-    <p class="text-muted small mb-0">Veja seus investimentos, saques e comissões</p>
+    <p class="text-muted small mb-0">Veja seus investimentos, saques, comissões e depósitos</p>
   </div>
 
-  {% if investments or withdrawals or commissions or active_plans %}
+  {% if investments or withdrawals or commissions or active_plans or deposits %}
 
     {% if investments %}
     <div class="mb-4">
@@ -60,6 +60,29 @@
               <span class="text-muted small ms-1">(Nível {{ cm.level }})</span>
             </div>
             <small class="text-muted">{{ cm.timestamp.strftime("%d/%m/%Y %H:%M") }}</small>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if deposits %}
+    <div class="mb-4">
+      <h6 class="fw-bold text-warning mb-2">🏦 Depósitos</h6>
+      <div class="list-group shadow-sm rounded-4 overflow-hidden">
+        {% for dp in deposits %}
+          <div class="list-group-item d-flex justify-content-between align-items-center bg-light">
+            <div>
+              <strong>{{ dp.amount }} AOA</strong>
+              {% if dp.status == 'Aprovado' %}
+                <span class="badge bg-success-subtle text-success ms-2">Aprovado</span>
+              {% elif dp.status == 'Rejeitado' %}
+                <span class="badge bg-danger-subtle text-danger ms-2">Rejeitado</span>
+              {% else %}
+                <span class="badge bg-primary-subtle text-primary ms-2">Pendente</span>
+              {% endif %}
+            </div>
+            <small class="text-muted">{{ dp.timestamp.strftime("%d/%m/%Y %H:%M") }}</small>
           </div>
         {% endfor %}
       </div>
