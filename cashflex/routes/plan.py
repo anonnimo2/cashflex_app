@@ -41,7 +41,7 @@ def invest():
         
         filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
         os.makedirs(os.path.dirname(filepath), exist_ok=True)
-        file.save(filepath)-*
+        file.save(filepath)
 
 
         # 🕓 Cria investimento pendente
