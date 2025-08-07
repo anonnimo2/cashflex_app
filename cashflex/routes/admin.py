@@ -48,13 +48,13 @@ def aprovar_deposito(id):
     deposito = Deposit.query.get_or_404(id)
     if deposito.status != 'Pendente':
         flash('Depósito já processado.', 'warning')
-        return redirect(url_for('admin.admin_dashboard'))
+        return redirect(url_for('admin/dashboard'))
 
     deposito.status = 'Aprovado'
     deposito.user.balance += deposito.amount
     db.session.commit()
     flash('Depósito aprovado e saldo atualizado.', 'success')
-    return redirect(url_for('admin.admin_dashboard'))
+    return redirect(url_for('admin/dashboard'))
 
 
 @admin.route('/approve-investment/<int:id>')
