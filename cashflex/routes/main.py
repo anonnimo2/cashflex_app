@@ -174,7 +174,7 @@ def history():
         active_plans=active_plans
     )
 
-@main.route('/depositar', methods=['GET', 'POST'])
+@main.route('/deposit', methods=['GET', 'POST'])
 @login_required
 def deposit():
     form = DepositForm()
