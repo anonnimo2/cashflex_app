@@ -54,7 +54,9 @@
     <li class="nav-item" role="presentation">
   <a class="nav-link" data-bs-toggle="tab" href="#plans" role="tab">Planos</a>
 </li>
-
+     <li class="nav-item" role="presentation">
+  <a class="nav-link" data-bs-toggle="tab" href="#deposits" role="tab">Depósitos</a>
+</li>
   </ul>
 
   <div class="tab-content mt-3">
@@ -124,6 +126,25 @@
         </table>
       </div>
     </div>
+
+<!-- Depósitos -->
+<div class="tab-pane fade" id="deposits" role="tabpanel">
+  <table class="table table-striped">
+    <thead>
+      <tr><th>ID</th><th>Usuário</th><th>Valor</th><th>Comprovativo</th><th>Status</th><th>Ações</th></tr>
+    </thead>
+    <tbody>
+      {% for d in deposits if d.status == 'Pendente' %}
+      <tr>
+        <td>{{ d.id }}</td>
+        <td>{{ d.user_id }}</td>
+        <td>{{ d.amount }} AOA</td>
+        <td><a href="{{ url_for('static', filename='proofs/' ~ d.proof) }}" target="_blank">Ver</a></td>
+        <td>{{ d.status }}</td>
+        <td>
+          <a href="{{ url_for('admin.aprovar_deposito', id=d.id) }}" class="btn btn-success btn-sm">Aprovar</a>
+        </td>
+      </tr>
 
     <!-- Aba: Investimentos Pendentes -->
     <div class="tab-pane fade" id="investments" role="tabpanel">

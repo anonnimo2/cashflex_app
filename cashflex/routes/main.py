@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from cashflex import db
-from cashflex.forms import LoginForm, RegisterForm, WithdrawalForm, ProfileForm
-from cashflex.models import User, Withdrawal,generate_unique_code, UserPlan, Investment, Commission, InvestmentPlan
-
+from flask import current_app
+from cashflex.forms import LoginForm, RegisterForm, WithdrawalForm, ProfileForm, DepositForm
+from cashflex.models import User, Withdrawal,generate_unique_code, UserPlan, Investment, Commission, InvestmentPlan, Deposit
+import os
 main = Blueprint('main', __name__)
 
 @main.route('/')
@@ -172,6 +174,29 @@ def history():
         active_plans=active_plans
     )
 
+@main.route('/depositar', methods=['GET', 'POST'])
+@login_required
+def deposit():
+    form = DepositForm()
+    if form.validate_on_submit():
+        file = form.proof.data
+        filename = secure_filename(file.filename)
+        filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        file.save(filepath)
+
+        deposito = Deposit(
+            user_id=current_user.id,
+            amount=form.amount.data,
+            payment_method=form.payment_method.data,
+            bank=form.bank.data,
+            proof=filename
+        )
+        db.session.add(deposito)
+        db.session.commit()
+        flash('Depósito enviado para aprovação.', 'success')
+        return redirect(url_for('main.dashboard'))
+
+    return render_template('deposit.html', form=form)
 
 @main.route('/profile', methods=['GET', 'POST'])
 @login_required

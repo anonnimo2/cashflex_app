@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
-from cashflex.models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan
+from cashflex.models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan, Deposit
 from cashflex import db
 from datetime import datetime
 from cashflex.forms import PlanForm
@@ -42,6 +42,19 @@ def dashboard():
         form=form
     )
 
+@admin.route('/aprovar_deposito/<int:id>')
+@login_required
+def aprovar_deposito(id):
+    deposito = Deposit.query.get_or_404(id)
+    if deposito.status != 'Pendente':
+        flash('Depósito já processado.', 'warning')
+        return redirect(url_for('admin.admin_dashboard'))
+
+    deposito.status = 'Aprovado'
+    deposito.user.balance += deposito.amount
+    db.session.commit()
+    flash('Depósito aprovado e saldo atualizado.', 'success')
+    return redirect(url_for('admin.admin_dashboard'))
 
 
 @admin.route('/approve-investment/<int:id>')

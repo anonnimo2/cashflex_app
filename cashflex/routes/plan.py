@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import current_app
 from flask_login import login_required, current_user
 from cashflex.models import Investment, UserPlan, Commission, User, InvestmentPlan
-from cashflex.forms import InvestForm
+from cashflex.forms import DepositForm
 from cashflex import db
 from datetime import datetime
 from werkzeug.utils import secure_filename
@@ -19,7 +20,7 @@ def allowed_file(filename):
 @plan.route('/invest', methods=['GET', 'POST'])
 @login_required
 def invest():
-    form = InvestForm()
+    form = DepositForm()
 
     if form.validate_on_submit():
         valor = form.amount.data
@@ -59,6 +60,9 @@ def invest():
         return redirect(url_for('main.dashboard'))
 
     return render_template('invest.html', form=form)
+
+
+
 
 
 @plan.route('/activate-plan/<int:id>')

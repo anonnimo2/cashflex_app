@@ -142,6 +142,20 @@ class InvestmentPlan(db.Model):
     def retorno(self):
         return self.retorno_total
 
+class Deposit(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    amount = db.Column(db.Float, nullable=False)
+    payment_method = db.Column(db.String(50))
+    bank = db.Column(db.String(50))
+    proof = db.Column(db.String(120))
+    status = db.Column(db.String(20), default='Pendente')
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='deposits')
+
+
+
 class Commission(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))  # quem recebeu

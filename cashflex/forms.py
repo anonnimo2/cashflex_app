@@ -30,7 +30,7 @@ class RegisterForm(FlaskForm):
 
 
 # Formulário de Investimento
-class InvestForm(FlaskForm):
+class DepositForm(FlaskForm):
     amount = FloatField('Valor do Investimento', validators=[
         DataRequired(message='Informe um valor.'),
         NumberRange(min=5000, message='Valor mínimo: 5000 AOA')
@@ -51,7 +51,7 @@ class InvestForm(FlaskForm):
         FileAllowed(['jpg', 'jpeg', 'png', 'pdf'], 'Apenas JPG, PNG ou PDF!')
     ])
 
-    submit = SubmitField('Investir')
+    submit = SubmitField('Depositar')
 
 
 # Formulário de Saque
