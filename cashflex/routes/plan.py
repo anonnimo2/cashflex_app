@@ -220,7 +220,7 @@ def confirm_deposit():
         amount=amount,
         proof=filename,
         status="Pendente",
-        created_at=datetime.utcnow()
+        timestamp = datetime.utcnow()
     )
     db.session.add(deposit)
     db.session.commit()
