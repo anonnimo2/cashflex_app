@@ -1,96 +1,40 @@
 {% extends "base.html" %}
 {% block content %}
 
-<div class="container mt-4 mb-5">
+<div class="container py-4">
 
-  <!-- Saldo dinâmico -->
-  <div class="p-3 mb-4 text-white rounded shadow" style="background: linear-gradient(135deg, #007bff, #0056b3);">
-    <h5 class="mb-0">Saldo Atual</h5>
-    <h2 class="fw-bold">Kz {{ "{:,.2f}".format(current_user.balance) }}</h2>
+  <!-- Card de Saldo -->
+  <div class="card shadow-sm mb-4 border-0" style="background: linear-gradient(135deg, #0d6efd, #003c96); color: white;">
+    <div class="card-body d-flex justify-content-between align-items-center">
+      <div>
+        <h6 class="mb-1">Meu Saldo</h6>
+        <h3 class="fw-bold">Kz {{ "{:,.2f}".format(current_user.balance) }}</h3>
+      </div>
+      <i class="bi bi-coin" style="font-size: 2rem;"></i>
+    </div>
   </div>
 
   <!-- Título -->
-  <h5 class="text-center fw-semibold mb-3">Selecionar valor do investimento</h5>
+  <h6 class="text-center fw-semibold mb-3">Selecione um valor</h6>
 
   <!-- Valores pré-definidos -->
-  <div class="d-flex flex-wrap justify-content-center gap-2 mb-4">
+  <div class="row g-2">
     {% for plano in planos %}
-      <button type="button" class="btn btn-outline-primary px-4 py-2"
-              onclick="selecionarPlano('{{ plano.valor }}')">
-        {{ plano.valor | int }} Kz
-      </button>
+      <div class="col-4 col-md-3">
+        <form method="POST" action="{{ url_for('deposit_details') }}">
+          <input type="hidden" name="amount" value="{{ plano.valor }}">
+          <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-bold">
+            {{ plano.valor | int }}
+          </button>
+        </form>
+      </div>
     {% endfor %}
   </div>
 
-  <!-- IBANs para transferência -->
-  <div class="alert alert-info shadow-sm rounded">
-    <h6 class="fw-bold mb-2">IBANs para Transferência:</h6>
-    <ul class="mb-0">
-      <li>Maneco Fino</li>
-      <li><strong>BAI:</strong> 0040 0000 5185 5656 1019 3</li>
-      <li>Sidney dos Santos</li>
-      <li><strong>BCI:</strong> 0005 0000 0118 6521 1011 5</li>
-    </ul>
-    <small class="text-muted">Faça a transferência e anexe o comprovativo abaixo.</small>
-  </div>
-
-  <!-- Formulário -->
-  <form method="POST" enctype="multipart/form-data" class="bg-white p-3 rounded shadow-sm border">
-    {{ form.hidden_tag() }}
-
-    <!-- Valor -->
-    <div class="mb-3">
-      <label for="valor_input" class="form-label fw-semibold">Valor do Investimento (Kz)</label>
-      {{ form.amount(class="form-control", id="valor_input", placeholder="Ex: 5000") }}
-      {% if form.amount.errors %}
-        <div class="text-danger small mt-1">{{ form.amount.errors[0] }}</div>
-      {% endif %}
-    </div>
-
-    <!-- Método de pagamento -->
-    <div class="mb-3">
-      {{ form.payment_method.label(class="form-label fw-semibold") }}
-      {{ form.payment_method(class="form-select") }}
-      {% if form.payment_method.errors %}
-        <div class="text-danger small mt-1">{{ form.payment_method.errors[0] }}</div>
-      {% endif %}
-    </div>
-
-    <!-- Banco -->
-    <div class="mb-3">
-      {{ form.bank.label(class="form-label fw-semibold") }}
-      {{ form.bank(class="form-select") }}
-      {% if form.bank.errors %}
-        <div class="text-danger small mt-1">{{ form.bank.errors[0] }}</div>
-      {% endif %}
-    </div>
-
-    <!-- Comprovativo -->
-    <div class="mb-3">
-      {{ form.proof.label(class="form-label fw-semibold") }}
-      {{ form.proof(class="form-control") }}
-      <small class="text-muted">Formatos aceitos: JPG, PNG ou PDF</small>
-      {% if form.proof.errors %}
-        <div class="text-danger small mt-1">{{ form.proof.errors[0] }}</div>
-      {% endif %}
-    </div>
-
-    <!-- Botão -->
-    <div class="d-grid">
-      {{ form.submit(class="btn btn-primary btn-lg rounded-pill") }}
-    </div>
-  </form>
-
-  <!-- Dicas -->
-  <div class="mt-4">
-    <h6 class="fw-semibold"><i class="bi bi-info-circle"></i> Dicas úteis</h6>
-    <ol class="small text-muted mt-2">
-      <li><strong class="text-danger">Valor mínimo de investimento: 5.000 Kz.</strong></li>
-      <li>O saldo é creditado após a confirmação do comprovativo.</li>
-      <li>Se houver erro no canal de pagamento, troque o método selecionado.</li>
-    </ol>
-  </div>
 </div>
+
+{% endblock %}
+
 
 <script>
   function selecionarPlano(valor) {
