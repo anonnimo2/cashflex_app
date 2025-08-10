@@ -214,19 +214,21 @@
       </div>
     </div>
 
-<div class="tab-pane fade" id="plans" role="tabpanel">
-  <h5>Cadastrar Novo Plano</h5>
-  <form method="POST" action="{{ url_for('admin.gerenciar_planos') }}">
+<div class="tab-pane fade" id="deposits" role="tabpanel">
+  <h5>Registrar Novo Depósito</h5>
+  <form method="POST" enctype="multipart/form-data" action="{{ url_for('admin.gerenciar_depositos') }}">
     {{ form.hidden_tag() }}
     <div class="row">
-      <div class="col-md-3">{{ form.nome.label }} {{ form.nome(class="form-control") }}</div>
-      <div class="col-md-2">{{ form.invest.label }} {{ form.invest(class="form-control") }}</div>
-      <div class="col-md-2">{{ form.rendimento.label }} {{ form.rendimento(class="form-control") }}</div>
-      <div class="col-md-2">{{ form.retorno.label }} {{ form.retorno(class="form-control") }}</div>
-      <div class="col-md-2">{{ form.ativo.label }} {{ form.ativo() }}</div>
-      <div class="col-md-1 mt-4">{{ form.submit(class="btn btn-success btn-sm") }}</div>
+      <div class="col-md-3">{{ form.amount.label }} {{ form.amount(class="form-control") }}</div>
+      <div class="col-md-3">{{ form.payment_method.label }} {{ form.payment_method(class="form-select") }}</div>
+      <div class="col-md-3">{{ form.bank.label }} {{ form.bank(class="form-select") }}</div>
+      <div class="col-md-3">{{ form.proof.label }} {{ form.proof(class="form-control") }}</div>
+    </div>
+    <div class="mt-3">
+      {{ form.submit(class="btn btn-success") }}
     </div>
   </form>
+</div>
 
   <hr>
   <h5 class="mt-3">Planos Existentes</h5>
