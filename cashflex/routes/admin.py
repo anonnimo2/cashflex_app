@@ -1,12 +1,9 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
-from cashflex.models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan, Deposit
+from cashflex.models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan, Deposito
 from cashflex import db
 from datetime import datetime
 from cashflex.forms import PlanForm, DepositForm
-from werkzeug.utils import secure_filename
-import os
-
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -15,6 +12,7 @@ admin = Blueprint('admin', __name__, url_prefix='/admin')
 def check_admin():
     if not current_user.is_authenticated or not current_user.is_admin:
         return redirect(url_for('main.login'))
+
 
 @admin.route('/dashboard')
 @login_required
@@ -30,16 +28,16 @@ def dashboard():
 
     investments = Investment.query.all()
     withdrawals = Withdrawal.query.all()
-    deposits = Deposit.query.all()
+    deposits = Deposito.query.all()
 
     # Filtragem dos depósitos por status
-    pendentes_depositos = Deposit.query.filter_by(status='Pendente').order_by(Deposit.timestamp.desc()).all()
-    aprovados_depositos = Deposit.query.filter_by(status='Aprovado').order_by(Deposit.timestamp.desc()).all()
-    recusados_depositos = Deposit.query.filter_by(status='Recusado').order_by(Deposit.timestamp.desc()).all()
+    pendentes_depositos = Deposito.query.filter_by(status='pendente').order_by(Deposito.timestamp.desc()).all()
+    aprovados_depositos = Deposito.query.filter_by(status='aprovado').order_by(Deposito.timestamp.desc()).all()
+    recusados_depositos = Deposito.query.filter_by(status='recusado').order_by(Deposito.timestamp.desc()).all()
 
     total_users = len(users)
-    total_investido = sum(i.amount for i in investments if i.status == 'Aprovado')
-    total_sacado = sum(w.amount for w in withdrawals if w.status == 'Aprovado')
+    total_investido = sum(i.amount for i in investments if i.status.lower() == 'aprovado')
+    total_sacado = sum(w.amount for w in withdrawals if w.status.lower() == 'aprovado')
     saldo_total = sum(u.balance for u in users)
 
     form_plan = PlanForm()
@@ -59,44 +57,41 @@ def dashboard():
         total_sacado=total_sacado,
         saldo_total=saldo_total,
         form_plan=form_plan,
-        form_deposit=form_deposit
+        form=form_deposit
     )
 
-@admin.route('/admin/depositos', methods=['GET', 'POST'])
+# Aprovar depósito
+@admin.route('/aprovar_deposito/<int:id>', methods=['POST'])
 @login_required
-def depositos():
+def aprovar_deposito(id):
     if not current_user.is_admin:
-        abort(403)
+        flash("Acesso negado.", "danger")
+        return redirect(url_for('main.login'))
 
-    if request.method == 'POST':
-        deposito_id = request.form.get('deposito_id')
-        acao = request.form.get('acao')
+    deposito = Deposito.query.get_or_404(id)
+    deposito.status = "aprovado"
+    deposito.data_aprovacao = datetime.utcnow()
+    db.session.commit()
 
-        deposito = Deposit.query.get_or_404(deposito_id)
+    flash(f"Depósito de {deposito.user.phone} aprovado com sucesso!", "success")
+    return redirect(url_for('admin.dashboard'))
 
-        if acao == 'aprovar':
-            deposito.status = 'Aprovado'
-            deposito.user.balance += deposito.amount
-            flash(f"💰 Depósito de {deposito.amount:.2f} Kz aprovado com sucesso!", "success")
+# Recusar depósito
+@admin.route('/recusar_deposito/<int:id>', methods=['POST'])
+@login_required
+def recusar_deposito(id):
+    if not current_user.is_admin:
+        flash("Acesso negado.", "danger")
+        return redirect(url_for('main.login'))
 
-        elif acao == 'recusar':
-            deposito.status = 'Recusado'
-            flash("❌ Depósito recusado!", "danger")
+    deposito = Deposito.query.get_or_404(id)
+    deposito.status = "recusado"
+    deposito.data_recusa = datetime.utcnow()
+    db.session.commit()
 
-        deposito.timestamp = datetime.utcnow()
-        db.session.commit()
-        return redirect(url_for('admin.depositos'))
+    flash(f"Depósito de {deposito.user.phone} recusado.", "warning")
+    return redirect(url_for('admin.dashboard'))
 
-    pendentes = Deposit.query.filter_by(status='Pendente').order_by(Deposit.timestamp.desc()).all()
-    aprovados = Deposit.query.filter_by(status='Aprovado').order_by(Deposit.timestamp.desc()).all()
-    recusados = Deposit.query.filter_by(status='Recusado').order_by(Deposit.timestamp.desc()).all()
-
-    return render_template(
-        'admin/depositos.html',
-        pendentes=pendentes,
-        aprovados=aprovados,
-        recusados=recusados
-    )
 
 @admin.route('/approve-investment/<int:id>')
 @login_required
