@@ -18,7 +18,7 @@
   </div>
 
   <!-- Upload Comprovativo -->
-  <form method="POST" enctype="multipart/form-data" action="{{ url_for('confirm_deposit') }}">
+  <form method="POST" enctype="multipart/form-data" action="{{ url_for('plan.confirm_deposit') }}">
     <input type="hidden" name="amount" value="{{ amount }}">
 
     <div class="mb-3">
