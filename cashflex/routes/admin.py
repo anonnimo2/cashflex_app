@@ -21,7 +21,6 @@ def check_admin():
 def dashboard():
     if not current_user.is_admin:
         abort(403)
-
     search = request.args.get('search')
     if search:
         users = User.query.filter(User.phone.contains(search)).all()
@@ -31,7 +30,7 @@ def dashboard():
     investments = Investment.query.all()
     withdrawals = Withdrawal.query.all()
     deposits = Deposit.query.all()
-
+    
     # Filtragem dos depósitos por status
     pendentes_depositos = Deposit.query.filter_by(status='pendente').order_by(Deposit.timestamp.desc()).all()
     aprovados_depositos = Deposit.query.filter_by(status='aprovado').order_by(Deposit.timestamp.desc()).all()
@@ -41,10 +40,10 @@ def dashboard():
     total_investido = sum(i.amount for i in investments if i.status.lower() == 'aprovado')
     total_sacado = sum(w.amount for w in withdrawals if w.status.lower() == 'aprovado')
     saldo_total = sum(u.balance for u in users)
-
+    simple_action_form = SimpleActionForm()
     form_plan = PlanForm()
     form_deposit = DepositForm()
-    simple_action_form = SimpleActionForm()
+    
     return render_template(
         'admin.html',
         users=users,
