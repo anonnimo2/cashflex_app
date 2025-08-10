@@ -153,7 +153,7 @@
                     {% for deposito in deposits %}
                         <tr class="{% if deposito.status == 'pendente' %}table-warning{% elif deposito.status == 'aprovado' %}table-success{% elif deposito.status == 'recusado' %}table-danger{% endif %}">
                             <td>{{ deposito.id }}</td>
-                            <td>{{ deposito.usuario.nome }}</td>
+                            <td>{{ deposito.user.nome }}</td>
                             <td>{{ deposito.valor | round(2) }}</td>
                             <td>{{ deposito.status }}</td>
                             <td>{{ deposito.data.strftime('%d/%m/%Y %H:%M') }}</td>
