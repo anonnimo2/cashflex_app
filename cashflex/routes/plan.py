@@ -180,8 +180,9 @@ def gerar_comissoes(user, amount):
 @plan.route("/deposit/select", methods=["GET"])
 @login_required
 def select_deposit_amount():
+    form = DepositForm()
     planos = InvestmentPlan.query.all()
-    return render_template("deposit.html", planos=planos)
+    return render_template("deposit.html", planos=planos, form=form)
 
 # Página de detalhes e upload comprovativo
 @plan.route("/deposit/details", methods=["POST"])
