@@ -93,6 +93,8 @@ class PlanForm(FlaskForm):
     submit = SubmitField('Salvar')
 
 
+class SimpleActionForm(FlaskForm):
+    submit = SubmitField('Enviar')
     
     
     
