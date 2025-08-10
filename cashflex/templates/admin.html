@@ -127,25 +127,45 @@
       </div>
     </div>
 
-<!-- Depósitos -->
+<!-- Aba: Depósitos -->
 <div class="tab-pane fade" id="deposits" role="tabpanel">
-  <table class="table table-striped">
-    <thead>
-      <tr><th>ID</th><th>Usuário</th><th>Valor</th><th>Comprovativo</th><th>Status</th><th>Ações</th></tr>
-    </thead>
-    <tbody>
-      {% for d in deposits if d.status == 'Pendente' %}
-      <tr>
-        <td>{{ d.id }}</td>
-        <td>{{ d.user_id }}</td>
-        <td>{{ d.amount }} AOA</td>
-        <td><a href="{{ url_for('static', filename='proofs/' + i.proof) }}" target="_blank">Ver</a></td>
-        <td>{{ d.status }}</td>
-        <td>
-          <a href="{{ url_for('admin.aprovar_deposito', id=d.id) }}" class="btn btn-success btn-sm">Aprovar</a>
-        </td>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead class="table-light">
+        <tr>
+          <th>ID</th>
+          <th>Usuário</th>
+          <th>Valor</th>
+          <th>Comprovativo</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in deposits %}
+          {% if d.status == 'Pendente' %}
+          <tr>
+            <td>{{ d.id }}</td>
+            <td>{{ d.user_id }}</td>
+            <td>{{ d.amount }} AOA</td>
+            <td>
+              {% if d.proof %}
+                <a href="{{ url_for('static', filename='proofs/' + d.proof) }}" target="_blank">Ver</a>
+              {% else %}
+                <span class="text-muted">N/A</span>
+              {% endif %}
+            </td>
+            <td>{{ d.status }}</td>
+            <td>
+              <a href="{{ url_for('admin.aprovar_deposito', id=d.id) }}" class="btn btn-success btn-sm">Aprovar</a>
+            </td>
+          </tr>
+          {% endif %}
         {% endfor %}
-      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
     <!-- Aba: Investimentos Pendentes -->
     <div class="tab-pane fade" id="investments" role="tabpanel">

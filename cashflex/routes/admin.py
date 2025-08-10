@@ -1,10 +1,11 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort, current_app
 from flask_login import login_required, current_user
 from cashflex.models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan, Deposit
 from cashflex import db
 from datetime import datetime
-from cashflex.forms import PlanForm
-
+from cashflex.forms import PlanForm, DepositForm
+from werkzeug.utils import secure_filename
+import os
 
 
 admin = Blueprint('admin', __name__, url_prefix='/admin')
@@ -42,19 +43,79 @@ def dashboard():
         form=form
     )
 
+@admin.route('/depositos', methods=['GET', 'POST'])
+@login_required
+def depositos():
+    if not current_user.is_admin:
+        abort(403)
+
+    form = DepositForm()
+    if form.validate_on_submit():
+        # Cria a pasta se não existir
+        folder = os.path.join(current_app.root_path, 'static', 'proofs')
+        os.makedirs(folder, exist_ok=True)
+
+        file = form.proof.data
+        filename = secure_filename(file.filename)
+
+        # Salva o arquivo na pasta correta
+        filepath = os.path.join(folder, filename)
+        file.save(filepath)
+
+        deposito = Deposit(
+            user_id=current_user.id,
+            amount=form.amount.data,
+            payment_method=form.payment_method.data,
+            bank=form.bank.data,
+            proof=filename
+        )
+        db.session.add(deposito)
+        db.session.commit()
+        flash('Depósito enviado para aprovação.', 'success')
+        return redirect(url_for('main.dashboard'))
+
+    # Listas de depósitos para o painel admin
+    pendentes = Deposit.query.filter_by(status='Pendente').order_by(Deposit.timestamp.desc()).all()
+    aprovados = Deposit.query.filter_by(status='Aprovado').order_by(Deposit.timestamp.desc()).all()
+    recusados = Deposit.query.filter_by(status='Recusado').order_by(Deposit.timestamp.desc()).all()
+
+    return render_template('admin/depositos.html',
+                           form=form,
+                           pendentes=pendentes,
+                           aprovados=aprovados,
+                           recusados=recusados)
+
+
+
 @admin.route('/aprovar_deposito/<int:id>')
 @login_required
 def aprovar_deposito(id):
     deposito = Deposit.query.get_or_404(id)
     if deposito.status != 'Pendente':
         flash('Depósito já processado.', 'warning')
-        return redirect(url_for('admin/dashboard'))
+        return redirect(url_for('admin.dashboard'))
 
     deposito.status = 'Aprovado'
-    deposito.user.balance += deposito.amount
+    deposito.user.balance = (deposito.user.balance or 0) + deposito.amount
     db.session.commit()
     flash('Depósito aprovado e saldo atualizado.', 'success')
-    return redirect(url_for('admin/dashboard'))
+    return redirect(url_for('admin.dashboard'))
+
+@admin.route('/recusar_deposito/<int:id>')
+@login_required
+def recusar_deposito(id):
+    if not current_user.is_admin:
+        abort(403)
+
+    deposito = Deposit.query.get_or_404(id)
+    if deposito.status != 'Pendente':
+        flash('Depósito já processado.', 'warning')
+        return redirect(url_for('admin.depositos'))
+
+    deposito.status = 'Recusado'
+    db.session.commit()
+    flash('Depósito recusado.', 'danger')
+    return redirect(url_for('admin.depositos'))
 
 
 @admin.route('/approve-investment/<int:id>')
@@ -125,6 +186,7 @@ def approve_investment(id):
 
 
 @admin.route('/reject-investment/<int:id>')
+@login_required
 def reject_investment(id):
     inv = Investment.query.get_or_404(id)
     if inv.status == 'Pendente':
@@ -134,6 +196,7 @@ def reject_investment(id):
     return redirect(url_for('admin.dashboard'))
 
 @admin.route('/approve-withdraw/<int:id>')
+@login_required
 def approve_withdraw(id):
     wd = Withdrawal.query.get_or_404(id)
     if wd.status == 'Pendente':
@@ -143,6 +206,7 @@ def approve_withdraw(id):
     return redirect(url_for('admin.dashboard'))
 
 @admin.route('/reject-withdraw/<int:id>')
+@login_required
 def reject_withdraw(id):
     wd = Withdrawal.query.get_or_404(id)
     if wd.status == 'Pendente':
