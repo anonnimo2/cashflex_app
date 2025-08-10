@@ -38,13 +38,13 @@
         </div>
       </div>
     </div>
-     <div class="col-6 col-md-2 mb-2">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h6 class="text-muted">Depósitos</h6>
-                <h4 class="fw-bold">{{ total_depositos }} AOA</h4>
-            </div>
+    <div class="col-6 col-md-2 mb-2">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="text-muted">Depósitos</h6>
+          <h4 class="fw-bold">{{ total_depositos }} AOA</h4>
         </div>
+      </div>
     </div>
   </div>
 
@@ -60,11 +60,11 @@
       <a class="nav-link" data-bs-toggle="tab" href="#investments" role="tab">Investimentos Pendentes</a>
     </li>
     <li class="nav-item" role="presentation">
-  <a class="nav-link" data-bs-toggle="tab" href="#plans" role="tab">Planos</a>
-</li>
-     <li class="nav-item" role="presentation">
-  <a class="nav-link" data-bs-toggle="tab" href="#deposits" role="tab">Depósitos</a>
-</li>
+      <a class="nav-link" data-bs-toggle="tab" href="#plans" role="tab">Planos</a>
+    </li>
+    <li class="nav-item" role="presentation">
+      <a class="nav-link" data-bs-toggle="tab" href="#deposits" role="tab">Depósitos</a>
+    </li>
   </ul>
 
   <div class="tab-content mt-3">
@@ -79,8 +79,8 @@
         <table class="table table-sm table-bordered">
           <thead class="table-light">
             <tr>
-              <th>ID</th><th>Telefone</th><th>Saldo</th><th>Código</th>
-              <th>Banco</th><th>IBAN</th><th>Titular</th>
+              <th scope="col">ID</th><th scope="col">Telefone</th><th scope="col">Saldo</th><th scope="col">Código</th>
+              <th scope="col">Banco</th><th scope="col">IBAN</th><th scope="col">Titular</th>
             </tr>
           </thead>
           <tbody>
@@ -94,6 +94,8 @@
               <td>{{ u.iban or 'N/A' }}</td>
               <td>{{ u.iban_owner or 'N/A' }}</td>
             </tr>
+            {% else %}
+            <tr><td colspan="7" class="text-center">Nenhum usuário encontrado</td></tr>
             {% endfor %}
           </tbody>
         </table>
@@ -106,8 +108,8 @@
         <table class="table table-striped">
           <thead class="table-light">
             <tr>
-              <th>ID</th><th>Usuário</th><th>Valor</th><th>Status</th>
-              <th>Banco</th><th>IBAN</th><th>Titular</th><th>Ações</th>
+              <th scope="col">ID</th><th scope="col">Usuário</th><th scope="col">Valor</th><th scope="col">Status</th>
+              <th scope="col">Banco</th><th scope="col">IBAN</th><th scope="col">Titular</th><th scope="col">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -122,61 +124,24 @@
               <td>{{ w.user.iban_owner or 'N/A' }}</td>
               <td>
                 {% if w.status == "Pendente" %}
-                  <a href="{{ url_for('admin.approve_withdraw', id=w.id) }}" class="btn btn-success btn-sm">Aprovar</a>
-                  <a href="{{ url_for('admin.reject_withdraw', id=w.id) }}" class="btn btn-danger btn-sm">Rejeitar</a>
+                  <form action="{{ url_for('admin.approve_withdraw', id=w.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-success btn-sm">Aprovar</button>
+                  </form>
+                  <form action="{{ url_for('admin.reject_withdraw', id=w.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Rejeitar</button>
+                  </form>
                 {% else %}
                   <span class="text-muted">--</span>
                 {% endif %}
               </td>
             </tr>
+            {% else %}
+            <tr><td colspan="8" class="text-center">Nenhum saque registrado</td></tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
-
-        <!-- Aba de Depósitos -->
-        <div class="tab-pane fade" id="deposits" role="tabpanel">
-            <h4>Depósitos</h4>
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Usuário</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Data</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for deposito in deposits %}
-                        <tr class="{% if deposito.status == 'pendente' %}table-warning{% elif deposito.status == 'aprovado' %}table-success{% elif deposito.status == 'recusado' %}table-danger{% endif %}">
-                            <td>{{ deposito.id }}</td>
-                            <td>{{ deposito.user.nome }}</td>
-                            <td>{{ deposito.amount | round(2) }}</td>
-                            <td>{{ deposito.status }}</td>
-                            <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
-                            <td>
-                                {% if deposito.status == 'pendente' %}
-                                    <form action="{{ url_for('admin.aprovar_deposito', id=deposito.id) }}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-success btn-sm">Aprovar</button>
-                                    </form>
-                                    <form action="{{ url_for('admin.recusar_deposito', id=deposito.id) }}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-danger btn-sm">Rejeitar</button>
-                                    </form>
-                                {% else %}
-                                    <span>-</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr><td colspan="6" class="text-center">Nenhum depósito registrado</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-
 
     <!-- Aba: Investimentos Pendentes -->
     <div class="tab-pane fade" id="investments" role="tabpanel">
@@ -184,7 +149,7 @@
         <table class="table table-striped">
           <thead class="table-light">
             <tr>
-              <th>ID</th><th>Usuário</th><th>Valor</th><th>Comprovativo</th><th>Status</th><th>Ações</th>
+              <th scope="col">ID</th><th scope="col">Usuário</th><th scope="col">Valor</th><th scope="col">Comprovativo</th><th scope="col">Status</th><th scope="col">Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -203,66 +168,95 @@
                 </td>
                 <td>{{ i.status }}</td>
                 <td>
-                  <a href="{{ url_for('admin.approve_investment', id=i.id) }}" class="btn btn-success btn-sm">Aprovar</a>
-                  <a href="{{ url_for('admin.reject_investment', id=i.id) }}" class="btn btn-danger btn-sm">Rejeitar</a>
+                  <form action="{{ url_for('admin.approve_investment', id=i.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-success btn-sm">Aprovar</button>
+                  </form>
+                  <form action="{{ url_for('admin.reject_investment', id=i.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Rejeitar</button>
+                  </form>
                 </td>
               </tr>
               {% endif %}
+            {% else %}
+            <tr><td colspan="6" class="text-center">Nenhum investimento pendente</td></tr>
             {% endfor %}
           </tbody>
         </table>
       </div>
     </div>
 
-<div class="tab-pane fade" id="deposits" role="tabpanel">
-  <h5>Registrar Novo Depósito</h5>
-  <form method="POST" enctype="multipart/form-data" action="{{ url_for('admin.gerenciar_depositos') }}">
-    {{ form.hidden_tag() }}
-    <div class="row">
-      <div class="col-md-3">{{ form.amount.label }} {{ form.amount(class="form-control") }}</div>
-      <div class="col-md-3">{{ form.payment_method.label }} {{ form.payment_method(class="form-select") }}</div>
-      <div class="col-md-3">{{ form.bank.label }} {{ form.bank(class="form-select") }}</div>
-      <div class="col-md-3">{{ form.proof.label }} {{ form.proof(class="form-control") }}</div>
+    <!-- Aba: Depósitos -->
+    <div class="tab-pane fade" id="deposits" role="tabpanel">
+      <h4>Depósitos</h4>
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Usuário</th>
+            <th scope="col">Valor</th>
+            <th scope="col">Status</th>
+            <th scope="col">Data</th>
+            <th scope="col">Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for deposito in deposits %}
+            <tr class="{% if deposito.status.lower() == 'pendente' %}table-warning{% elif deposito.status.lower() == 'aprovado' %}table-success{% elif deposito.status.lower() == 'recusado' %}table-danger{% endif %}">
+              <td>{{ deposito.id }}</td>
+              <td>{{ deposito.user.nome }}</td>
+              <td>{{ deposito.amount | round(2) }}</td>
+              <td>{{ deposito.status }}</td>
+              <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+              <td>
+                {% if deposito.status.lower() == 'pendente' %}
+                  <form action="{{ url_for('admin.aprovar_deposito', id=deposito.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-success btn-sm">Aprovar</button>
+                  </form>
+                  <form action="{{ url_for('admin.recusar_deposito', id=deposito.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Rejeitar</button>
+                  </form>
+                {% else %}
+                  <span>-</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% else %}
+            <tr><td colspan="6" class="text-center">Nenhum depósito registrado</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-    <div class="mt-3">
-      {{ form.submit(class="btn btn-success") }}
+
+    <!-- Aba: Planos -->
+    <div class="tab-pane fade" id="plans" role="tabpanel">
+      <h5 class="mb-3">Planos Existentes</h5>
+      <table class="table table-sm table-bordered">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">ID</th><th scope="col">Nome</th><th scope="col">Invest</th><th scope="col">Rendimento</th><th scope="col">Retorno</th><th scope="col">Status</th><th scope="col">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in planos %}
+          <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.nome }}</td>
+            <td>{{ p.invest }}</td>
+            <td>{{ p.rendimento }}</td>
+            <td>{{ p.retorno }}</td>
+            <td>{{ 'Ativo' if p.ativo else 'Inativo' }}</td>
+            <td>
+              <a href="{{ url_for('admin.editar_plano', id=p.id) }}" class="btn btn-primary btn-sm">Editar</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="7" class="text-center">Nenhum plano cadastrado</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
-  </form>
-</div>
-
-  <hr>
-  <h5 class="mt-3">Planos Existentes</h5>
-  <table class="table table-sm table-bordered mt-2">
-    <thead class="table-light">
-      <tr>
-        <th>ID</th><th>Nome</th><th>Invest</th><th>Rendimento</th><th>Retorno</th><th>Status</th><th>Ações</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for p in planos %}
-      <tr>
-        <td>{{ p.id }}</td>
-        <td>{{ p.nome }}</td>
-        <td>{{ p.invest }}</td>
-        <td>{{ p.rendimento }}</td>
-        <td>{{ p.retorno }}</td>
-        <td>{{ 'Ativo' if p.ativo else 'Inativo' }}</td>
-        <td>
-          <a href="{{ url_for('admin.editar_plano', id=p.id) }}" class="btn btn-primary btn-sm">Editar</a>
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</div>
-
 
   </div>
-
-
-
 </div>
-
-
 
 {% endblock %}
