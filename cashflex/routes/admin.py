@@ -28,7 +28,7 @@ def dashboard():
 
     investments = Investment.query.all()
     withdrawals = Withdrawal.query.all()
-    deposits = Deposit.query.allo()
+    deposits = Deposit.query.all()
 
     # Filtragem dos depósitos por status
     pendentes_depositos = Deposit.query.filter_by(status='pendente').order_by(Deposit.timestamp.desc()).all()
@@ -68,7 +68,7 @@ def aprovar_deposito(id):
         flash("Acesso negado.", "danger")
         return redirect(url_for('main.login'))
 
-    deposito = Deposito.query.get_or_404(id)
+    deposito = Deposit.query.get_or_404(id)
     deposito.status = "aprovado"
     deposito.data_aprovacao = datetime.utcnow()
     db.session.commit()
@@ -84,7 +84,7 @@ def recusar_deposito(id):
         flash("Acesso negado.", "danger")
         return redirect(url_for('main.login'))
 
-    deposito = Deposito.query.get_or_404(id)
+    deposito = Deposit.query.get_or_404(id)
     deposito.status = "recusado"
     deposito.data_recusa = datetime.utcnow()
     db.session.commit()
