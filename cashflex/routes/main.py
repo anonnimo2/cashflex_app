@@ -197,15 +197,20 @@ def depositar():
     form = DepositForm()
 
     if form.validate_on_submit():
-        valor = form.valor.data
-        comprovativo = form.comprovativo.data
+        valor = form.amount.data  # ajustar aqui para amount
+        comprovativo = form.proof.data  # seu campo chama proof, não comprovativo
 
-        # Salva o comprovativo
         filename = secure_filename(comprovativo.filename)
-        upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-        comprovativo.save(upload_path)
+        upload_folder = current_app.config.get('UPLOAD_FOLDER', 'static/proofs')
+        upload_path = os.path.join(current_app.root_path, upload_folder)
 
-        # Registra no banco
+        # Garantir que a pasta existe
+        os.makedirs(upload_path, exist_ok=True)
+
+        # Salvar arquivo
+        comprovativo.save(os.path.join(upload_path, filename))
+
+        # Salvar no banco
         novo_deposito = Deposit(
             user_id=current_user.id,
             amount=float(valor),
@@ -219,9 +224,9 @@ def depositar():
         flash("✅ Depósito enviado para aprovação!", "success")
         return redirect(url_for('main.dashboard'))
 
-    # 🔹 Buscar planos sempre que for renderizar a tela
     planos = InvestmentPlan.query.all()
     return render_template('deposit.html', form=form, planos=planos)
+
 
 
 
