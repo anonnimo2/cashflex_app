@@ -16,8 +16,8 @@ ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png', 'pdf'}
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-UPLOAD_FOLDER = os.path.join(current_app.root_path, "static", "proofs")
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # 🔹 Cria a pasta se não existir
+UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "static", "proofs")
+UPLOAD_FOLDER = os.path.abspath(UPLOAD_FOLDER)
 
 @plan.route('/invest', methods=['GET', 'POST'])
 @login_required
