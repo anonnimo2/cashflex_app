@@ -177,6 +177,53 @@ def gerar_comissoes(user, amount):
 
         upline_code = upline.referred_by  # próximo nível
 
+
+@plan.route("/deposit/confirm", methods=["POST"])
+@login_required
+def confirm_deposit():
+    amount = request.form.get("amount")
+    proof_file = request.files.get("proof")  # arquivo de comprovativo
+
+    # Valida valor
+    if not amount:
+        flash("O valor do depósito é obrigatório.", "danger")
+        return redirect(url_for("plan.select_deposit_amount"))
+
+    try:
+        amount = float(amount)
+    except ValueError:
+        flash("Valor inválido.", "danger")
+        return redirect(url_for("plan.select_deposit_amount"))
+
+    if amount <= 0:
+        flash("O valor deve ser maior que zero.", "danger")
+        return redirect(url_for("plan.select_deposit_amount"))
+
+    # Valida arquivo
+    if not proof_file or proof_file.filename == "":
+        flash("Envie um comprovativo de pagamento.", "danger")
+        return redirect(url_for("plan.deposit_details"))
+
+    # Salvar arquivo de forma segura
+    filename = secure_filename(proof_file.filename)
+    filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
+    proof_file.save(filepath)
+
+    # Registrar depósito no banco
+    deposit = Deposit(
+        user_id=current_user.id,
+        amount=amount,
+        proof=filename,
+        status="Pendente",
+        created_at=datetime.utcnow()
+    )
+    db.session.add(deposit)
+    db.session.commit()
+
+    flash("Depósito enviado para análise. Aguarde aprovação.", "success")
+    return redirect(url_for("main.dashboard"))
+
+
 @plan.route("/deposit/select", methods=["GET"])
 @login_required
 def select_deposit_amount():
