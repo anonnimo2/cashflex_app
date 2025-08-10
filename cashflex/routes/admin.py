@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_required, current_user
-from cashflex.models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan, Deposito
+from cashflex.models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan, Deposit
 from cashflex import db
 from datetime import datetime
 from cashflex.forms import PlanForm, DepositForm
