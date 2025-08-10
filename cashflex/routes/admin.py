@@ -28,7 +28,7 @@ def dashboard():
 
     investments = Investment.query.all()
     withdrawals = Withdrawal.query.all()
-    deposits = Deposit.query.all()
+    deposits = Deposit.query.allo()
 
     # Filtragem dos depósitos por status
     pendentes_depositos = Deposit.query.filter_by(status='pendente').order_by(Deposit.timestamp.desc()).all()
