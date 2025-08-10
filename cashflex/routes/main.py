@@ -194,20 +194,18 @@ def profile():
 @main.route('/depositar', methods=['GET', 'POST'])
 @login_required
 def depositar():
-    if request.method == 'POST':
-        valor = request.form.get('valor')
-        comprovativo = request.files.get('comprovativo')
+    form = DepositForm()
 
-        if not valor or not comprovativo:
-            flash("⚠️ Informe o valor e envie o comprovativo!", "warning")
-            return redirect(url_for('main.depositar'))
+    if form.validate_on_submit():
+        valor = form.valor.data
+        comprovativo = form.comprovativo.data
 
         # Salva o comprovativo
         filename = secure_filename(comprovativo.filename)
         upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
         comprovativo.save(upload_path)
 
-        # Registra o depósito como pendente
+        # Registra no banco
         novo_deposito = Deposit(
             user_id=current_user.id,
             amount=float(valor),
@@ -221,28 +219,7 @@ def depositar():
         flash("✅ Depósito enviado para aprovação!", "success")
         return redirect(url_for('main.dashboard'))
 
-    return render_template('deposit.html')
+    return render_template('deposit.html', form=form)
 
-@main.route("/deposit/select", methods=["GET"])
-@login_required
-def select_deposit_amount():
-    planos = InvestmentPlan.query.all()
-    return render_template("select_amount.html", planos=planos)
 
-# Página de detalhes e upload comprovativo
-main.route("/deposit/details", methods=["POST"])
-@login_required
-def deposit_details():
-    amount = request.form.get("amount")
-    if not amount:
-        flash("Selecione um valor válido.", "danger")
-        return redirect(url_for("select_deposit_amount"))
-
-    try:
-        amount = float(amount)
-    except ValueError:
-        flash("Valor inválido.", "danger")
-        return redirect(url_for("select_deposit_amount"))
-
-    return render_template("deposit_details.html", amount=amount)
 
