@@ -22,7 +22,8 @@
     {% for plano in planos %}
       <div class="col-4 col-md-3">
         <form method="POST" action="{{ url_for('main.depositar') }}">
-          <input type="hidden" name="amount" value="{{ plano.valor }}">
+          {{ form.hidden_tag() }}
+          <input type="hidden" name="valor" value="{{ plano.valor }}">
           <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-bold">
             {{ plano.valor | int }}
           </button>
@@ -31,29 +32,6 @@
     {% endfor %}
   </div>
 
-</div>
-
-
-<script>
-  function selecionarPlano(valor) {
-    document.getElementById('valor_input').value = valor;
-  }
-</script>
-
-<!-- Tab Bar -->
-<div class="tab-bar">
-  <a href="{{ url_for('main.dashboard') }}">
-    <i class="bi bi-house-door-fill"></i> Início
-  </a>
-  <a href="{{ url_for('main.history') }}">
-    <i class="bi bi-clock-history"></i> Histórico
-  </a>
-  <a href="{{ url_for('main.referrals') }}">
-    <i class="bi bi-people-fill"></i> Equipa
-  </a>
-  <a href="{{ url_for('main.wallet') }}">
-    <i class="bi bi-wallet2"></i> Carteira
-  </a>
 </div>
 
 {% endblock %}
