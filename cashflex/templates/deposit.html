@@ -21,7 +21,7 @@
   <div class="row g-2">
     {% for plano in planos %}
       <div class="col-4 col-md-3">
-        <form method="POST" action="{{ url_for('deposit_details') }}">
+        <form method="POST" action="{{ url_for('main.depositar') }}">
           <input type="hidden" name="amount" value="{{ plano.valor }}">
           <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-bold">
             {{ plano.valor | int }}
