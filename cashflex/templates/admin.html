@@ -156,7 +156,7 @@
                             <td>{{ deposito.user.nome }}</td>
                             <td>{{ deposito.amount | round(2) }}</td>
                             <td>{{ deposito.status }}</td>
-                            <td>{{ deposito.data.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
                             <td>
                                 {% if deposito.status == 'pendente' %}
                                     <form action="{{ url_for('admin.aprovar_deposito', id=deposito.id) }}" method="post" style="display:inline;">
