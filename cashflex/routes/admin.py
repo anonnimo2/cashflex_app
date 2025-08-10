@@ -2,9 +2,11 @@ from flask import Blueprint, render_template, redirect, url_for, flash, request,
 from flask_login import login_required, current_user
 from cashflex.models import Investment, Withdrawal, User, UserPlan, Commission, InvestmentPlan, Deposit
 from cashflex import db
+from flask import current_app
+from werkzeug.utils import secure_filename
 from datetime import datetime
 from cashflex.forms import PlanForm, DepositForm
-
+import os
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
 # Verifica se é admin antes de qualquer rota
@@ -91,6 +93,43 @@ def recusar_deposito(id):
 
     flash(f"Depósito de {deposito.user.phone} recusado.", "warning")
     return redirect(url_for('admin.dashboard'))
+
+@admin.route('/cadastrar_deposito', methods=['GET', 'POST'])
+@login_required
+def cadastrar_deposito():
+    form = DepositForm()
+
+    if form.validate_on_submit():
+        amount = form.amount.data
+        payment_method = form.payment_method.data
+        bank = form.bank.data
+        proof_file = form.proof.data
+
+        # Salvar arquivo de comprovativo
+        filename = secure_filename(proof_file.filename)
+        upload_folder = current_app.config.get('UPLOAD_FOLDER', 'static/proofs')
+        os.makedirs(upload_folder, exist_ok=True)
+        file_path = os.path.join(upload_folder, filename)
+        proof_file.save(file_path)
+
+        # Criar objeto depósito
+        novo_deposito = Deposit(
+            user_id=None,  # Se quiser associar a um usuário específico, adicione o campo no form e aqui
+            amount=amount,
+            payment_method=payment_method,
+            bank=bank,
+            proof=filename,
+            status='Aprovado',  # Como é admin, já aprova direto, mas pode ajustar
+            timestamp=datetime.utcnow()
+        )
+
+        db.session.add(novo_deposito)
+        db.session.commit()
+
+        flash("✅ Depósito registrado com sucesso!", "success")
+        return redirect(url_for('admin.dashboard'))  # Ajuste para sua rota de dashboard/admin
+
+    return render_template('admin_deposit_form.html', form=form)
 
 
 @admin.route('/approve-investment/<int:id>')
