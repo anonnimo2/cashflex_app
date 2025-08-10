@@ -5,7 +5,7 @@ from cashflex import db
 from flask import current_app
 from werkzeug.utils import secure_filename
 from datetime import datetime
-from cashflex.forms import PlanForm, DepositForm
+from cashflex.forms import PlanForm, DepositForm, SimpleActionForm
 import os
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
@@ -44,7 +44,7 @@ def dashboard():
 
     form_plan = PlanForm()
     form_deposit = DepositForm()
-
+    simple_action_form = SimpleActionForm()
     return render_template(
         'admin.html',
         users=users,

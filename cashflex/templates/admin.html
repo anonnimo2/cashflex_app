@@ -210,10 +210,11 @@
               <td>
                 {% if deposito.status.lower() == 'pendente' %}
                   <form action="{{ url_for('admin.aprovar_deposito', id=deposito.id) }}" method="post" style="display:inline;">
-                    {{ form.hidden_tag() }}
+                    {{ simple_action_form.hidden_tag() }}
                     <button type="submit" class="btn btn-success btn-sm">Aprovar</button>
                   </form>
                   <form action="{{ url_for('admin.recusar_deposito', id=deposito.id) }}" method="post" style="display:inline;">
+                    {{ simple_action_form.hidden_tag() }}
                     <button type="submit" class="btn btn-danger btn-sm">Rejeitar</button>
                   </form>
                 {% else %}
