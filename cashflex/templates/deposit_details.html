@@ -19,11 +19,12 @@
 
   <!-- Upload Comprovativo -->
   <form method="POST" enctype="multipart/form-data" action="{{ url_for('plan.confirm_deposit') }}">
+    {{ form.hidden_tag() }}   <!-- 🔹 Insere o CSRF token -->
     <input type="hidden" name="amount" value="{{ amount }}">
 
     <div class="mb-3">
       <label class="form-label fw-semibold">Comprovativo de pagamento</label>
-      <input type="file" name="proof" class="form-control" required>
+      <input type="file" name="proof" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
       <small class="text-muted">Formatos aceitos: JPG, PNG ou PDF</small>
     </div>
 
