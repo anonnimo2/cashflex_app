@@ -25,7 +25,7 @@
     <div class="col-6 col-md-3 mb-2">
       <div class="card shadow-sm">
         <div class="card-body">
-          <h6 class="text-muted">Sacado</h6>
+          <h6 class="text-muted">Retirado</h6>
           <h4 class="fw-bold">{{ total_sacado }} AOA</h4>
         </div>
       </div>
@@ -38,6 +38,14 @@
         </div>
       </div>
     </div>
+     <div class="col-6 col-md-2 mb-2">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h6 class="text-muted">Depósitos</h6>
+                <h4 class="fw-bold">{{ total_depositos }} AOA</h4>
+            </div>
+        </div>
+    </div>
   </div>
 
   <!-- Tabs -->
@@ -46,7 +54,7 @@
       <a class="nav-link active" data-bs-toggle="tab" href="#users" role="tab">Usuários</a>
     </li>
     <li class="nav-item" role="presentation">
-      <a class="nav-link" data-bs-toggle="tab" href="#withdrawals" role="tab">Saques</a>
+      <a class="nav-link" data-bs-toggle="tab" href="#withdrawals" role="tab">Retiradas</a>
     </li>
     <li class="nav-item" role="presentation">
       <a class="nav-link" data-bs-toggle="tab" href="#investments" role="tab">Investimentos Pendentes</a>
@@ -127,45 +135,48 @@
       </div>
     </div>
 
-<!-- Aba: Depósitos -->
-<div class="tab-pane fade" id="deposits" role="tabpanel">
-  <div class="table-responsive">
-    <table class="table table-striped">
-      <thead class="table-light">
-        <tr>
-          <th>ID</th>
-          <th>Usuário</th>
-          <th>Valor</th>
-          <th>Comprovativo</th>
-          <th>Status</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for d in deposits %}
-          {% if d.status == 'Pendente' %}
-          <tr>
-            <td>{{ d.id }}</td>
-            <td>{{ d.user_id }}</td>
-            <td>{{ d.amount }} AOA</td>
-            <td>
-              {% if d.proof %}
-                <a href="{{ url_for('static', filename='proofs/' + d.proof) }}" target="_blank">Ver</a>
-              {% else %}
-                <span class="text-muted">N/A</span>
-              {% endif %}
-            </td>
-            <td>{{ d.status }}</td>
-            <td>
-              <a href="{{ url_for('admin.aprovar_deposito', id=d.id) }}" class="btn btn-success btn-sm">Aprovar</a>
-            </td>
-          </tr>
-          {% endif %}
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
+        <!-- Aba de Depósitos -->
+        <div class="tab-pane fade" id="deposits" role="tabpanel">
+            <h4>Depósitos</h4>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Usuário</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Ação</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for deposito in deposits %}
+                        <tr class="{% if deposito.status == 'pendente' %}table-warning{% elif deposito.status == 'aprovado' %}table-success{% elif deposito.status == 'recusado' %}table-danger{% endif %}">
+                            <td>{{ deposito.id }}</td>
+                            <td>{{ deposito.usuario.nome }}</td>
+                            <td>{{ deposito.valor | round(2) }}</td>
+                            <td>{{ deposito.status }}</td>
+                            <td>{{ deposito.data.strftime('%d/%m/%Y %H:%M') }}</td>
+                            <td>
+                                {% if deposito.status == 'pendente' %}
+                                    <form action="{{ url_for('admin.aprovar_deposito', id=deposito.id) }}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-success btn-sm">Aprovar</button>
+                                    </form>
+                                    <form action="{{ url_for('admin.recusar_deposito', id=deposito.id) }}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm">Rejeitar</button>
+                                    </form>
+                                {% else %}
+                                    <span>-</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr><td colspan="6" class="text-center">Nenhum depósito registrado</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
 
     <!-- Aba: Investimentos Pendentes -->
     <div class="tab-pane fade" id="investments" role="tabpanel">

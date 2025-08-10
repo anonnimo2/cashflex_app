@@ -17,7 +17,11 @@ def check_admin():
         return redirect(url_for('main.login'))
 
 @admin.route('/dashboard')
+@login_required
 def dashboard():
+    if not current_user.is_admin:
+        abort(403)
+
     search = request.args.get('search')
     if search:
         users = User.query.filter(User.phone.contains(search)).all()
@@ -26,97 +30,73 @@ def dashboard():
 
     investments = Investment.query.all()
     withdrawals = Withdrawal.query.all()
+    deposits = Deposit.query.all()
+
+    # Filtragem dos depósitos por status
+    pendentes_depositos = Deposit.query.filter_by(status='Pendente').order_by(Deposit.timestamp.desc()).all()
+    aprovados_depositos = Deposit.query.filter_by(status='Aprovado').order_by(Deposit.timestamp.desc()).all()
+    recusados_depositos = Deposit.query.filter_by(status='Recusado').order_by(Deposit.timestamp.desc()).all()
 
     total_users = len(users)
     total_investido = sum(i.amount for i in investments if i.status == 'Aprovado')
     total_sacado = sum(w.amount for w in withdrawals if w.status == 'Aprovado')
     saldo_total = sum(u.balance for u in users)
-    form = PlanForm()
-    return render_template('admin.html',
+
+    form_plan = PlanForm()
+    form_deposit = DepositForm()
+
+    return render_template(
+        'admin.html',
         users=users,
         investments=investments,
         withdrawals=withdrawals,
+        deposits=deposits,
+        pendentes_depositos=pendentes_depositos,
+        aprovados_depositos=aprovados_depositos,
+        recusados_depositos=recusados_depositos,
         total_users=total_users,
         total_investido=total_investido,
         total_sacado=total_sacado,
-        saldo_total=saldo_total, 
-        form=form
+        saldo_total=saldo_total,
+        form_plan=form_plan,
+        form_deposit=form_deposit
     )
 
-@admin.route('/depositos', methods=['GET', 'POST'])
+@admin.route('/admin/depositos', methods=['GET', 'POST'])
 @login_required
 def depositos():
     if not current_user.is_admin:
         abort(403)
 
-    form = DepositForm()
-    if form.validate_on_submit():
-        # Cria a pasta se não existir
-        folder = os.path.join(current_app.root_path, 'static', 'proofs')
-        os.makedirs(folder, exist_ok=True)
+    if request.method == 'POST':
+        deposito_id = request.form.get('deposito_id')
+        acao = request.form.get('acao')
 
-        file = form.proof.data
-        filename = secure_filename(file.filename)
+        deposito = Deposit.query.get_or_404(deposito_id)
 
-        # Salva o arquivo na pasta correta
-        filepath = os.path.join(folder, filename)
-        file.save(filepath)
+        if acao == 'aprovar':
+            deposito.status = 'Aprovado'
+            deposito.user.balance += deposito.amount
+            flash(f"💰 Depósito de {deposito.amount:.2f} Kz aprovado com sucesso!", "success")
 
-        deposito = Deposit(
-            user_id=current_user.id,
-            amount=form.amount.data,
-            payment_method=form.payment_method.data,
-            bank=form.bank.data,
-            proof=filename
-        )
-        db.session.add(deposito)
+        elif acao == 'recusar':
+            deposito.status = 'Recusado'
+            flash("❌ Depósito recusado!", "danger")
+
+        deposito.timestamp = datetime.utcnow()
         db.session.commit()
-        flash('Depósito enviado para aprovação.', 'success')
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('admin.depositos'))
 
-    # Listas de depósitos para o painel admin
     pendentes = Deposit.query.filter_by(status='Pendente').order_by(Deposit.timestamp.desc()).all()
     aprovados = Deposit.query.filter_by(status='Aprovado').order_by(Deposit.timestamp.desc()).all()
     recusados = Deposit.query.filter_by(status='Recusado').order_by(Deposit.timestamp.desc()).all()
 
-    return render_template('admin/depositos.html',
-                           form=form,
-                           pendentes=pendentes,
-                           aprovados=aprovados,
-                           recusados=recusados)
-
-
-
-@admin.route('/aprovar_deposito/<int:id>')
-@login_required
-def aprovar_deposito(id):
-    deposito = Deposit.query.get_or_404(id)
-    if deposito.status != 'Pendente':
-        flash('Depósito já processado.', 'warning')
-        return redirect(url_for('admin.dashboard'))
-
-    deposito.status = 'Aprovado'
-    deposito.user.balance = (deposito.user.balance or 0) + deposito.amount
-    db.session.commit()
-    flash('Depósito aprovado e saldo atualizado.', 'success')
-    return redirect(url_for('admin.dashboard'))
-
-@admin.route('/recusar_deposito/<int:id>')
-@login_required
-def recusar_deposito(id):
-    if not current_user.is_admin:
-        abort(403)
-
-    deposito = Deposit.query.get_or_404(id)
-    if deposito.status != 'Pendente':
-        flash('Depósito já processado.', 'warning')
-        return redirect(url_for('admin.depositos'))
-
-    deposito.status = 'Recusado'
-    db.session.commit()
-    flash('Depósito recusado.', 'danger')
-    return redirect(url_for('admin.depositos'))
-
+    return render_template(
+        'admin/depositos.html',
+        pendentes=pendentes,
+        aprovados=aprovados,
+        recusados=recusados
+    )
 
 @admin.route('/approve-investment/<int:id>')
 @login_required

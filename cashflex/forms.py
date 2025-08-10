@@ -29,7 +29,7 @@ class RegisterForm(FlaskForm):
     submit = SubmitField('Cadastrar')
 
 
-# Formulário de Investimento
+# Formulário de depósito
 class DepositForm(FlaskForm):
     amount = FloatField('Valor do Investimento', validators=[
         DataRequired(message='Informe um valor.'),
@@ -65,7 +65,7 @@ class WithdrawalForm(FlaskForm):
         ('BCI', 'BCI')
     ], validators=[DataRequired(message='Selecione um banco.')])
 
-    submit = SubmitField('Solicitar Saque')
+    submit = SubmitField('Solicitar Retirada')
 
 
 

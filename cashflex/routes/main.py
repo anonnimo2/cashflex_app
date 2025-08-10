@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, abort
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from cashflex import db
 from flask import current_app
+from datetime import datetime
 from cashflex.forms import LoginForm, RegisterForm, WithdrawalForm, ProfileForm, DepositForm
 from cashflex.models import User, Withdrawal,generate_unique_code, UserPlan, Investment, Commission, InvestmentPlan, Deposit
 import os
@@ -174,35 +175,6 @@ def history():
         active_plans=active_plans
     )
 
-@main.route('/deposit', methods=['GET', 'POST'])
-@login_required
-def deposit():
-    form = DepositForm()
-    if form.validate_on_submit():
-        # Cria a pasta se não existir
-        folder = os.path.join(current_app.root_path, 'static', 'proofs')
-        os.makedirs(folder, exist_ok=True)
-
-        file = form.proof.data
-        filename = secure_filename(file.filename)
-
-        # Usa a pasta correta criada acima
-        filepath = os.path.join(folder, filename)
-        file.save(filepath)
-
-        deposito = Deposit(
-            user_id=current_user.id,
-            amount=form.amount.data,
-            payment_method=form.payment_method.data,
-            bank=form.bank.data,
-            proof=filename
-        )
-        db.session.add(deposito)
-        db.session.commit()
-        flash('Depósito enviado para aprovação.', 'success')
-        return redirect(url_for('main.dashboard'))
-
-    return render_template('deposit.html', form=form)
 
 
 @main.route('/profile', methods=['GET', 'POST'])
@@ -217,6 +189,39 @@ def profile():
         flash('Informações atualizadas com sucesso!', 'success')
         return redirect(url_for('main.withdraw'))
     return render_template('profile.html', form=form)
+
+
+@main.route('/depositar', methods=['GET', 'POST'])
+@login_required
+def depositar():
+    if request.method == 'POST':
+        valor = request.form.get('valor')
+        comprovativo = request.files.get('comprovativo')
+
+        if not valor or not comprovativo:
+            flash("⚠️ Informe o valor e envie o comprovativo!", "warning")
+            return redirect(url_for('main.depositar'))
+
+        # Salva o comprovativo
+        filename = secure_filename(comprovativo.filename)
+        upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        comprovativo.save(upload_path)
+
+        # Registra o depósito como pendente
+        novo_deposito = Deposit(
+            user_id=current_user.id,
+            amount=float(valor),
+            proof=filename,
+            status='Pendente',
+            timestamp=datetime.utcnow()
+        )
+        db.session.add(novo_deposito)
+        db.session.commit()
+
+        flash("✅ Depósito enviado para aprovação!", "success")
+        return redirect(url_for('main.dashboard'))
+
+    return render_template('deposit.html')
 
 
 
