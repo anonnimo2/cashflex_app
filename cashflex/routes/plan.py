@@ -190,13 +190,13 @@ def deposit_details():
     amount = request.form.get("amount")
     if not amount:
         flash("Selecione um valor válido.", "danger")
-        return redirect(url_for("select_deposit_amount"))
+        return redirect(url_for("plan.select_deposit_amount"))
 
     try:
         amount = float(amount)
     except ValueError:
         flash("Valor inválido.", "danger")
-        return redirect(url_for("select_deposit_amount"))
+        return redirect(url_for("plan.select_deposit_amount"))
 
     return render_template("deposit_details.html", amount=amount)
 
