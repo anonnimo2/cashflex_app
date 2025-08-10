@@ -19,6 +19,9 @@ def allowed_file(filename):
 UPLOAD_FOLDER = os.path.join(os.path.dirname(__file__), "..", "static", "proofs")
 UPLOAD_FOLDER = os.path.abspath(UPLOAD_FOLDER)
 
+# Criar diretório se não existir
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 @plan.route('/invest', methods=['GET', 'POST'])
 @login_required
 def invest():
