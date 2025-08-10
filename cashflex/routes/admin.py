@@ -28,12 +28,12 @@ def dashboard():
 
     investments = Investment.query.all()
     withdrawals = Withdrawal.query.all()
-    deposits = Deposito.query.all()
+    deposits = Deposit.query.all()
 
     # Filtragem dos depósitos por status
-    pendentes_depositos = Deposito.query.filter_by(status='pendente').order_by(Deposito.timestamp.desc()).all()
-    aprovados_depositos = Deposito.query.filter_by(status='aprovado').order_by(Deposito.timestamp.desc()).all()
-    recusados_depositos = Deposito.query.filter_by(status='recusado').order_by(Deposito.timestamp.desc()).all()
+    pendentes_depositos = Deposit.query.filter_by(status='pendente').order_by(Deposit.timestamp.desc()).all()
+    aprovados_depositos = Deposit.query.filter_by(status='aprovado').order_by(Deposit.timestamp.desc()).all()
+    recusados_depositos = Deposit.query.filter_by(status='recusado').order_by(Deposit.timestamp.desc()).all()
 
     total_users = len(users)
     total_investido = sum(i.amount for i in investments if i.status.lower() == 'aprovado')
