@@ -182,7 +182,7 @@ def gerar_comissoes(user, amount):
 @login_required
 def confirm_deposit():
     amount = request.form.get("amount")
-    proof_file = request.files.get("proof")  # arquivo de comprovativo
+    proof_file = request.files.get("proof")  # Arquivo do comprovativo
 
     # Valida valor
     if not amount:
@@ -195,14 +195,14 @@ def confirm_deposit():
         flash("Valor inválido.", "danger")
         return redirect(url_for("plan.select_deposit_amount"))
 
-    if amount <= 0:
-        flash("O valor deve ser maior que zero.", "danger")
+    if amount < 5000:
+        flash("O valor mínimo de depósito é 5.000 Kz.", "danger")
         return redirect(url_for("plan.select_deposit_amount"))
 
     # Valida arquivo
-    if not proof_file or proof_file.filename == "":
+    if not proof_file or proof_file.filename.strip() == "":
         flash("Envie um comprovativo de pagamento.", "danger")
-        return redirect(url_for("plan.deposit_details"))
+        return redirect(url_for("plan.deposit_details", amount=amount))
 
     # Salvar arquivo de forma segura
     filename = secure_filename(proof_file.filename)
@@ -235,6 +235,7 @@ def select_deposit_amount():
 @plan.route("/deposit/details", methods=["POST"])
 @login_required
 def deposit_details():
+    form=DepositForm()
     amount = request.form.get("amount")
     if not amount:
         flash("Selecione um valor válido.", "danger")
@@ -246,6 +247,6 @@ def deposit_details():
         flash("Valor inválido.", "danger")
         return redirect(url_for("plan.select_deposit_amount"))
 
-    return render_template("deposit_details.html", amount=amount)
+    return render_template("deposit_details.html", amount=amount, form=form)
 
 
