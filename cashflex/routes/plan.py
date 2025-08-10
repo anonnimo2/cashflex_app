@@ -62,53 +62,6 @@ def invest():
     return render_template('invest.html', form=form)
 
 
-@plan.route('/depositar', methods=['GET', 'POST'])
-@login_required
-def depositar():
-    form = DepositForm()
-
-    if form.validate_on_submit():
-        valor = form.amount.data
-
-        # ✅ Valor mínimo
-        if valor < 5000:
-            flash('O valor mínimo para depósito é 5.000 AOA.', 'warning')
-            return redirect(url_for('plan.depositar'))
-
-        # 📁 Upload do comprovativo (opcional)
-        filename = None
-        if form.proof.data:
-            file = form.proof.data
-            filename = secure_filename(file.filename)
-
-            if not allowed_file(filename):
-                flash('Formato de arquivo não permitido. Envie JPG, PNG ou PDF.', 'danger')
-                return redirect(url_for('plan.depositar'))
-
-            filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-            os.makedirs(os.path.dirname(filepath), exist_ok=True)
-            file.save(filepath)
-
-        # 📝 Cria o depósito como pendente
-        deposito = Deposit(
-            user_id=current_user.id,
-            amount=valor,
-            proof=filename,
-            status='Pendente',
-            timestamp=datetime.utcnow()
-        )
-
-        db.session.add(deposito)
-        db.session.commit()
-
-        flash('📥 Depósito enviado! Aguarde aprovação do administrador.', 'success')
-        return redirect(url_for('main.dashboard'))
-
-    return render_template('depositar.html', form=form)
-
-
-
-
 @plan.route('/activate-plan/<int:id>')
 @login_required
 def activate_plan(id):
@@ -224,5 +177,27 @@ def gerar_comissoes(user, amount):
 
         upline_code = upline.referred_by  # próximo nível
 
+@plan.route("/deposit/select", methods=["GET"])
+@login_required
+def select_deposit_amount():
+    planos = InvestmentPlan.query.all()
+    return render_template("deposit.html", planos=planos)
+
+# Página de detalhes e upload comprovativo
+@plan.route("/deposit/details", methods=["POST"])
+@login_required
+def deposit_details():
+    amount = request.form.get("amount")
+    if not amount:
+        flash("Selecione um valor válido.", "danger")
+        return redirect(url_for("select_deposit_amount"))
+
+    try:
+        amount = float(amount)
+    except ValueError:
+        flash("Valor inválido.", "danger")
+        return redirect(url_for("select_deposit_amount"))
+
+    return render_template("deposit_details.html", amount=amount)
 
 

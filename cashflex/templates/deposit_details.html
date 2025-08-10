@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container py-4">
+
+  <h5 class="fw-bold mb-3">Detalhes para Depósito</h5>
+
+  <div class="alert alert-info shadow-sm rounded small mb-4">
+    <strong>Valor a transferir:</strong> <span class="fw-bold">Kz {{ "{:,.2f}".format(amount) }}</span>
+  </div>
+
+  <div class="alert alert-info shadow-sm rounded small mb-4">
+    <strong>Dados para transferência:</strong>
+    <ul class="mb-0 mt-2">
+      <li><strong>BAI:</strong> 0040 0000 5185 5656 1019 3 (Maneco Fino)</li>
+      <li><strong>BCI:</strong> 0005 0000 0118 6521 1011 5 (Sidney dos Santos)</li>
+    </ul>
+  </div>
+
+  <!-- Upload Comprovativo -->
+  <form method="POST" enctype="multipart/form-data" action="{{ url_for('confirm_deposit') }}">
+    <input type="hidden" name="amount" value="{{ amount }}">
+
+    <div class="mb-3">
+      <label class="form-label fw-semibold">Comprovativo de pagamento</label>
+      <input type="file" name="proof" class="form-control" required>
+      <small class="text-muted">Formatos aceitos: JPG, PNG ou PDF</small>
+    </div>
+
+    <!-- Botão -->
+    <div class="d-grid mb-4">
+      <button type="submit" class="btn btn-primary py-2 fw-bold">Enviar</button>
+    </div>
+  </form>
+
+  <div class="small text-muted">
+    <ol>
+      <li>Valor mínimo de recarga: <strong>5.000 Kz</strong></li>
+      <li>Envie o comprovativo após a transferência.</li>
+      <li>O saldo será creditado após confirmação.</li>
+    </ol>
+  </div>
+</div>
+
+{% endblock %}

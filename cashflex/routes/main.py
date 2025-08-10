@@ -223,5 +223,26 @@ def depositar():
 
     return render_template('deposit.html')
 
+@main.route("/deposit/select", methods=["GET"])
+@login_required
+def select_deposit_amount():
+    planos = InvestmentPlan.query.all()
+    return render_template("select_amount.html", planos=planos)
 
+# Página de detalhes e upload comprovativo
+main.route("/deposit/details", methods=["POST"])
+@login_required
+def deposit_details():
+    amount = request.form.get("amount")
+    if not amount:
+        flash("Selecione um valor válido.", "danger")
+        return redirect(url_for("select_deposit_amount"))
+
+    try:
+        amount = float(amount)
+    except ValueError:
+        flash("Valor inválido.", "danger")
+        return redirect(url_for("select_deposit_amount"))
+
+    return render_template("deposit_details.html", amount=amount)
 
