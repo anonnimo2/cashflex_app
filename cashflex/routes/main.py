@@ -217,7 +217,12 @@ def depositar():
         db.session.commit()
 
         flash("✅ Depósito enviado para aprovação!", "success")
+
+        planos = InvestmentPlan.query.all()
+
         return redirect(url_for('main.dashboard'))
+    
+
 
     return render_template('deposit.html', form=form)
 
