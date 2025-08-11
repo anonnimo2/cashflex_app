@@ -25,7 +25,7 @@ class User(db.Model, UserMixin):
     investments = db.relationship('Investment', backref='user', lazy=True)
     withdrawals = db.relationship('Withdrawal', backref='user', lazy=True)
     planos = db.relationship('UserPlan', backref='user', lazy=True)
-
+    deposits = db.relationship('Deposit', backref='user', lazy=True)
     def has_active_plan(self):
         return any(plan.ativo for plan in self.planos)
 

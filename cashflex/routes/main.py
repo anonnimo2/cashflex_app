@@ -68,8 +68,10 @@ def logout():
 @main.route('/dashboard')
 @login_required
 def dashboard():
+    user = current_user
+    deposits = Deposit.query.filter_by(user_id=user.id).order_by(Deposit.timestamp.desc()).all()
     planos = InvestmentPlan.query.filter_by(ativo=True).order_by(InvestmentPlan.valor.asc()).all()
-    return render_template('dashboard.html', planos=planos)
+    return render_template('dashboard.html', planos=planos, deposits=deposits, user=user)
 
 @main.route('/withdraw', methods=['GET', 'POST'])
 @login_required
@@ -167,12 +169,13 @@ def history():
     withdrawals = Withdrawal.query.filter_by(user_id=current_user.id).order_by(Withdrawal.timestamp.desc()).all()
     commissions = Commission.query.filter_by(user_id=current_user.id).order_by(Commission.timestamp.desc()).all()
     active_plans = UserPlan.query.filter_by(user_id=current_user.id, ativo=True).order_by(UserPlan.criado_em.desc()).all()
-
+    deposits = Deposit.query.filter_by(user_id=current_user.id).order_by(Deposit.timestamp.desc()).all()
     return render_template("history.html",
         investments=investments,
         withdrawals=withdrawals,
         commissions=commissions,
-        active_plans=active_plans
+        active_plans=active_plans,
+        deposits=deposits
     )
 
 
