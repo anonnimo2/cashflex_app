@@ -57,6 +57,7 @@ def dashboard():
         total_investido=total_investido,
         total_sacado=total_sacado,
         saldo_total=saldo_total,
+        simple_action_form=simple_action_form, 
         form_plan=form_plan,
         form=form_deposit
     )
