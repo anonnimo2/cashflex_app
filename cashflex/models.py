@@ -197,3 +197,8 @@ def distribuir_comissao(investimento):
             db.session.add(padrinho)
             ref_code = padrinho
            
+class JobLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    job_name = db.Column(db.String(100), nullable=False)
+    run_date = db.Column(db.Date, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)           
