@@ -17,7 +17,7 @@ def distribuir_rendimentos():
 
     for plano, user in planos:
         # Evita pagar mais de uma vez no mesmo dia
-        if plano.ultima_distribuicao and plano.ultima_distribuicao.date() == hoje:
+        if plano.ultimo_credito and plano.ultimo_credito.date() == hoje:
             continue
 
         # Inicializa recebido se for None
@@ -27,7 +27,7 @@ def distribuir_rendimentos():
         # Atualiza saldo e registro de plano
         user.balance += plano.rendimento_diario
         plano.recebido += plano.rendimento_diario
-        plano.ultima_distribuicao = datetime.utcnow()
+        plano.ultimo_credito = datetime.utcnow()
 
         # Finaliza plano se atingir retorno total
         if plano.recebido >= plano.retorno_total:
