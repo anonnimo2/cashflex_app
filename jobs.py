@@ -1,33 +1,41 @@
 # jobs.py
-
-from datetime import datetime, timedelta
+from datetime import datetime, date
 from cashflex import db
 from cashflex.models import UserPlan, User
 
 def distribuir_rendimentos():
-    planos = UserPlan.query.filter_by(ativo=True).all()
-    agora = datetime.utcnow()
+    hoje = date.today()
     count = 0
 
-    for plano in planos:
-        if plano.ultima_distribuicao is None or (agora - plano.ultima_distribuicao) >= timedelta(seconds=10):
-            user = User.query.get(plano.user_id)
-            if not user:
-                continue
+    # Busca planos ativos e já traz o usuário junto (JOIN)
+    planos = (
+        db.session.query(UserPlan, User)
+        .join(User, UserPlan.user_id == User.id)
+        .filter(UserPlan.ativo == True)
+        .all()
+    )
 
-            if plano.recebido is None:
-                plano.recebido = 0.0
+    for plano, user in planos:
+        # Evita pagar mais de uma vez no mesmo dia
+        if plano.ultima_distribuicao and plano.ultima_distribuicao.date() == hoje:
+            continue
 
-            user.balance += plano.rendimento_diario
-            plano.recebido += plano.rendimento_diario
-            plano.ultima_distribuicao = agora
-                                         
-            if plano.recebido >= plano.retorno_total:
-                plano.ativo = False
+        # Inicializa recebido se for None
+        if plano.recebido is None:
+            plano.recebido = 0.0
 
-            db.session.add(user)
-            db.session.add(plano)
-            count += 1
+        # Atualiza saldo e registro de plano
+        user.balance += plano.rendimento_diario
+        plano.recebido += plano.rendimento_diario
+        plano.ultima_distribuicao = datetime.utcnow()
+
+        # Finaliza plano se atingir retorno total
+        if plano.recebido >= plano.retorno_total:
+            plano.ativo = False
+            print(f"Plano ID {plano.id} finalizado para usuário {user.id}")
+
+        count += 1
 
     db.session.commit()
     print(f"[{datetime.now()}] Rendimento distribuído para {count} planos.")
+
