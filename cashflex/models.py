@@ -152,8 +152,6 @@ class Deposit(db.Model):
     status = db.Column(db.String(20), default='Pendente')
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('User', backref='deposits')
-
 
 
 class Commission(db.Model):
