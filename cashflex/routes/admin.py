@@ -62,7 +62,6 @@ def dashboard():
         form=form_deposit
     )
 
-# Aprovar depósito
 @admin.route('/aprovar_deposito/<int:id>', methods=['POST'])
 @login_required
 def aprovar_deposito(id):
@@ -71,11 +70,21 @@ def aprovar_deposito(id):
         return redirect(url_for('main.login'))
 
     deposito = Deposit.query.get_or_404(id)
+
+    if deposito.status.lower() != 'pendente':
+        flash("Este depósito já foi processado.", "warning")
+        return redirect(url_for('admin.dashboard'))
+
     deposito.status = "aprovado"
     deposito.data_aprovacao = datetime.utcnow()
+
+    # Atualiza saldo do usuário
+    user = deposito.user
+    user.saldo += deposito.amount  # ajuste conforme seu campo de saldo
+
     db.session.commit()
 
-    flash(f"Depósito de {deposito.user.phone} aprovado com sucesso!", "success")
+    flash(f"Depósito de {user.phone} aprovado com sucesso!", "success")
     return redirect(url_for('admin.dashboard'))
 
 # Recusar depósito
