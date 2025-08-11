@@ -1,8 +1,6 @@
-
 import os
-
 from dotenv import load_dotenv
-load_dotenv()  # Isso precisa vir ANTES de importar Config
+load_dotenv()  # Carrega as variáveis do .env antes de usar
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -29,5 +27,5 @@ class Config:
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or '@Anonimo22'
     MAIL_DEFAULT_SENDER = MAIL_USERNAME
 
-    # Pasta de uploads
+    # Pasta de uploads (caminho absoluto)
     UPLOAD_FOLDER = os.path.join(basedir, 'static', 'proofs')
