@@ -80,7 +80,7 @@ def aprovar_deposito(id):
 
     # Atualiza saldo do usuário
     user = deposito.user
-    user.saldo += deposito.amount  # ajuste conforme seu campo de saldo
+    user.balance += deposito.amount  # ajuste conforme seu campo de saldo
 
     db.session.commit()
 
