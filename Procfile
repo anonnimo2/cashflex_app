@@ -1,1 +1,1 @@
-worker: python cashflex_app/worker.py
+worker: python worker.py
