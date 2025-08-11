@@ -82,6 +82,7 @@ class UserPlan(db.Model):
     ultimo_credito = db.Column(db.DateTime)
     ativo = db.Column(db.Boolean, default=True)
     dias_pagamentos = db.Column(db.Integer, default=0)
+    recebido = db.Column(db.Float, default=0.0)
 
     @property
     def profit(self):
