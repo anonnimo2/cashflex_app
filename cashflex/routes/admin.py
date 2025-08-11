@@ -75,7 +75,7 @@ def aprovar_deposito(id):
         flash("Este depósito já foi processado.", "warning")
         return redirect(url_for('admin.dashboard'))
 
-    deposito.status = "aprovado"
+    deposito.status = "Aprovado"
     deposito.data_aprovacao = datetime.utcnow()
 
     # Atualiza saldo do usuário
@@ -96,7 +96,7 @@ def recusar_deposito(id):
         return redirect(url_for('main.login'))
 
     deposito = Deposit.query.get_or_404(id)
-    deposito.status = "recusado"
+    deposito.status = "Recusado"
     deposito.data_recusa = datetime.utcnow()
     db.session.commit()
 
