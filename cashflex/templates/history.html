@@ -74,9 +74,9 @@
           <div class="list-group-item d-flex justify-content-between align-items-center bg-light">
             <div>
               <strong>{{ dp.amount }} AOA</strong>
-              {% if dp.status == 'Aprovado' %}
+              {% if dp.status == 'aprovado' %}
                 <span class="badge bg-success-subtle text-success ms-2">Aprovado</span>
-              {% elif dp.status == 'Rejeitado' %}
+              {% elif dp.status == 'recusado' %}
                 <span class="badge bg-danger-subtle text-danger ms-2">Rejeitado</span>
               {% else %}
                 <span class="badge bg-primary-subtle text-primary ms-2">Pendente</span>
