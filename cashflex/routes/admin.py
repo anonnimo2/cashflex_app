@@ -186,9 +186,12 @@ def reject_investment(id):
 def approve_withdraw(id):
     wd = Withdrawal.query.get_or_404(id)
     if wd.status == 'Pendente':
+        taxa_percentual = 0.16
+        wd.taxa = wd.amount * taxa_percentual
+        wd.valor_liquido = wd.amount - wd.taxa
         wd.status = 'Aprovado'
         db.session.commit()
-        flash('Saque aprovado.', 'success')
+        flash(f"Saque aprovado. Taxa: {wd.taxa:.2f} Kz | Valor líquido: {wd.valor_liquido:.2f} Kz", "success")
     return redirect(url_for('admin.dashboard'))
 
 @admin.route('/reject-withdraw/<int:id>')

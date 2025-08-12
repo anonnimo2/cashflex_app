@@ -114,6 +114,9 @@ class Withdrawal(db.Model):
     bank = db.Column(db.String(10))  # Banco selecionado
     iban = db.Column(db.String(34))  # IBAN informado
     timestamp = db.Column(db.DateTime, server_default=db.func.now())
+    taxa = db.Column(db.Float, default=0.0)           # valor da taxa cobrada
+    valor_liquido = db.Column(db.Float, default=0.0)  # valor após desconto
+
 
     def __repr__(self):
         return f"<Saque {self.amount} de {self.user_id}>"
