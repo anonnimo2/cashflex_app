@@ -34,14 +34,20 @@
   <form method="POST">
     {{ form.hidden_tag() }}
 
-    <!-- Valor -->
-    <div class="mb-3">
-      {{ form.amount.label(class="form-label") }}
-      {{ form.amount(class="form-control", placeholder="Ex: 5000") }}
-      {% if form.amount.errors %}
-        <div class="text-danger small mt-1">{{ form.amount.errors[0] }}</div>
-      {% endif %}
-    </div>
+   <!-- Valor -->
+<div class="mb-3">
+  {{ form.amount.label(class="form-label") }}
+  {{ form.amount(class="form-control", placeholder="Ex: 5000", id="amount-input") }}
+  {% if form.amount.errors %}
+    <div class="text-danger small mt-1">{{ form.amount.errors[0] }}</div>
+  {% endif %}
+  <!-- Prévia da taxa e valor líquido -->
+  <div id="taxa-info" class="small text-muted mt-2" style="display: none;">
+    Taxa (16%): <span id="taxa-valor">0</span> AOA <br>
+    Valor líquido: <span id="liquido-valor">0</span> AOA
+  </div>
+</div>
+
 
     <!-- Banco -->
     <div class="mb-3">
@@ -95,4 +101,20 @@
     }
   });
 </script>
+
+<script>
+document.getElementById('amount-input').addEventListener('input', function () {
+    const valor = parseFloat(this.value);
+    if (!isNaN(valor) && valor > 0) {
+        const taxa = valor * 0.16;
+        const liquido = valor - taxa;
+        document.getElementById('taxa-valor').textContent = taxa.toFixed(2);
+        document.getElementById('liquido-valor').textContent = liquido.toFixed(2);
+        document.getElementById('taxa-info').style.display = 'block';
+    } else {
+        document.getElementById('taxa-info').style.display = 'none';
+    }
+});
+</script>
+
 {% endblock %}
