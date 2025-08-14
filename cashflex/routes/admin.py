@@ -181,7 +181,7 @@ def reject_investment(id):
         flash('Investimento rejeitado.', 'warning')
     return redirect(url_for('admin.dashboard'))
 
-@admin.route('/approve-withdraw/<int:id>')
+@admin.route('/approve-withdraw/<int:id>', methods=["POST"])
 @login_required
 def approve_withdraw(id):
     wd = Withdrawal.query.get_or_404(id)
@@ -194,7 +194,7 @@ def approve_withdraw(id):
         flash(f"Saque aprovado. Taxa: {wd.taxa:.2f} Kz | Valor líquido: {wd.valor_liquido:.2f} Kz", "success")
     return redirect(url_for('admin.dashboard'))
 
-@admin.route('/reject-withdraw/<int:id>')
+@admin.route('/reject-withdraw/<int:id>', methods=["POST"])
 @login_required
 def reject_withdraw(id):
     wd = Withdrawal.query.get_or_404(id)
@@ -203,6 +203,7 @@ def reject_withdraw(id):
         db.session.commit()
         flash('Saque rejeitado.', 'danger')
     return redirect(url_for('admin.dashboard'))
+
 
 # routes/admin.py
 
