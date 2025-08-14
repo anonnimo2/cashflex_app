@@ -1,77 +1,82 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="container py-4 mb-5">
 
-  <!-- Título -->
-  <div class="text-center mb-4">
-    <h4 class="fw-bold text-success">Solicitar Saque</h4>
-    <p class="text-muted small">
-      Saldo disponível: <strong>{{ current_user.balance | round(2) }} AOA</strong><br>
-      Mínimo para saque: <strong>1.200 AOA</strong>
-    </p>
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body">
 
-    {% if not current_user.bank or not current_user.iban %}
-      <div class="alert alert-danger small text-center">
-        ⚠️ Você precisa vincular seu <strong>banco</strong> e <strong>IBAN</strong> antes de solicitar saques.<br>
-        <a href="{{ url_for('main.profile') }}" class="btn btn-sm btn-outline-primary mt-2">Vincular Agora</a>
+      <!-- Título -->
+      <div class="text-center mb-4">
+        <h4 class="fw-bold text-success">💸 Solicitar Saque</h4>
+        <p class="text-muted small mb-0">
+          Saldo disponível: <strong>{{ current_user.balance | round(2) }} AOA</strong><br>
+          Mínimo para saque: <strong>1.200 AOA</strong>
+        </p>
       </div>
-    {% elif not current_user.has_active_plan() %}
-      <div class="alert alert-warning small">
-        ⚠️ Você precisa investir em um plano para desbloquear saques.
-      </div>
-    {% elif current_user.has_withdrawn_today() %}
-      <div class="alert alert-info small">
-        🕒 Você já fez um saque hoje. Tente novamente amanhã.
-      </div>
-    {% elif current_user.has_pending_withdrawal() %}
-      <div class="alert alert-info small">
-        ⏳ Você já tem um saque em análise. Aguarde a aprovação antes de solicitar outro.
-      </div>
-    {% endif %}
-  </div>
 
-  <!-- Formulário -->
-  <form method="POST">
-    {{ form.hidden_tag() }}
-
-   <!-- Valor -->
-<div class="mb-3">
-  {{ form.amount.label(class="form-label") }}
-  {{ form.amount(class="form-control", placeholder="Ex: 5000", id="amount-input") }}
-  {% if form.amount.errors %}
-    <div class="text-danger small mt-1">{{ form.amount.errors[0] }}</div>
-  {% endif %}
-  <!-- Prévia da taxa e valor líquido -->
-  <div id="taxa-info" class="small text-muted mt-2" style="display: none;">
-    Taxa (16%): <span id="taxa-valor">0</span> AOA <br>
-    Valor líquido: <span id="liquido-valor">0</span> AOA
-  </div>
-</div>
-
-
-    <!-- Banco -->
-    <div class="mb-3">
-      {{ form.bank.label(class="form-label") }}
-      {{ form.bank(class="form-select", id="bank-select") }}
-      {% if form.bank.errors %}
-        <div class="text-danger small mt-1">{{ form.bank.errors[0] }}</div>
+      <!-- Mensagens de alerta -->
+      {% if not current_user.bank or not current_user.iban %}
+        <div class="alert alert-danger small text-center">
+          ⚠️ Vincule seu <strong>banco</strong> e <strong>IBAN</strong> antes de solicitar saques.<br>
+          <a href="{{ url_for('main.profile') }}" class="btn btn-sm btn-outline-primary mt-2">Vincular Agora</a>
+        </div>
+      {% elif not current_user.has_active_plan() %}
+        <div class="alert alert-warning small text-center">
+          ⚠️ Você precisa investir em um plano para desbloquear saques.
+        </div>
+      {% elif current_user.has_withdrawn_today() %}
+        <div class="alert alert-info small text-center">
+          🕒 Você já fez um saque hoje. Tente novamente amanhã.
+        </div>
+      {% elif current_user.has_pending_withdrawal() %}
+        <div class="alert alert-info small text-center">
+          ⏳ Você já tem um saque em análise. Aguarde a aprovação.
+        </div>
       {% endif %}
-    </div>
 
-    <!-- Botão -->
-    <div class="d-grid">
-      <button type="submit" class="btn btn-danger w-100 py-2"
-        {% if not current_user.has_active_plan()
-              or current_user.has_withdrawn_today()
-              or current_user.has_pending_withdrawal()
-              or not current_user.bank
-              or not current_user.iban %}
-          disabled
-        {% endif %}>
-        Solicitar Saque
-      </button>
+      <!-- Formulário -->
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <!-- Valor -->
+        <div class="mb-3">
+          {{ form.amount.label(class="form-label fw-semibold") }}
+          {{ form.amount(class="form-control", placeholder="Ex: 5000", id="amount-input") }}
+          {% if form.amount.errors %}
+            <div class="text-danger small mt-1">{{ form.amount.errors[0] }}</div>
+          {% endif %}
+          <div id="taxa-info" class="small text-muted mt-2" style="display: none;">
+            Taxa (16%): <span id="taxa-valor">0</span> AOA <br>
+            Valor líquido: <span id="liquido-valor">0</span> AOA
+          </div>
+        </div>
+
+        <!-- Banco -->
+        <div class="mb-3">
+          {{ form.bank.label(class="form-label fw-semibold") }}
+          {{ form.bank(class="form-select", id="bank-select") }}
+          {% if form.bank.errors %}
+            <div class="text-danger small mt-1">{{ form.bank.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Botão -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-danger py-2 fw-bold"
+            {% if not current_user.has_active_plan()
+                  or current_user.has_withdrawn_today()
+                  or current_user.has_pending_withdrawal()
+                  or not current_user.bank
+                  or not current_user.iban %} disabled {% endif %}>
+            💵 Solicitar Saque
+          </button>
+        </div>
+
+      </form>
     </div>
-  </form>
+  </div>
 </div>
 
 <!-- Barra inferior -->
@@ -90,31 +95,21 @@
   </a>
 </div>
 
-<!-- Mostrar IBAN dinamicamente -->
-<script>
-  document.getElementById('bank-select').addEventListener('change', function () {
-    const ibanField = document.getElementById('iban-field');
-    if (this.value) {
-      ibanField.classList.remove('d-none');
-    } else {
-      ibanField.classList.add('d-none');
-    }
-  });
-</script>
-
+<!-- Script cálculo taxa -->
 <script>
 document.getElementById('amount-input').addEventListener('input', function () {
-    const valor = parseFloat(this.value);
-    if (!isNaN(valor) && valor > 0) {
-        const taxa = valor * 0.16;
-        const liquido = valor - taxa;
-        document.getElementById('taxa-valor').textContent = taxa.toFixed(2);
-        document.getElementById('liquido-valor').textContent = liquido.toFixed(2);
-        document.getElementById('taxa-info').style.display = 'block';
-    } else {
-        document.getElementById('taxa-info').style.display = 'none';
-    }
+  const valor = parseFloat(this.value);
+  if (!isNaN(valor) && valor > 0) {
+    const taxa = valor * 0.16;
+    const liquido = valor - taxa;
+    document.getElementById('taxa-valor').textContent = taxa.toFixed(2);
+    document.getElementById('liquido-valor').textContent = liquido.toFixed(2);
+    document.getElementById('taxa-info').style.display = 'block';
+  } else {
+    document.getElementById('taxa-info').style.display = 'none';
+  }
 });
 </script>
 
 {% endblock %}
+

@@ -3,47 +3,44 @@
 <div class="container py-3">
 
   <!-- SALDO ATUAL -->
-  <div class="rounded-4 shadow-sm mb-4 p-4 text-white position-relative overflow-hidden"
-       style="background-image: linear-gradient(to bottom, rgba(163, 160, 160, 0), rgba(0, 0, 0, 0.562)), 
-              url('{{ url_for('static', filename='img/img.png') }}');
-              background-size: cover;
-              height: 160px;
-              background-position: center;">
+  <div class="rounded-4 shadow-sm mb-4 p-4 text-white position-relative"
+       style="background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7)),
+              url('{{ url_for('static', filename='img/img.png') }}') center/cover no-repeat;">
     <h6 class="mb-1">Saldo Atual</h6>
-    <h2 class="fw-bold mb-0">Kz {{ current_user.balance }}</h2>
+    <h2 class="fw-bold mb-0">Kz {{ "{:,.2f}".format(current_user.balance) }}</h2>
   </div>
 
   <!-- ATALHOS RÁPIDOS -->
   <div class="row g-3 text-center mb-4">
-    <div class="col-3">
+    <div class="col-6 col-md-3">
       <a href="{{ url_for('main.depositar') }}" class="text-decoration-none">
-        <div class="bg-white border rounded-3 py-3 shadow-sm">
-          <i class="bi bi-arrow-up-circle-fill text-primary fs-4"></i>
-          <div class="small mt-1">Depósito</div>
+        <div class="bg-white border rounded-3 py-3 shadow-sm h-100 hover-shadow">
+          <i class="bi bi-arrow-up-circle-fill text-primary fs-3"></i>
+          <div class="small mt-1 fw-semibold">Depósito</div>
         </div>
       </a>
     </div>
-    <div class="col-3">
+    <div class="col-6 col-md-3">
       <a href="{{ url_for('main.withdraw') }}" class="text-decoration-none">
-        <div class="bg-white border rounded-3 py-3 shadow-sm">
-          <i class="bi bi-arrow-down-circle-fill text-danger fs-4"></i>
-          <div class="small mt-1">Retirar</div>
+        <div class="bg-white border rounded-3 py-3 shadow-sm h-100 hover-shadow">
+          <i class="bi bi-arrow-down-circle-fill text-danger fs-3"></i>
+          <div class="small mt-1 fw-semibold">Retirar</div>
         </div>
       </a>
     </div>
-    <div class="col-3">
+    <div class="col-6 col-md-3">
       <a href="{{ url_for('main.referrals') }}" class="text-decoration-none">
-        <div class="bg-white border rounded-3 py-3 shadow-sm">
-          <i class="bi bi-people-fill text-success fs-4"></i>
-          <div class="small mt-1">Equipa</div>
+        <div class="bg-white border rounded-3 py-3 shadow-sm h-100 hover-shadow">
+          <i class="bi bi-people-fill text-success fs-3"></i>
+          <div class="small mt-1 fw-semibold">Equipa</div>
         </div>
       </a>
     </div>
-    <div class="col-3">
+    <div class="col-6 col-md-3">
       <a href="https://t.me/+oVt0BV7LkrgwNWU0" target="_blank" class="text-decoration-none">
-        <div class="bg-white border rounded-3 py-3 shadow-sm">
-          <i class="bi bi-telegram text-info fs-4"></i>
-          <div class="small mt-1">Suporte</div>
+        <div class="bg-white border rounded-3 py-3 shadow-sm h-100 hover-shadow">
+          <i class="bi bi-telegram text-info fs-3"></i>
+          <div class="small mt-1 fw-semibold">Suporte</div>
         </div>
       </a>
     </div>
@@ -61,19 +58,20 @@
     {% else %}
       {% set roi = 0 %}
     {% endif %}
+
     <div class="card mb-3 shadow-sm border-0 rounded-4">
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <strong>{{ plano.nome }}</strong>
+          <strong class="text-truncate">{{ plano.nome }}</strong>
           <span class="badge bg-success">+{{ roi }}% ROI</span>
         </div>
-        <ul class="list-unstyled small mb-3">
-          <li><i class="bi bi-cash-coin me-1"></i> Investimento: <strong>{{ plano.invest }} AOA</strong></li>
-          <li><i class="bi bi-graph-up-arrow me-1"></i> Rendimento diário: <strong>{{ plano.rendimento_diario }} AOA</strong></li>
-          <li><i class="bi bi-piggy-bank me-1"></i> Retorno total: <strong>{{ plano.retorno_total }} AOA</strong></li>
-        </ul>
+        <div class="row small text-muted mb-3">
+          <div class="col-6"><i class="bi bi-cash-coin me-1"></i> Invest: <strong>{{ "{:,.2f}".format(plano.invest) }} AOA</strong></div>
+          <div class="col-6"><i class="bi bi-graph-up-arrow me-1"></i> Diário: <strong>{{ "{:,.2f}".format(plano.rendimento_diario) }} AOA</strong></div>
+          <div class="col-12 mt-1"><i class="bi bi-piggy-bank me-1"></i> Retorno total: <strong>{{ "{:,.2f}".format(plano.retorno_total) }} AOA</strong></div>
+        </div>
         <a href="{{ url_for('plan.confirmar_plano', plano_id=plano.id, nome=plano.nome, invest=plano.invest, rendimento=plano.rendimento_diario, retorno=plano.retorno_total) }}"
-           class="btn btn-primary w-100 rounded-pill">
+           class="btn btn-primary w-100 rounded-pill fw-semibold">
           Comprar Plano
         </a>
       </div>
@@ -84,17 +82,25 @@
 
 <!-- TAB BAR -->
 <div class="tab-bar">
-  <a href="{{ url_for('main.dashboard') }}" class="active">
+  <a href="{{ url_for('main.dashboard') }}" class="{% if request.endpoint == 'main.dashboard' %}active{% endif %}">
     <i class="bi bi-house-door-fill"></i> Início
   </a>
-  <a href="{{ url_for('main.history') }}">
+  <a href="{{ url_for('main.history') }}" class="{% if request.endpoint == 'main.history' %}active{% endif %}">
     <i class="bi bi-clock-history"></i> Histórico
   </a>
-  <a href="{{ url_for('main.referrals') }}">
+  <a href="{{ url_for('main.referrals') }}" class="{% if request.endpoint == 'main.referrals' %}active{% endif %}">
     <i class="bi bi-people-fill"></i> Equipa
   </a>
-  <a href="{{ url_for('main.wallet') }}">
+  <a href="{{ url_for('main.wallet') }}" class="{% if request.endpoint == 'main.wallet' %}active{% endif %}">
     <i class="bi bi-wallet2"></i> Carteira
   </a>
 </div>
+
+<style>
+  .hover-shadow:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+  }
+</style>
 {% endblock %}
