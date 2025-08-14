@@ -194,6 +194,7 @@ def approve_withdraw(id):
         flash(f"Saque aprovado. Taxa: {wd.taxa:.2f} Kz | Valor líquido: {wd.valor_liquido:.2f} Kz", "success")
     return redirect(url_for('admin.dashboard'))
 
+
 @admin.route('/reject-withdraw/<int:id>', methods=["POST"])
 @login_required
 def reject_withdraw(id):
