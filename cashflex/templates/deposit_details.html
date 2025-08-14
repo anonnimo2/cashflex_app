@@ -22,27 +22,43 @@
     <div class="card-body">
       <h6 class="fw-semibold text-muted mb-3">Dados para Transferência</h6>
       <div class="row gy-3">
+        
+        <!-- BAI -->
         <div class="col-12 col-md-4">
-          <div class="p-3 bg-light rounded shadow-sm h-100">
-            <h6 class="fw-bold mb-1">BAI</h6>
-            <p class="mb-0 small text-muted">0040 0000 5185 5656 1019 3</p>
-            <small class="text-dark">Maneco Fino</small>
+          <div class="p-3 bg-light rounded shadow-sm h-100 d-flex flex-column justify-content-between">
+            <div>
+              <h6 class="fw-bold mb-1">BAI</h6>
+              <p id="iban-bai" class="mb-1 small text-muted">0040 0000 5185 5656 1019 3</p>
+              <small class="text-dark">Maneco Fino</small>
+            </div>
+            <button class="btn btn-outline-primary btn-sm mt-3" onclick="copyIBAN('iban-bai')">Copiar</button>
           </div>
         </div>
+
+        <!-- BCI -->
         <div class="col-12 col-md-4">
-          <div class="p-3 bg-light rounded shadow-sm h-100">
-            <h6 class="fw-bold mb-1">BCI</h6>
-            <p class="mb-0 small text-muted">0005 0000 0118 6521 1011 5</p>
-            <small class="text-dark">Sidney dos Santos</small>
+          <div class="p-3 bg-light rounded shadow-sm h-100 d-flex flex-column justify-content-between">
+            <div>
+              <h6 class="fw-bold mb-1">BCI</h6>
+              <p id="iban-bci" class="mb-1 small text-muted">0005 0000 0118 6521 1011 5</p>
+              <small class="text-dark">Sidney dos Santos</small>
+            </div>
+            <button class="btn btn-outline-primary btn-sm mt-3" onclick="copyIBAN('iban-bci')">Copiar</button>
           </div>
         </div>
+
+        <!-- Atlântico -->
         <div class="col-12 col-md-4">
-          <div class="p-3 bg-light rounded shadow-sm h-100">
-            <h6 class="fw-bold mb-1">Atlântico</h6>
-            <p class="mb-0 small text-muted">0055 0000 6706 3328 1019 2</p>
-            <small class="text-dark">Júlio Pedro</small>
+          <div class="p-3 bg-light rounded shadow-sm h-100 d-flex flex-column justify-content-between">
+            <div>
+              <h6 class="fw-bold mb-1">Atlântico</h6>
+              <p id="iban-atl" class="mb-1 small text-muted">0055 0000 6706 3328 1019 2</p>
+              <small class="text-dark">Júlio Pedro</small>
+            </div>
+            <button class="btn btn-outline-primary btn-sm mt-3" onclick="copyIBAN('iban-atl')">Copiar</button>
           </div>
         </div>
+
       </div>
     </div>
   </div>
@@ -79,5 +95,23 @@
   </div>
 
 </div>
+
+<!-- Script de cópia -->
+<script>
+function copyIBAN(elementId) {
+    const text = document.getElementById(elementId).textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        btn.textContent = "Copiado!";
+        btn.classList.remove("btn-outline-primary");
+        btn.classList.add("btn-success");
+        setTimeout(() => {
+            btn.textContent = "Copiar";
+            btn.classList.remove("btn-success");
+            btn.classList.add("btn-outline-primary");
+        }, 1500);
+    });
+}
+</script>
 
 {% endblock %}
