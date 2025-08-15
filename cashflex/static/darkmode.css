@@ -1,0 +1,93 @@
+/* ======== MODO NOTURNO ABSOLUTO ======== */
+body {
+    background-color: #121212 !important; /* fundo principal */
+    color: #ffffff !important; /* texto padrão */
+}
+
+.card,
+.modal-content,
+.dropdown-menu,
+.list-group-item {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.text-muted,
+.text-secondary {
+    color: #b0b0b0 !important; /* cinza claro */
+}
+
+.badge {
+    font-weight: bold;
+}
+
+/* Botões */
+.btn {
+    border: none;
+}
+
+.btn-primary {
+    background-color: #007bff !important;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9 !important;
+}
+
+.btn-success {
+    background-color: #28a745 !important;
+}
+
+.btn-success:hover {
+    background-color: #218838 !important;
+}
+
+/* Ícones sempre claros */
+.bi {
+    color: #ffffff !important;
+}
+
+/* Inputs, selects e textarea */
+input,
+select,
+textarea {
+    background-color: #1e1e1e !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    background-color: #252525 !important;
+    border-color: #007bff !important;
+    box-shadow: none !important;
+}
+
+/* Links */
+a {
+    color: #4da3ff !important;
+}
+
+a:hover {
+    color: #80c0ff !important;
+}
+
+/* Tabelas */
+.table {
+    color: #ffffff !important;
+}
+
+.table thead th {
+    background-color: #1a1a1a !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.table tbody tr {
+    background-color: #1e1e1e !important;
+}
+
+.table tbody tr:hover {
+    background-color: #252525 !important;
+}
