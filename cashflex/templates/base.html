@@ -4,104 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Cash Flex</title>
-  <link rel="icon" href="{{ url_for('static', filename='logo.png') }}">
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
 
-  <!-- Bootstrap 5 -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
-  <!-- Estilo customizado (modo noturno absoluto) -->
-  <style>
-    body {    
-      background: linear-gradient(to bottom, #e4f0ff, #6959CD); /* Azul claro para branco */
-      color: #f1f1f1;
-      min-height: 100vh;
-      padding-bottom: 80px;
-    }
+<!-- Seu CSS do modo noturno (deve vir por último) -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
 
-    .tab-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: #1e1e1e;
-      border-top: 1px solid #333;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      height: 60px;
-      z-index: 1000;
-    }
-
-    .tab-bar a {
-      text-decoration: none;
-      color: #ffffff;
-      font-size: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-    }
-
-    .tab-bar a i {
-      font-size: 20px;
-      margin-bottom: 2px;
-    }
-
-    .tab-bar a.active {
-      color: #4da3ff;
-      font-weight: bold;
-    }
-
-    .tab-bar a.active i {
-      color: #4da3ff;
-    }
-
-    .card {
-      background-color: #1e1e1e;
-      border-radius: 1rem;
-      border: 1px solid #333;
-    }
-
-    .rounded-top-4 {
-      border-top-left-radius: 1rem;
-      border-top-right-radius: 1rem;
-    }
-
-    .btn-primary {
-      background-color: #4da3ff;
-      color: #fff;
-      border: none;
-    }
-
-    .btn-primary:hover {
-      background-color: #3399ff;
-    }
-
-    /* Inputs, selects e textarea */
-    input, select, textarea {
-      background-color: #1e1e1e;
-      color: #f1f1f1;
-      border: 1px solid #333;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: #4da3ff;
-      outline: none;
-    }
-
-    /* Ajuste das mensagens flash */
-    .alert-info {
-      background-color: #222;
-      color: #ddd;
-      border: 1px solid #444;
-    }
-  </style>
 </head>
 <body>
 

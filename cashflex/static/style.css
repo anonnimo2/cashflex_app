@@ -1,6 +1,6 @@
 /* Tema escuro permanente */
 body {
-  background-color: #121212;
+  background: linear-gradient(to bottom, #e4f0ff, #6959CD); 
   color: #f1f1f1;
 }
 
