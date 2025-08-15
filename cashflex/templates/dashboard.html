@@ -10,41 +10,42 @@
     <h2 class="fw-bold mb-0">Kz {{ "{:,.2f}".format(current_user.balance) }}</h2>
   </div>
 
-  <!-- ATALHOS RÁPIDOS -->
-  <div class="row g-3 text-center mb-4">
-    <div class="col-6 col-md-3">
-      <a href="{{ url_for('main.depositar') }}" class="text-decoration-none">
-        <div class="bg-white border rounded-3 py-3 shadow-sm h-100 hover-shadow">
-          <i class="bi bi-arrow-up-circle-fill text-primary fs-3"></i>
-          <div class="small mt-1 fw-semibold">Depósito</div>
-        </div>
-      </a>
-    </div>
-    <div class="col-6 col-md-3">
-      <a href="{{ url_for('main.withdraw') }}" class="text-decoration-none">
-        <div class="bg-white border rounded-3 py-3 shadow-sm h-100 hover-shadow">
-          <i class="bi bi-arrow-down-circle-fill text-danger fs-3"></i>
-          <div class="small mt-1 fw-semibold">Retirar</div>
-        </div>
-      </a>
-    </div>
-    <div class="col-6 col-md-3">
-      <a href="{{ url_for('main.referrals') }}" class="text-decoration-none">
-        <div class="bg-white border rounded-3 py-3 shadow-sm h-100 hover-shadow">
-          <i class="bi bi-people-fill text-success fs-3"></i>
-          <div class="small mt-1 fw-semibold">Equipa</div>
-        </div>
-      </a>
-    </div>
-    <div class="col-6 col-md-3">
-      <a href="https://t.me/+oVt0BV7LkrgwNWU0" target="_blank" class="text-decoration-none">
-        <div class="bg-white border rounded-3 py-3 shadow-sm h-100 hover-shadow">
-          <i class="bi bi-telegram text-info fs-3"></i>
-          <div class="small mt-1 fw-semibold">Suporte</div>
-        </div>
-      </a>
-    </div>
+ <!-- ATALHOS RÁPIDOS -->
+<div class="row g-3 text-center mb-4">
+  <div class="col-6 col-md-3">
+    <a href="{{ url_for('main.depositar') }}" class="text-decoration-none text-light">
+      <div class="bg-dark border rounded-3 py-3 shadow-sm h-100 hover-shadow">
+        <i class="bi bi-arrow-up-circle-fill text-primary fs-3"></i>
+        <div class="small mt-1 fw-semibold">Depósito</div>
+      </div>
+    </a>
   </div>
+  <div class="col-6 col-md-3">
+    <a href="{{ url_for('main.withdraw') }}" class="text-decoration-none text-light">
+      <div class="bg-dark border rounded-3 py-3 shadow-sm h-100 hover-shadow">
+        <i class="bi bi-arrow-down-circle-fill text-danger fs-3"></i>
+        <div class="small mt-1 fw-semibold">Retirar</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="{{ url_for('main.referrals') }}" class="text-decoration-none text-light">
+      <div class="bg-dark border rounded-3 py-3 shadow-sm h-100 hover-shadow">
+        <i class="bi bi-people-fill text-success fs-3"></i>
+        <div class="small mt-1 fw-semibold">Equipa</div>
+      </div>
+    </a>
+  </div>
+  <div class="col-6 col-md-3">
+    <a href="https://t.me/+oVt0BV7LkrgwNWU0" target="_blank" class="text-decoration-none text-light">
+      <div class="bg-dark border rounded-3 py-3 shadow-sm h-100 hover-shadow">
+        <i class="bi bi-telegram text-info fs-3"></i>
+        <div class="small mt-1 fw-semibold">Suporte</div>
+      </div>
+    </a>
+  </div>
+</div>
+
 
   <!-- PLANOS DE INVESTIMENTO -->
   <div class="mb-3">
