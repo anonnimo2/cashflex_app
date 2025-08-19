@@ -116,30 +116,52 @@ def approve_investment(id):
     user = inv.user
     inv.status = 'Aprovado'
 
+    # 📌 Definição dos planos VIP
+    planos_vip = [
+    {"nome": "VIP-1", "valor": 5000, "invest": 5000, "rendimento_diario": 1000, "retorno_total": 50000},
+    {"nome": "VIP-2", "valor": 15000, "invest": 15000, "rendimento_diario": 3000, "retorno_total": 150000},
+    {"nome": "VIP-3", "valor": 30000, "invest": 30000, "rendimento_diario": 6000, "retorno_total": 300000},
+    {"nome": "VIP-4", "valor": 60000, "invest": 60000, "rendimento_diario": 12000, "retorno_total": 600000},
+    {"nome": "VIP-5", "valor": 120000, "invest": 120000, "rendimento_diario": 24000, "retorno_total": 1200000},
+    {"nome": "VIP-6", "valor": 300000, "invest": 300000, "rendimento_diario": 60000, "retorno_total": 3000000},
+    {"nome": "VIP-7", "valor": 500000, "invest": 500000, "rendimento_diario": 100000, "retorno_total": 5000000},
+    {"nome": "VIP-8", "valor": 1000000, "invest": 1000000, "rendimento_diario": 200000, "retorno_total": 10000000},
+]
+
+    # 🧮 Identificar plano
+    if inv.amount in planos_vip:
+        nome_plano = planos_vip[inv.amount]["nome"]
+        rendimento = planos_vip[inv.amount]["_diario"]
+        retorno = planos_vip[inv.amount]["retorno_total"]
+    else:
+        nome_plano = "Plano Personalizado"
+        rendimento = inv.amount * 0.10
+        retorno = inv.amount * 1.5
+
     # 🔁 Verifica se já existe um plano ativo
     plano_existente = UserPlan.query.filter_by(user_id=user.id, ativo=True).first()
 
     if plano_existente:
-        # 🔄 Soma o investimento ao plano existente
+        # 🔄 Atualiza com os valores certos
+        plano_existente.nome = nome_plano
         plano_existente.investimento += inv.amount
-        plano_existente.rendimento_diario = plano_existente.investimento * 0.10
-        plano_existente.retorno_total = plano_existente.investimento * 1.5
+        plano_existente.rendimento_diario = rendimento
+        plano_existente.retorno_total = retorno
         plano_existente.ultimo_credito = datetime.utcnow()
-        plano_existente.ativo = True  # 🔁 reforça a ativação
     else:
-        # ✅ Cria novo plano se não houver ativo
+        # ✅ Cria novo plano
         novo_plano = UserPlan(
             user_id=user.id,
-            nome='Plano Básico',
+            nome=nome_plano,
             investimento=inv.amount,
-            rendimento_diario=inv.amount * 0.10,
-            retorno_total=inv.amount * 1.5,
+            rendimento_diario=rendimento,
+            retorno_total=retorno,
             ultimo_credito=datetime.utcnow(),
-            ativo=True  # 🟢 ESSENCIAL
+            ativo=True
         )
         db.session.add(novo_plano)
 
-    # 💰 COMISSÕES (25%, 3%, 1%) com registro
+   # 💰 COMISSÕES (25%, 3%, 1%) com registro
     comissoes = [0.25, 0.03, 0.01]
     upline_code = user.referred_by
 
@@ -168,7 +190,6 @@ def approve_investment(id):
     db.session.commit()
     flash('Investimento aprovado, plano atualizado e comissões registradas.', 'success')
     return redirect(url_for('admin.dashboard'))
-
 
 
 @admin.route('/reject-investment/<int:id>')
