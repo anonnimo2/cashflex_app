@@ -131,8 +131,9 @@ def approve_investment(id):
     # 🧮 Identificar plano
     if inv.amount in planos_vip:
         nome_plano = planos_vip[inv.amount]["nome"]
-        rendimento = planos_vip[inv.amount]["_diario"]
+        rendimento = planos_vip[inv.amount]["rendimento_diario"]
         retorno = planos_vip[inv.amount]["retorno_total"]
+        
     else:
         nome_plano = "Plano Personalizado"
         rendimento = inv.amount * 0.10
@@ -142,24 +143,23 @@ def approve_investment(id):
     plano_existente = UserPlan.query.filter_by(user_id=user.id, ativo=True).first()
 
     if plano_existente:
-        # 🔄 Atualiza com os valores certos
-        plano_existente.nome = nome_plano
-        plano_existente.investimento += inv.amount
-        plano_existente.rendimento_diario = rendimento
-        plano_existente.retorno_total = retorno
-        plano_existente.ultimo_credito = datetime.utcnow()
+    # Se já existe plano ativo, soma o investimento
+       plano_existente.investimento += inv.amount
+       plano_existente.rendimento_diario = plano_existente.investimento * 0.10
+       plano_existente.retorno_total = plano_existente.investimento * 1.5
+       plano_existente.ultimo_credito = datetime.utcnow()
     else:
-        # ✅ Cria novo plano
+    # Cria um novo plano com o valor do investimento
         novo_plano = UserPlan(
-            user_id=user.id,
-            nome=nome_plano,
-            investimento=inv.amount,
-            rendimento_diario=rendimento,
-            retorno_total=retorno,
-            ultimo_credito=datetime.utcnow(),
-            ativo=True
-        )
-        db.session.add(novo_plano)
+        user_id=user.id,
+        nome='Plano Básico',
+        investimento=inv.amount,   # <-- aqui já guarda o valor aplicado
+        rendimento_diario=inv.amount * 0.10,
+        retorno_total=inv.amount * 1.5,
+        ultimo_credito=datetime.utcnow(),
+        ativo=True
+    )
+    db.session.add(novo_plano)
 
    # 💰 COMISSÕES (25%, 3%, 1%) com registro
     comissoes = [0.25, 0.03, 0.01]

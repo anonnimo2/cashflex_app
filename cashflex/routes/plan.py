@@ -76,12 +76,6 @@ def activate_plan(id):
         flash('Investimento inválido ou já utilizado.', 'danger')
         return redirect(url_for('main.dashboard'))
 
-    # ⛔ Impede mais de um plano ativo por usuário
-    plano_existente = UserPlan.query.filter_by(user_id=current_user.id, ativo=True).first()
-    if plano_existente:
-        flash('Você já possui um plano ativo.', 'warning')
-        return redirect(url_for('main.dashboard'))
-
     # 🔢 Parâmetros do plano
     rendimento = inv.amount * 0.10
     dias_duracao = 5
