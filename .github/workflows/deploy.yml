@@ -1,0 +1,39 @@
+name: Rendimento Diário
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Roda todos os dias à meia-noite UTC
+  workflow_dispatch:       # Permite execução manual
+
+jobs:
+  run-cron:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Instalar dependências
+        run: |
+          pip install -r requirements.txt
+
+      - name: Definir FLASK_APP
+        run: echo "FLASK_APP=app:create_app()" >> $GITHUB_ENV
+
+      - name: Executar migrações do banco de dados
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: flask db upgrade
+
+      - name: Executar cron.py
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python cron.py
+

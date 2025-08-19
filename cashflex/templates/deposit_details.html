@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container py-4">
+
+  <!-- Título -->
+  <div class="text-center mb-4">
+    <h4 class="fw-bold text-primary mb-1">💳 Detalhes para Depósito</h4>
+    <p class="text-muted small">Utilize os dados abaixo para efetuar a transferência</p>
+  </div>
+
+  <!-- Valor -->
+  <div class="card shadow-sm border-0 mb-3">
+    <div class="card-body text-center py-3">
+      <h6 class="fw-semibold text-muted mb-1">Valor a Transferir</h6>
+      <h4 class="fw-bold text-success mb-0">Kz {{ "{:,.2f}".format(amount) }}</h4>
+    </div>
+  </div>
+
+  <!-- Dados Bancários Compactos -->
+  <div class="card shadow-sm border-0 mb-3">
+    <div class="card-body p-3">
+      <h6 class="fw-semibold text-muted mb-2">Dados para Transferência</h6>
+
+      <!-- Lista -->
+      <div class="row g-2 small">
+        <!-- BAI -->
+        <div class="col-12 col-md-4">
+          <div class="p-2 bg-light rounded shadow-sm d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-bold">BAI</div>
+              <div class="text-muted d-flex align-items-center">
+                <span id="iban-bai">0040 0000 5185 5656 1019 3</span>
+                <button class="btn btn-sm btn-link text-primary p-0 ms-2" onclick="copyIBAN('iban-bai')" title="Copiar">
+                  📋
+                </button>
+              </div>
+              <small>Maneco Fino</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- BCI -->
+        <div class="col-12 col-md-4">
+          <div class="p-2 bg-light rounded shadow-sm d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-bold">BCI</div>
+              <div class="text-muted d-flex align-items-center">
+                <span id="iban-bci">0005 0000 0118 6521 1011 5</span>
+                <button class="btn btn-sm btn-link text-primary p-0 ms-2" onclick="copyIBAN('iban-bci')" title="Copiar">
+                  📋
+                </button>
+              </div>
+              <small>Sidney dos Santos</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Atlântico -->
+        <div class="col-12 col-md-4">
+          <div class="p-2 bg-light rounded shadow-sm d-flex justify-content-between align-items-center">
+            <div>
+              <div class="fw-bold">Atlântico</div>
+              <div class="text-muted d-flex align-items-center">
+                <span id="iban-atl">0055 0000 6731 4748 1016 4</span>
+                <button class="btn btn-sm btn-link text-primary p-0 ms-2" onclick="copyIBAN('iban-atl')" title="Copiar">
+                  📋
+                </button>
+              </div>
+              <small>Adilson Nogueira</small>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Upload Comprovativo -->
+  <div class="card shadow-sm border-0 mb-3">
+    <div class="card-body p-3">
+      <form method="POST" enctype="multipart/form-data" action="{{ url_for('plan.confirm_deposit') }}">
+        {{ form.hidden_tag() }}
+        <input type="hidden" name="amount" value="{{ amount }}">
+
+        <div class="mb-2">
+          <label class="form-label fw-semibold small mb-1">📎 Comprovativo de Pagamento</label>
+          <input type="file" name="proof" class="form-control form-control-sm" accept=".jpg,.jpeg,.png,.pdf" required>
+          <div class="form-text">Formatos aceitos: JPG, PNG ou PDF</div>
+        </div>
+
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary btn-sm fw-bold shadow-sm">
+            Enviar Comprovativo
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Observações -->
+  <div class="alert alert-warning border-0 shadow-sm small py-2 px-3">
+    <ul class="mb-0 ps-3">
+      <li>Valor mínimo de recarga: <strong>5.000 Kz</strong></li>
+      <li>Envie o comprovativo após a transferência.</li>
+      <li>O saldo será creditado após confirmação.</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- Script de cópia -->
+<script>
+function copyIBAN(elementId) {
+    const text = document.getElementById(elementId).textContent.trim();
+    navigator.clipboard.writeText(text).then(() => {
+        const btn = event.target;
+        btn.textContent = "✅";
+        setTimeout(() => btn.textContent = "📋", 1000);
+    });
+}
+</script>
+
+{% endblock %}

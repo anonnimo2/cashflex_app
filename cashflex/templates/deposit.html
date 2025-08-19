@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container py-4">
+
+  <!-- Card de Saldo -->
+  <div class="card shadow-sm mb-4 border-0" style="background: linear-gradient(135deg, #0d6efd, #003c96); color: white;">
+    <div class="card-body d-flex justify-content-between align-items-center">
+      <div>
+        <h6 class="mb-1">Meu Saldo</h6>
+        <h3 class="fw-bold">Kz {{ "{:,.2f}".format(current_user.balance) }}</h3>
+      </div>
+      <i class="bi bi-coin" style="font-size: 2rem;"></i>
+    </div>
+  </div>
+
+  <!-- Título -->
+  <h6 class="text-center fw-semibold mb-3">Selecione um valor</h6>
+
+  <!-- Valores pré-definidos -->
+  <div class="row g-2">
+    {% for plano in planos %}
+      <div class="col-4 col-md-3">
+        <form method="POST" action="{{ url_for('plan.deposit_details') }}">
+          {{ form.hidden_tag() }}
+          <input type="hidden" name="amount" value="{{ plano.valor }}">
+          <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-bold">
+            {{ plano.valor | int }}
+          </button>
+        </form>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,42 @@
+/* Tema escuro permanente */
+body {
+  background: linear-gradient(to bottom, #e4f0ff, #6959CD); 
+  color: #f1f1f1;
+}
+
+.card {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 12px;
+}
+
+/* Links */
+a {
+  color: #4da3ff;
+}
+a:hover {
+  color: #82c0ff;
+}
+
+/* Botões */
+.btn {
+  border-radius: 8px;
+}
+.btn-primary {
+  background-color: #007bff;
+  border: none;
+}
+.btn-primary:hover {
+  background-color: #3399ff;
+}
+
+/* Inputs e selects */
+input, select, textarea {
+  background-color: #1e1e1e;
+  color: #f1f1f1;
+  border: 1px solid #333;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #4da3ff;
+  outline: none;
+}

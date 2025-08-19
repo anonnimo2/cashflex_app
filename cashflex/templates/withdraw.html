@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container py-4 mb-5">
+
+  <!-- Card principal -->
+  <div class="card shadow-sm border-0 rounded-4">
+    <div class="card-body">
+
+      <!-- Título -->
+      <div class="text-center mb-4">
+        <h4 class="fw-bold text-success">💸 Solicitar Retirada</h4>
+        <p class="text-muted small mb-0">
+          Saldo disponível: <strong>{{ current_user.balance | round(2) }} AOA</strong><br>
+          Mínimo para Retirada: <strong>1.200 AOA</strong>
+        </p>
+      </div>
+
+      <!-- Mensagens de alerta -->
+      {% if not current_user.bank or not current_user.iban %}
+        <div class="alert alert-danger small text-center">
+          ⚠️ Vincule seu <strong>banco</strong> e <strong>IBAN</strong> antes de solicitar saques.<br>
+          <a href="{{ url_for('main.profile') }}" class="btn btn-sm btn-outline-primary mt-2">Vincular Agora</a>
+        </div>
+      {% elif not current_user.has_active_plan() %}
+        <div class="alert alert-warning small text-center">
+          ⚠️ Você precisa investir em um plano para desbloquear Retiradas.
+        </div>
+      {% elif current_user.has_withdrawn_today() %}
+        <div class="alert alert-info small text-center">
+          🕒 Você já fez um saque hoje. Tente novamente amanhã.
+        </div>
+      {% elif current_user.has_pending_withdrawal() %}
+        <div class="alert alert-info small text-center">
+          ⏳ Você já tem um saque em análise. Aguarde a aprovação.
+        </div>
+      {% endif %}
+
+      <!-- Formulário -->
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <!-- Valor -->
+        <div class="mb-3">
+          {{ form.amount.label(class="form-label fw-semibold") }}
+          {{ form.amount(class="form-control", placeholder="Ex: 5000", id="amount-input") }}
+          {% if form.amount.errors %}
+            <div class="text-danger small mt-1">{{ form.amount.errors[0] }}</div>
+          {% endif %}
+          <div id="taxa-info" class="small text-muted mt-2" style="display: none;">
+            Taxa (16%): <span id="taxa-valor">0</span> AOA <br>
+            Valor líquido: <span id="liquido-valor">0</span> AOA
+          </div>
+        </div>
+
+        <!-- Banco -->
+        <div class="mb-3">
+          {{ form.bank.label(class="form-label fw-semibold") }}
+          {{ form.bank(class="form-select", id="bank-select") }}
+          {% if form.bank.errors %}
+            <div class="text-danger small mt-1">{{ form.bank.errors[0] }}</div>
+          {% endif %}
+        </div>
+
+        <!-- Botão -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-danger py-2 fw-bold"
+            {% if not current_user.has_active_plan()
+                  or current_user.has_withdrawn_today()
+                  or current_user.has_pending_withdrawal()
+                  or not current_user.bank
+                  or not current_user.iban %} disabled {% endif %}>
+            💵 Solicitar Saque
+          </button>
+        </div>
+
+              <!--Alerta-->
+              <div>
+                <ul>
+                  <li>Retiradas são apenas Processadas no horário das 10h às 17h00</li>
+                  <li>De segunda à Domingo</li>
+
+
+                </ul>
+
+
+              </div>
+
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Barra inferior -->
+<div class="tab-bar">
+  <a href="{{ url_for('main.dashboard') }}">
+    <i class="bi bi-house-door-fill"></i> Início
+  </a>
+  <a href="{{ url_for('main.withdraw') }}" class="active">
+    <i class="bi bi-arrow-down-circle-fill"></i> Saque
+  </a>
+  <a href="{{ url_for('main.referrals') }}">
+    <i class="bi bi-people-fill"></i> Equipa
+  </a>
+  <a href="{{ url_for('main.wallet') }}">
+    <i class="bi bi-wallet2"></i> Carteira
+  </a>
+</div>
+
+<!-- Script cálculo taxa -->
+<script>
+document.getElementById('amount-input').addEventListener('input', function () {
+  const valor = parseFloat(this.value);
+  if (!isNaN(valor) && valor > 0) {
+    const taxa = valor * 0.16;
+    const liquido = valor - taxa;
+    document.getElementById('taxa-valor').textContent = taxa.toFixed(2);
+    document.getElementById('liquido-valor').textContent = liquido.toFixed(2);
+    document.getElementById('taxa-info').style.display = 'block';
+  } else {
+    document.getElementById('taxa-info').style.display = 'none';
+  }
+});
+</script>
+
+{% endblock %}
+

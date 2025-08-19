@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4 mb-5 text-dark">
+
+  <!-- Cabeçalho -->
+  <div class="text-center mb-4">
+    <h4 class="fw-bold text-primary">Minha Equipa</h4>
+    <p class="text-muted small">Convide amigos e ganhe comissões em 3 níveis!</p>
+  </div>
+
+  <!-- Link e Código de Convite -->
+  <div class="mb-4 p-3 rounded shadow-sm border bg-white">
+    <p class="mb-1 small fw-semibold">Seu link de convite:</p>
+    <div class="input-group">
+      <input type="text" id="invite-link" class="form-control form-control-sm bg-white text-dark border-secondary" readonly
+             value="{{ url_for('main.register', ref=current_user.invite_code, _external=True) }}">
+      <button class="btn btn-outline-primary btn-sm" onclick="copiarLink()">Copiar</button>
+    </div>
+    <p class="mt-2 small">Código de convite: <strong>{{ current_user.invite_code }}</strong></p>
+  </div>
+
+  <!-- Estatísticas dos Níveis -->
+  <div class="row g-3">
+    
+    <!-- Nível 1 -->
+    <div class="col-12">
+      <div class="card bg-white border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0 text-warning"><i class="bi bi-1-circle me-2"></i> Equipe de Nível 1</h6>
+            <span class="badge bg-warning text-dark">25%</span>
+          </div>
+          <div class="row text-center small mb-3 text-dark">
+            <div class="col">Comissão<br><strong>Kz {{ '%.2f' | format(nivel1_total) }}</strong></div>
+            <div class="col">Tamanho<br><strong>{{ nivel1|length }}</strong></div>
+          </div>
+          {% if not nivel1 %}
+            <div class="text-muted small">Nenhum convidado no nível 1.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Nível 2 -->
+    <div class="col-12">
+      <div class="card bg-white border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0 text-secondary"><i class="bi bi-2-circle me-2"></i> Equipe de Nível 2</h6>
+            <span class="badge bg-secondary">3%</span>
+          </div>
+          <div class="row text-center small mb-3 text-dark">
+            <div class="col">Comissão<br><strong>Kz {{ '%.2f' | format(nivel2_total) }}</strong></div>
+            <div class="col">Tamanho<br><strong>{{ nivel2|length }}</strong></div>
+          </div>
+          {% if not nivel2 %}
+            <div class="text-muted small">Nenhum convidado no nível 2.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Nível 3 -->
+    <div class="col-12">
+      <div class="card bg-white border-0 shadow-sm rounded-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="fw-bold mb-0 text-info"><i class="bi bi-3-circle me-2"></i> Equipe de Nível 3</h6>
+            <span class="badge bg-info text-dark">1%</span>
+          </div>
+          <div class="row text-center small mb-3 text-dark">
+            <div class="col">Comissão<br><strong>Kz {{ '%.2f' | format(nivel3_total) }}</strong></div>
+            <div class="col">Tamanho<br><strong>{{ nivel3|length }}</strong></div>
+          </div>
+          {% if not nivel3 %}
+            <div class="text-muted small">Nenhum convidado no nível 3.</div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Benefício -->
+  <div class="alert alert-light border mt-4 small shadow-sm">
+    <strong>Por que criar uma equipe?</strong><br>
+    Convide amigos com seu link ou código. Você receberá comissão sobre os investimentos deles:
+    <ul class="mb-0">
+      <li>Nível 1: 25%</li>
+      <li>Nível 2: 3%</li>
+      <li>Nível 3: 1%</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Tab Bar -->
+<div class="tab-bar bg-white border-top shadow-sm">
+  <a href="{{ url_for('main.dashboard') }}">
+    <i class="bi bi-house-door-fill"></i> Início
+  </a>
+  <a href="{{ url_for('main.history') }}">
+    <i class="bi bi-clock-history"></i> Histórico
+  </a>
+  <a href="{{ url_for('main.referrals') }}" class="active text-primary">
+    <i class="bi bi-people-fill"></i> Equipa
+  </a>
+  <a href="{{ url_for('main.wallet') }}">
+    <i class="bi bi-wallet2"></i> Carteira
+  </a>
+</div>
+
+<!-- Script para copiar link -->
+<script>
+  function copiarLink() {
+    const link = document.getElementById('invite-link');
+    link.select();
+    link.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+
+    const btn = event.target;
+    btn.innerText = "Copiado!";
+    setTimeout(() => btn.innerText = "Copiar", 1500);
+  }
+</script>
+{% endblock %}

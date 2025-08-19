@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container py-4 mb-5">
+
+  <!-- Título -->
+  <div class="text-center mb-4">
+    <h4 class="fw-bold text-primary">Histórico de Transações</h4>
+    <p class="text-muted small mb-0">Acompanhe todas as suas operações</p>
+  </div>
+
+  <!-- Abas -->
+  <ul class="nav nav-tabs nav-fill mb-3 rounded-3 shadow-sm overflow-hidden bg-white" id="historyTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#investimentos">📈 Investimentos</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#saques">💸 Saques</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#comissoes">🎁 Comissões</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#depositos">🏦 Depósitos</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" data-bs-toggle="tab" data-bs-target="#planos">📦 Planos Ativos</button>
+    </li>
+  </ul>
+
+  <!-- Conteúdo das abas -->
+  <div class="tab-content shadow-sm rounded-4 bg-white p-3" id="historyTabsContent">
+
+    <!-- Investimentos -->
+    <div class="tab-pane fade show active" id="investimentos">
+      {% if investments %}
+        <div class="list-group">
+          {% for inv in investments %}
+          <div class="list-group-item bg-light d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ inv.amount }} AOA</strong>
+              <span class="text-muted small ms-2">{{ inv.status or "ativo" }}</span>
+            </div>
+            <small class="text-muted">{{ inv.timestamp.strftime("%d/%m/%Y %H:%M") }}</small>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-secondary text-center">Nenhum investimento.</div>
+      {% endif %}
+    </div>
+
+    <!-- Saques -->
+    <div class="tab-pane fade" id="saques">
+      {% if withdrawals %}
+        <div class="list-group">
+          {% for wd in withdrawals %}
+          <div class="list-group-item bg-light d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ wd.amount }} AOA</strong>
+              {% if wd.status == 'Aprovado' %}
+                <span class="badge bg-success ms-2">Aprovado</span>
+              {% elif wd.status == 'Rejeitado' %}
+                <span class="badge bg-danger ms-2">Rejeitado</span>
+              {% else %}
+                <span class="badge bg-warning text-dark ms-2">Em processo</span>
+              {% endif %}
+            </div>
+            <small class="text-muted">{{ wd.timestamp.strftime("%d/%m/%Y %H:%M") }}</small>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-secondary text-center">Nenhum saque.</div>
+      {% endif %}
+    </div>
+
+    <!-- Comissões -->
+    <div class="tab-pane fade" id="comissoes">
+      {% if commissions %}
+        <div class="list-group">
+          {% for cm in commissions %}
+          <div class="list-group-item bg-light d-flex justify-content-between align-items-center">
+            <div>
+              +<strong>{{ cm.amount }} AOA</strong>
+              <span class="text-muted small ms-1">(Nível {{ cm.level }})</span>
+            </div>
+            <small class="text-muted">{{ cm.timestamp.strftime("%d/%m/%Y %H:%M") }}</small>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-secondary text-center">Nenhuma comissão.</div>
+      {% endif %}
+    </div>
+
+    <!-- Depósitos -->
+    <div class="tab-pane fade" id="depositos">
+      {% if deposits %}
+        <div class="list-group">
+          {% for dp in deposits %}
+          <div class="list-group-item bg-light d-flex justify-content-between align-items-center">
+            <div>
+              <strong>{{ dp.amount }} AOA</strong>
+              {% if dp.status == 'Aprovado' %}
+                <span class="badge bg-success ms-2">Aprovado</span>
+              {% elif dp.status == 'Recusado' %}
+                <span class="badge bg-danger ms-2">Rejeitado</span>
+              {% else %}
+                <span class="badge bg-warning text-dark ms-2">Pendente</span>
+              {% endif %}
+            </div>
+            <small class="text-muted">{{ dp.timestamp.strftime("%d/%m/%Y %H:%M") }}</small>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-secondary text-center">Nenhum depósito.</div>
+      {% endif %}
+    </div>
+
+    <!-- Planos -->
+    <div class="tab-pane fade" id="planos">
+      {% if active_plans %}
+        <div class="list-group">
+          {% for plano in active_plans %}
+          <div class="list-group-item bg-light flex-column d-flex">
+            <div class="mb-1">
+              <strong>{{ plano.nome }}</strong>
+              <span class="badge bg-success ms-2">Ativo ✅</span>
+            </div>
+            <div class="small text-muted">
+              Investimento: {{ plano.investimento }} AOA |
+              Rendimento diário: {{ plano.rendimento_diario }} AOA |
+              Desde: {{ plano.criado_em.strftime("%d/%m/%Y") }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="alert alert-secondary text-center">Nenhum plano ativo.</div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+<!-- Rodapé Tab Bar -->
+<div class="tab-bar bg-white shadow-sm">
+  <a href="{{ url_for('main.dashboard') }}">
+    <i class="bi bi-house-door-fill"></i> Início
+  </a>
+  <a href="{{ url_for('main.history') }}" class="active">
+    <i class="bi bi-clock-history"></i> Histórico
+  </a>
+  <a href="{{ url_for('main.referrals') }}">
+    <i class="bi bi-people-fill"></i> Equipa
+  </a>
+  <a href="{{ url_for('main.wallet') }}">
+    <i class="bi bi-wallet2"></i> Carteira
+  </a>
+</div>
+{% endblock %}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cash Flex</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='logo.png') }}">
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
+  <style>
+        body {
+      
+      background: linear-gradient(to bottom, #e4f0ff, #6959CD);
+      font-family: 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+  /* --- Tab Bar estilo glass --- */
+  .tab-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(20, 20, 20, 0.85); /* fallback sólido */
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);         /* efeito vidro */
+    border-top: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 6px;
+    z-index: 1000;
+  }
+
+  .tab-bar a {
+    flex: 1;
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+
+  .tab-bar a i {
+    display: block;
+    font-size: 20px;
+    margin-bottom: 2px;
+    transition: transform 0.2s;
+  }
+
+  .tab-bar a.active {
+    color: #0d6efd; /* azul Bootstrap */
+    font-weight: 600;
+  }
+
+  .tab-bar a.active i {
+    transform: scale(1.2);
+  }
+
+  /* evitar que o conteúdo fique escondido atrás da tab bar */
+  body {
+    padding-bottom: 70px;
+  }
+
+  /* --- Efeitos premium nos cards --- */
+  .wallet-card {
+    transition: all 0.3s ease-in-out;
+    opacity: 0;
+    animation: fadeInUp 0.8s forwards;
+  }
+  .wallet-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+  }
+  .wallet-card:nth-child(1) { animation-delay: 0.1s; }
+  .wallet-card:nth-child(2) { animation-delay: 0.2s; }
+  .wallet-card:nth-child(3) { animation-delay: 0.3s; }
+  .wallet-card:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  </style>
+
+  <!-- CSS de Modo Noturno (deve vir por último) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/darkmode.css') }}">
+</head>
+<body>
+
+  <!-- Mensagens flash -->
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <div class="container mt-3">
+        {% for msg in messages %}
+          <div class="alert alert-info alert-dismissible fade show" role="alert">
+            {{ msg }}
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <!-- Conteúdo dinâmico -->
+  {% block content %}{% endblock %}
+
+  <!-- Barra de navegação inferior -->
+  <div class="tab-bar">
+    <a href="{{ url_for('main.dashboard') }}" 
+       class="{% if 'dashboard' in request.endpoint %}active{% endif %}">
+      <i class="bi bi-house-door-fill"></i> Início
+    </a>
+    <a href="{{ url_for('main.history') }}" 
+       class="{% if 'history' in request.endpoint %}active{% endif %}">
+      <i class="bi bi-clock-history"></i> Histórico
+    </a>
+    <a href="{{ url_for('main.referrals') }}" 
+       class="{% if 'referrals' in request.endpoint %}active{% endif %}">
+      <i class="bi bi-people-fill"></i> Equipa
+    </a>
+    <a href="{{ url_for('main.wallet') }}" 
+       class="{% if 'wallet' in request.endpoint %}active{% endif %}">
+      <i class="bi bi-wallet2"></i> Carteira
+    </a>
+  </div>
+
+  <!-- Bootstrap JS (com Popper incluído) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
