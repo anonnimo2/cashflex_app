@@ -109,6 +109,7 @@
   <!-- Conteúdo dinâmico -->
   {% block content %}{% endblock %}
 
+  {% if current_user.is_authenticated %}
   <!-- Barra de navegação inferior -->
   <div class="tab-bar">
     <a href="{{ url_for('main.dashboard') }}" 
@@ -128,8 +129,6 @@
       <i class="bi bi-wallet2"></i> Carteira
     </a>
   </div>
-
-  <!-- Bootstrap JS (com Popper incluído) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% endif %}
 </body>
 </html>
