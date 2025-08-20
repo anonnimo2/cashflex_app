@@ -232,11 +232,12 @@ def approve_withdraw(id):
 def reject_withdraw(id):
     wd = Withdrawal.query.get_or_404(id)
     if wd.status == 'Pendente':
+        # devolve o valor para o usuário
+        wd.user.balance += wd.amount
         wd.status = 'Rejeitado'
         db.session.commit()
-        flash('Saque rejeitado.', 'danger')
+        flash('Saque rejeitado e valor devolvido ao usuário.', 'danger')
     return redirect(url_for('admin.dashboard'))
-
 
 # routes/admin.py
 
