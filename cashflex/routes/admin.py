@@ -9,12 +9,23 @@ from cashflex.forms import PlanForm, DepositForm, SimpleActionForm
 import os
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
+
+
 # Verifica se é admin antes de qualquer rota
 @admin.before_request
 def check_admin():
     if not current_user.is_authenticated or not current_user.is_admin:
         return redirect(url_for('main.login'))
 
+
+from flask_wtf.csrf import generate_csrf
+from flask import jsonify
+from flask_login import login_required
+
+@admin.route("/refresh-csrf", methods=["GET"])
+@login_required
+def refresh_csrf():
+    return jsonify({"csrf_token": generate_csrf()})
 
 @admin.route('/dashboard')
 @login_required

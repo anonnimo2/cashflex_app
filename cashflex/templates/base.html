@@ -12,6 +12,27 @@
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
+
+<script>
+  async function refreshCsrfToken() {
+    try {
+      let response = await fetch("/refresh-csrf");
+      let data = await response.json();
+
+      // Atualiza todos os inputs CSRF da página
+      document.querySelectorAll("input[name=csrf_token]").forEach(el => {
+        el.value = data.csrf_token;
+      });
+    } catch (err) {
+      console.error("Erro ao renovar CSRF:", err);
+    }
+  }
+
+  // Atualiza a cada 15 minutos (900000 ms)
+  setInterval(refreshCsrfToken, 900000);
+</script>
+
+
   <style>
         body {
       
