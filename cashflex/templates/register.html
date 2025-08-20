@@ -1,42 +1,50 @@
-{% extends 'base_auth.html' %}
+{% extends 'base_auth.html' %} 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
-  <div class="card shadow-lg p-4 border-0 bg-white text-dark" style="max-width: 450px; width: 100%; border-radius: 1rem;">
-    
-    <!-- Título -->
-    <h4 class="text-center text-primary fw-bold mb-2">📝 Criar Conta</h4>
-    <p class="text-center text-muted small mb-4">Junte-se à <span class="fw-bold text-primary">Cash Flex</span> e comece a investir com segurança.</p>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 
+  <!-- Card Registro -->
+  <div class="card shadow-lg border-0 p-4" style="max-width: 430px; width: 100%; border-radius: 1.25rem;">
+
+    <!-- Cabeçalho -->
+    <div class="text-center mb-4">
+      <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" 
+           style="width:70px; height:70px;">
+        <i class="bi bi-person-plus text-white fs-2"></i>
+      </div>
+      <h3 class="fw-bold text-primary">Criar Conta</h3>
+      <p class="text-muted small">Junte-se à <span class="fw-bold text-primary">Cash Flex</span> e comece a investir hoje.</p>
+    </div>
+
+    <!-- Formulário -->
     <form method="POST">
       {{ form.hidden_tag() }}
 
       <!-- Telefone -->
-      <div class="mb-3">
-        {{ form.phone.label(class="form-label fw-semibold text-dark") }}
-        {{ form.phone(class="form-control border-0 shadow-sm bg-light text-dark", placeholder="Ex: 923000000") }}
+      <div class="form-floating mb-3">
+        {{ form.phone(class="form-control shadow-sm rounded-3", placeholder="923000000") }}
+        <label class="text-muted">📱 Número de Telefone</label>
         {% if form.phone.errors %}
           <div class="text-danger small mt-1">{{ form.phone.errors[0] }}</div>
         {% endif %}
       </div>
 
       <!-- Senha -->
-      <div class="mb-3">
-        {{ form.password.label(class="form-label fw-semibold text-dark") }}
-        <div class="input-group shadow-sm">
-          {{ form.password(class="form-control border-0 bg-light text-dark", id="passwordField", placeholder="Mínimo 6 caracteres") }}
-          <button type="button" class="btn btn-outline-secondary" onclick="togglePassword()" tabindex="-1">
-            <i class="bi bi-eye" id="toggleIcon"></i>
-          </button>
-        </div>
+      <div class="form-floating mb-3 position-relative">
+        {{ form.password(class="form-control shadow-sm rounded-3", id="passwordField", placeholder="********") }}
+        <label class="text-muted">🔒 Senha</label>
+        <button type="button" class="btn btn-sm btn-link position-absolute top-50 end-0 translate-middle-y me-2" 
+                onclick="togglePassword()" tabindex="-1">
+          <i class="bi bi-eye text-secondary" id="toggleIcon"></i>
+        </button>
         {% if form.password.errors %}
           <div class="text-danger small mt-1">{{ form.password.errors[0] }}</div>
         {% endif %}
       </div>
 
-      <!-- Código de referência -->
-      <div class="mb-3">
-        {{ form.referred_by.label(class="form-label fw-semibold text-dark") }}
-        {{ form.referred_by(class="form-control border-0 shadow-sm bg-light text-dark", placeholder="Código de convite") }}
+      <!-- Código de Convite -->
+      <div class="form-floating mb-4">
+        {{ form.referred_by(class="form-control shadow-sm rounded-3", placeholder="Código de convite") }}
+        <label class="text-muted">🎟️ Código de Convite</label>
         {% if form.referred_by.errors %}
           <div class="text-danger small mt-1">{{ form.referred_by.errors[0] }}</div>
         {% endif %}
@@ -44,16 +52,16 @@
 
       <!-- Botão Criar Conta -->
       <div class="d-grid mb-3">
-        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm">
-          <i class="bi bi-person-plus-fill me-1"></i> Criar Conta
+        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm rounded-3">
+          Criar Conta
         </button>
       </div>
 
       <!-- Link para login -->
-      <div class="text-center mt-3">
-        <span class="text-muted small">Já tem uma conta?</span><br>
-        <a href="{{ url_for('main.login') }}" class="btn btn-outline-primary btn-sm mt-2 px-3 rounded-pill">
-          <i class="bi bi-box-arrow-in-right me-1"></i> Fazer login
+      <div class="text-center">
+        <p class="text-muted small mb-1">Já possui uma conta?</p>
+        <a href="{{ url_for('main.login') }}" class="btn btn-outline-primary btn-sm px-4 rounded-pill">
+          Entrar
         </a>
       </div>
     </form>

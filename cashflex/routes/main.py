@@ -100,8 +100,8 @@ def withdraw():
             return redirect(url_for('main.withdraw'))
 
         # Verifica valor mínimo
-        if form.amount.data < 1200:
-            flash('O valor mínimo de saque é 1.200 AOA.', 'danger')
+        if form.amount.data < 2000:
+            flash('O valor mínimo de saque é 2000 AOA.', 'danger')
             return redirect(url_for('main.withdraw'))
 
         # Verifica saldo

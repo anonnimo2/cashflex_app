@@ -58,9 +58,9 @@ class DepositForm(FlaskForm):
 
 # Formulário de Saque
 class WithdrawalForm(FlaskForm):
-    amount = FloatField('Valor (mínimo 1200 Kz)', validators=[
+    amount = FloatField('Valor (mínimo 2000 Kz)', validators=[
         DataRequired(message='Informe um valor.'),
-        NumberRange(min=1200, message='O valor mínimo é 1200 Kz')
+        NumberRange(min=2000, message='O valor mínimo é 2000 Kz')
     ])
     bank = SelectField('Banco', choices=[
         ('BAI', 'BAI'),
