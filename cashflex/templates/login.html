@@ -1,85 +1,79 @@
 {% extends 'base_auth.html' %}
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh; background: linear-gradient(to bottom, #0d47a1, #1976d2);">
-  
-  <div class="card shadow-lg border-0 bg-white text-dark" style="max-width: 420px; width: 100%; border-radius: 1rem;">
-    
-    <!-- Tabs Login / Registrar -->
-    <ul class="nav nav-tabs nav-fill rounded-top" style="background-color: #e3f2fd; border-radius: 1rem 1rem 0 0;">
-      <li class="nav-item">
-        <a class="nav-link active fw-bold text-primary" href="{{ url_for('main.login') }}">Login</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link fw-bold text-secondary" href="{{ url_for('main.register') }}">Registrar</a>
-      </li>
-    </ul>
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 
-    <!-- Conteúdo -->
-    <div class="card-body p-4">
-      <h5 class="text-center fw-bold mb-3 text-primary">🔐 Bem-vindo de volta</h5>
-      <p class="text-center text-muted small mb-4">Acesse sua conta CashFlex para continuar.</p>
+  <!-- Card Login -->
+  <div class="card shadow-lg border-0 p-4" style="max-width: 430px; width: 100%; border-radius: 1.25rem;">
 
-      <form method="POST">
-        {{ form.hidden_tag() }}
-
-        <!-- Telefone -->
-        <div class="mb-3">
-          {{ form.phone.label(class="form-label fw-semibold") }}
-          <div class="input-group">
-            <span class="input-group-text bg-light text-muted">+244</span>
-            {{ form.phone(class="form-control border-secondary", placeholder="Digite seu número...") }}
-          </div>
-          {% if form.phone.errors %}
-            <div class="text-danger small mt-1">{{ form.phone.errors[0] }}</div>
-          {% endif %}
-        </div>
-
-        <!-- Senha -->
-        <div class="mb-3">
-          {{ form.password.label(class="form-label fw-semibold") }}
-          <div class="input-group">
-            {{ form.password(class="form-control border-secondary", placeholder="Sua senha...", id="passwordField") }}
-            <button class="btn btn-outline-secondary" type="button" onclick="togglePassword()" tabindex="-1">
-              <i class="bi bi-eye text-dark" id="toggleIcon"></i>
-            </button>
-          </div>
-          {% if form.password.errors %}
-            <div class="text-danger small mt-1">{{ form.password.errors[0] }}</div>
-          {% endif %}
-        </div>
-
-        <!-- Botão Entrar -->
-        <div class="d-grid mb-3">
-          <button type="submit" class="btn btn-primary fw-semibold">
-            <i class="bi bi-box-arrow-in-right me-1"></i> Acessar Agora
-          </button>
-        </div>
-      </form>
-
-      <!-- Link Criar conta -->
-      <div class="text-center">
-        <p class="small mb-1 text-muted">Não tem uma conta? <a href="{{ url_for('main.register') }}" class="fw-bold text-primary">Cadastre-se</a></p>
+    <!-- Cabeçalho -->
+    <div class="text-center mb-4">
+      <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" 
+           style="width:70px; height:70px;">
+        <i class="bi bi-box-arrow-in-right text-white fs-2"></i>
       </div>
+      <h3 class="fw-bold text-primary">Entrar</h3>
+      <p class="text-muted small">Acesse sua conta <span class="fw-bold text-primary">Cash Flex</span> e continue investindo.</p>
     </div>
+
+    <!-- Formulário -->
+    <form method="POST">
+      {{ form.hidden_tag() }}
+
+      <!-- Telefone -->
+      <div class="form-floating mb-3">
+        {{ form.phone(class="form-control shadow-sm rounded-3", placeholder="923000000") }}
+        <label class="text-muted">📱 Número de Telefone</label>
+        {% if form.phone.errors %}
+          <div class="text-danger small mt-1">{{ form.phone.errors[0] }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Senha -->
+      <div class="form-floating mb-4 position-relative">
+        {{ form.password(class="form-control shadow-sm rounded-3", id="passwordField", placeholder="********") }}
+        <label class="text-muted">🔒 Senha</label>
+        <button type="button" class="btn btn-sm btn-link position-absolute top-50 end-0 translate-middle-y me-2" 
+                onclick="togglePassword()" tabindex="-1">
+          <i class="bi bi-eye text-secondary" id="toggleIcon"></i>
+        </button>
+        {% if form.password.errors %}
+          <div class="text-danger small mt-1">{{ form.password.errors[0] }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Botão Entrar -->
+      <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary btn-lg fw-bold shadow-sm rounded-3">
+          Entrar
+        </button>
+      </div>
+
+      <!-- Link para registro -->
+      <div class="text-center">
+        <p class="text-muted small mb-1">Ainda não possui uma conta?</p>
+        <a href="{{ url_for('main.register') }}" class="btn btn-outline-primary btn-sm px-4 rounded-pill">
+          Criar Conta
+        </a>
+      </div>
+    </form>
   </div>
 </div>
 
-<!-- Script toggle senha -->
+<!-- Script para mostrar/esconder senha -->
 <script>
   function togglePassword() {
-    const input = document.getElementById('passwordField');
+    const field = document.getElementById('passwordField');
     const icon = document.getElementById('toggleIcon');
-    if (input.type === 'password') {
-      input.type = 'text';
-      icon.classList.remove('bi-eye');
-      icon.classList.add('bi-eye-slash');
+    if (field.type === 'password') {
+      field.type = 'text';
+      icon.classList.replace('bi-eye', 'bi-eye-slash');
     } else {
-      input.type = 'password';
-      icon.classList.remove('bi-eye-slash');
-      icon.classList.add('bi-eye');
+      field.type = 'password';
+      icon.classList.replace('bi-eye-slash', 'bi-eye');
     }
   }
 </script>
 
+<!-- Ícones Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 {% endblock %}
