@@ -187,7 +187,7 @@
       </div>
     </div>
 
-    <!-- Aba: Depósitos -->
+   <!-- Aba: Depósitos -->
 <div class="tab-pane fade" id="deposits" role="tabpanel">
   <h4>Depósitos</h4>
   <table class="table table-hover">
@@ -195,6 +195,7 @@
       <tr>
         <th scope="col">ID</th>
         <th scope="col">Usuário</th>
+        <th scope="col">Número</th> <!-- Novo -->
         <th scope="col">Valor</th>
         <th scope="col">Status</th>
         <th scope="col">Data</th>
@@ -207,6 +208,7 @@
         <tr class="{% if deposito.status.lower() == 'pendente' %}table-warning{% elif deposito.status.lower() == 'aprovado' %}table-success{% elif deposito.status.lower() == 'recusado' %}table-danger{% endif %}">
           <td>{{ deposito.id }}</td>
           <td>{{ deposito.user.nome }}</td>
+          <td>{{ deposito.user.phone }}</td> <!-- Mostra número do usuário -->
           <td>Kz {{ "{:,.2f}".format(deposito.amount) }}</td>
           <td>{{ deposito.status }}</td>
           <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
@@ -240,13 +242,12 @@
         </tr>
       {% else %}
         <tr>
-          <td colspan="7" class="text-center">Nenhum depósito registrado</td>
+          <td colspan="8" class="text-center">Nenhum depósito registrado</td>
         </tr>
       {% endfor %}
     </tbody>
   </table>
 </div>
-
 
     <!-- Aba: Planos -->
     <div class="tab-pane fade" id="plans" role="tabpanel">
