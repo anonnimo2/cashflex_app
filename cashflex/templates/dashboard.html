@@ -2,13 +2,12 @@
 {% block content %}
 <div class="container py-3">
 
-  <!-- SALDO ATUAL -->
-  <div class="rounded-4 shadow-sm mb-4 p-4 text-dark position-relative bg-white"
-       style="background: linear-gradient(to bottom, rgba(255,255,255,0.95), rgba(245,245,245,0.95)),
-              url('{{ url_for('static', filename='img/img.png') }}') center/cover no-repeat;">
-    <h6 class="mb-1">Saldo Atual</h6>
-    <h2 class="fw-bold mb-0">Kz {{ "{:,.2f}".format(current_user.balance) }}</h2>
-  </div>
+<!-- SALDO ATUAL -->
+<div class="rounded-4 shadow-sm mb-4 p-4 text-white position-relative"
+     style="background: url('{{ url_for('static', filename='img/img.png') }}') center/cover no-repeat;">
+  <h6 class="mb-1">Saldo Atual</h6>
+  <h2 class="fw-bold mb-0">Kz {{ "{:,.2f}".format(current_user.balance) }}</h2>
+</div>
 
  <!-- ATALHOS RÁPIDOS -->
 <div class="row g-3 text-center mb-4">

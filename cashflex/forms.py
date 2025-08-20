@@ -43,6 +43,7 @@ class DepositForm(FlaskForm):
 
     bank = SelectField('Banco', choices=[
         ('BAI', 'BAI'),
+        ('BFA', 'BFA'),
         ('BCI', 'BCI'),
         ('Atlântico', 'Atlântico')
     ], validators=[DataRequired(message='Selecione um banco.')])
@@ -63,6 +64,7 @@ class WithdrawalForm(FlaskForm):
     ])
     bank = SelectField('Banco', choices=[
         ('BAI', 'BAI'),
+        ('BFA', 'BFA'),
         ('BCI', 'BCI'),
         ('Atlântico', 'Atlântico')
     ], validators=[DataRequired(message='Selecione um banco.')])
@@ -72,7 +74,7 @@ class WithdrawalForm(FlaskForm):
 
 
 class ProfileForm(FlaskForm):
-    bank = SelectField('Banco', choices=[('BAI', 'BAI'), ('BCI', 'BCI'), ('Atlântico', 'Atlântico')], validators=[DataRequired()])
+    bank = SelectField('Banco', choices=[('BAI', 'BAI'), ('BFA', 'BFA'), ('BCI', 'BCI'), ('Atlântico', 'Atlântico')], validators=[DataRequired()])
     iban = StringField('IBAN', validators=[
         DataRequired(),
         Length(min=21, max=25, message='O IBAN deve conter entre 21 e 25 caracteres'),
