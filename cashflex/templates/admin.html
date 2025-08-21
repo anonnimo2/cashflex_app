@@ -18,7 +18,7 @@
       <div class="card shadow-lg border-0 text-center bg-light rounded-3 h-100">
         <div class="card-body">
           <h6 class="text-muted">Investido</h6>
-          <h3 class="fw-bold text-success">{{ total_investido }} AOA</h3>
+          <h3 class="fw-bold text-success">Kz {{ total_investido }}</h3>
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
       <div class="card shadow-lg border-0 text-center bg-light rounded-3 h-100">
         <div class="card-body">
           <h6 class="text-muted">Retirado</h6>
-          <h3 class="fw-bold text-danger">{{ total_sacado }} AOA</h3>
+          <h3 class="fw-bold text-danger">Kz {{ total_sacado }}</h3>
         </div>
       </div>
     </div>
@@ -34,7 +34,7 @@
       <div class="card shadow-lg border-0 text-center bg-light rounded-3 h-100">
         <div class="card-body">
           <h6 class="text-muted">Em Circulação</h6>
-          <h3 class="fw-bold text-warning">{{ saldo_total }} AOA</h3>
+          <h3 class="fw-bold text-warning">Kz {{ saldo_total }}</h3>
         </div>
       </div>
     </div>
@@ -48,8 +48,10 @@
     <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#plans">📋 Planos</a></li>
   </ul>
 
+  <!-- Conteúdo das Abas -->
   <div class="tab-content mt-3">
 
+   
    <!-- Usuários -->
 <div class="tab-pane fade show active" id="users">
   <form method="GET" class="mb-3 d-flex">
@@ -159,88 +161,67 @@
       </div>
     </div>
 
-
-    <div class="tab-content mt-4">
-
-  <!-- Aba: Depósitos -->
-<div class="tab-pane fade" id="deposits" role="tabpanel">
-  <h5 class="mb-3">📥 Depósitos</h5>
-
-  <div class="table-responsive shadow-sm rounded">
-    <table class="table table-hover align-middle">
-      <thead class="table-light">
-        <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Usuário</th>
-          <th scope="col">Número</th>
-          <th scope="col">Valor</th>
-          <th scope="col">Status</th>
-          <th scope="col">Data</th>
-          <th scope="col">Comprovativo</th>
-          <th scope="col">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for deposito in deposits %}
-        <tr>
-          <td><span class="fw-bold">#{{ deposito.id }}</span></td>
-          <td>{{ deposito.user.nome }}</td>
-          <td>{{ deposito.user.phone }}</td>
-          <td><span class="text-success fw-semibold">Kz {{ "{:,.2f}".format(deposito.amount) }}</span></td>
-          <td>
-            {% if deposito.status.lower() == 'pendente' %}
-              <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Pendente</span>
-            {% elif deposito.status.lower() == 'aprovado' %}
-              <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Aprovado</span>
-            {% elif deposito.status.lower() == 'recusado' %}
-              <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i> Recusado</span>
+    <!-- Depósitos -->
+    <div class="tab-pane fade" id="deposits" role="tabpanel">
+      <h5 class="mb-3">📥 Depósitos</h5>
+      <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle">
+          <thead class="table-light">
+            <tr>
+              <th>ID</th><th>Usuário</th><th>Número</th><th>Valor</th>
+              <th>Status</th><th>Data</th><th>Comprovativo</th><th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for deposito in deposits %}
+            <tr>
+              <td>#{{ deposito.id }}</td>
+              <td>{{ deposito.user.nome }}</td>
+              <td>{{ deposito.user.phone }}</td>
+              <td><span class="text-success fw-semibold">Kz {{ "{:,.2f}".format(deposito.amount) }}</span></td>
+              <td>
+                {% if deposito.status.lower() == 'pendente' %}
+                  <span class="badge bg-warning text-dark">⏳ Pendente</span>
+                {% elif deposito.status.lower() == 'aprovado' %}
+                  <span class="badge bg-success">✔️ Aprovado</span>
+                {% elif deposito.status.lower() == 'recusado' %}
+                  <span class="badge bg-danger">❌ Recusado</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ deposito.status }}</span>
+                {% endif %}
+              </td>
+              <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+              <td>
+                {% if deposito.proof %}
+                  <a href="{{ url_for('static', filename='proofs/' ~ deposito.proof) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                    📄 Ver
+                  </a>
+                {% else %}
+                  <span class="text-muted">-</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if deposito.status.lower() == 'pendente' %}
+                  <button type="button" class="btn btn-success btn-sm me-1" 
+                          onclick="confirmarDeposito('aprovar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount|float }})">
+                    ✔️
+                  </button>
+                  <button type="button" class="btn btn-danger btn-sm" 
+                          onclick="confirmarDeposito('rejeitar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount|float }})">
+                    ❌
+                  </button>
+                {% else %}
+                  <span class="badge bg-secondary">Sem ações</span>
+                {% endif %}
+              </td>
+            </tr>
             {% else %}
-              <span class="badge bg-secondary">{{ deposito.status }}</span>
-            {% endif %}
-          </td>
-          <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
-          <!-- Coluna Comprovativo -->
-          <td>
-            {% if deposito.proof %}
-              <a href="{{ url_for('static', filename='proofs/' ~ deposito.proof) }}" 
-                 target="_blank" 
-                 class="btn btn-outline-primary btn-sm">
-                 <i class="fas fa-file-alt me-1"></i> Ver
-              </a>
-            {% else %}
-              <span class="text-muted">-</span>
-            {% endif %}
-          </td>
-          <!-- Coluna Ações -->
-          <td>
-            {% if deposito.status.lower() == 'pendente' %}
-              <button type="button" 
-                      class="btn btn-success btn-sm me-1" 
-                      onclick="confirmarAcao('aprovar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount }})">
-                <i class="fas fa-check"></i>
-              </button>
-              <button type="button" 
-                      class="btn btn-danger btn-sm" 
-                      onclick="confirmarAcao('rejeitar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount }})">
-                <i class="fas fa-times"></i>
-              </button>
-            {% else %}
-              <span class="badge bg-secondary">Sem ações</span>
-            {% endif %}
-          </td>
-        </tr>
-        {% else %}
-        <tr>
-          <td colspan="8" class="text-center text-muted py-3">
-            Nenhum depósito registrado
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-
+            <tr><td colspan="8" class="text-center text-muted">Nenhum depósito registrado</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
 
 
 <!-- Aba: Planos -->
@@ -298,6 +279,7 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  // corrigido: uso de confirmarDeposito em vez de confirmarAcao
   function confirmarDeposito(acao, id, usuario, valor) {
     let rota = acao === 'aprovar'
       ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace('0', id)
@@ -308,10 +290,7 @@
       html: `
         <p><b>ID:</b> ${id}</p>
         <p><b>Usuário:</b> ${usuario}</p>
-        <p><b>Valor:</b> Kz ${valor.toFixed(2)}</p>
-        <p style="color:${acao === 'aprovar' ? 'green' : 'red'}">
-          Tem certeza que deseja ${acao === 'aprovar' ? 'aprovar' : 'rejeitar'} este depósito?
-        </p>
+        <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
       `,
       icon: acao === 'aprovar' ? 'success' : 'warning',
       showCancelButton: true,
@@ -325,104 +304,6 @@
       }
     });
   }
-
- function confirmarSaldo(userId, usuario) {
-  Swal.fire({
-    title: 'Adicionar Saldo',
-    html: `
-      <p><b>Usuário:</b> ${usuario}</p>
-      <input type="number" id="valorSaldo" class="form-control mt-2" placeholder="Digite o valor em Kz">
-    `,
-    icon: 'info',
-    showCancelButton: true,
-    confirmButtonColor: '#198754',
-    cancelButtonColor: '#6c757d',
-    confirmButtonText: 'Adicionar',
-    cancelButtonText: 'Cancelar',
-    preConfirm: () => {
-      const valor = document.getElementById('valorSaldo').value;
-      if (!valor || valor <= 0) {
-        Swal.showValidationMessage('Informe um valor válido!');
-        return false;
-      }
-      return valor;
-    }
-  }).then((result) => {
-    if (result.isConfirmed) {
-      // cria um form oculto e envia via POST
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = "{{ url_for('admin.add_balance', user_id='USER_ID') }}".replace('USER_ID', userId);
-
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = 'valor';
-      input.value = result.value;
-      form.appendChild(input);
-
-      document.body.appendChild(form);
-      form.submit();
-    }
-  });
-}
-
-
-function confirmarVIP(userId, usuario) {
-  Swal.fire({
-    title: 'Ativar VIP',
-    html: `
-      <p><b>Usuário:</b> ${usuario}</p>
-      <select id="planoVip" class="form-select mt-2">
-        {% for p in planos %}
-          <option value="{{ p.id }}">{{ p.nome }} - Kz {{ p.valor }}</option>
-        {% endfor %}
-      </select>
-    `,
-    icon: 'question',
-    showCancelButton: true,
-    confirmButtonColor: '#198754',
-    cancelButtonColor: '#6c757d',
-    confirmButtonText: 'Ativar',
-    cancelButtonText: 'Cancelar',
-    preConfirm: () => {
-      const plano = document.getElementById('planoVip').value;
-      if (!plano) {
-        Swal.showValidationMessage('Selecione um plano!');
-        return false;
-      }
-      return plano;
-    }
-  }).then((result) => {
-    if (result.isConfirmed) {
-      const formData = new FormData();
-      formData.append("user_id", userId);
-      formData.append("plano_id", result.value);
-
-      fetch("/admin/activate_vip", {
-        method: "POST",
-        body: formData
-      })
-      .then(() => location.reload());
-    }
-  });
-}
-
-  // função genérica para enviar POST com CSRF
-  function enviarAcao(rota) {
-    let form = document.createElement('form');
-    form.method = 'POST';
-    form.action = rota;
-
-    let csrf = document.createElement('input');
-    csrf.type = 'hidden';
-    csrf.name = 'csrf_token';
-    csrf.value = "{{ simple_action_form.csrf_token._value() }}";
-    form.appendChild(csrf);
-
-    document.body.appendChild(form);
-    form.submit();
-  }
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
