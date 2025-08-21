@@ -281,29 +281,63 @@
 <script>
   // corrigido: uso de confirmarDeposito em vez de confirmarAcao
   function confirmarDeposito(acao, id, usuario, valor) {
-    let rota = "{{ url_for('admin.add_balance', user_id='USER_ID', valor='VALOR') }}";
-    rota = rota.replace('USER_ID', userId).replace('VALOR', result.value);
-    enviarAcao(rota);
+  let rota = acao === 'aprovar' 
+    ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace("0", id)
+    : "{{ url_for('admin.recusar_deposito', id=0) }}".replace("0", id);
 
-    Swal.fire({
-      title: (acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito'),
-      html: `
-        <p><b>ID:</b> ${id}</p>
-        <p><b>Usuário:</b> ${usuario}</p>
-        <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
-      `,
-      icon: acao === 'aprovar' ? 'success' : 'warning',
-      showCancelButton: true,
-      confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
-      cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        enviarAcao(rota);
-      }
-    });
-  }
+  Swal.fire({
+    title: (acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito'),
+    html: `
+      <p><b>ID:</b> ${id}</p>
+      <p><b>Usuário:</b> ${usuario}</p>
+      <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
+    `,
+    icon: acao === 'aprovar' ? 'success' : 'warning',
+    showCancelButton: true,
+    confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      enviarAcao(rota);
+    }
+  });
+}
+
 </script>
+
+<script>
+function confirmarSaldo(userId) {
+    Swal.fire({
+        title: "Adicionar Saldo",
+        text: "Informe o valor para adicionar",
+        input: "number",
+        inputAttributes: {
+            min: 1
+        },
+        showCancelButton: true,
+        confirmButtonText: "Adicionar",
+        cancelButtonText: "Cancelar",
+        inputValidator: (value) => {
+            if (!value || value <= 0) {
+                return "❌ Informe um valor válido!";
+            }
+        }
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // 🚀 Geramos a rota com valores falsos (0/0)
+            let rotaBase = "{{ url_for('admin.add_balance', user_id=0, valor=0) }}";
+
+            // 🚀 Substituímos os falsos pelos reais
+            rotaBase = rotaBase.replace("/0/0", `/${userId}/${result.value}`);
+
+            // 🚀 Enviamos para o backend
+            enviarAcao(rotaBase);
+        }
+    });
+}
+</script>
+
 
 {% endblock %}
