@@ -156,25 +156,34 @@ def referrals():
 @main.route('/wallet')
 @login_required
 def wallet():
-    # Total investido (só investimentos aprovados/ativos)
-    total_investido = sum(inv.amount for inv in current_user.investments if inv.status == "Aprovado")
+    user = current_user
 
-    # Lucro acumulado de planos ativos
-    total_lucro = sum(plan.profit for plan in current_user.planos if plan.ativo)
+    # Total investido pelo usuário (somando todos os planos ativos dele)
+    total_investido = db.session.query(db.func.sum(UserPlan.investimento))\
+        .filter_by(user_id=user.id, ativo=True).scalar() or 0.0
+
+    # Lucro acumulado até agora (usando a property `profit`)
+    planos_usuario = UserPlan.query.filter_by(user_id=user.id, ativo=True).all()
+    total_lucro = sum([p.profit for p in planos_usuario])
+
+    # Total já recebido (somando `recebido` dos planos)
+    total_recebido = sum([p.recebido for p in planos_usuario])
 
     # Total já sacado
-    total_sacado = sum(w.amount for w in current_user.withdrawals if w.status == "Aprovado")
+    total_sacado = db.session.query(db.func.sum(Withdrawal.amount))\
+        .filter_by(user_id=user.id, status="Aprovado").scalar() or 0.0
 
-    # Saldo atual disponível (na conta do usuário)
-    saldo_atual = current_user.balance
+    # Saldo atual do usuário (campo balance do User)
+    saldo_atual = user.balance
 
-    # Depósitos pendentes (aguardando aprovação do admin)
-    pendentes = [dep for dep in current_user.deposits if dep.status == "Pendente"]
+    # Depósitos pendentes
+    pendentes = Deposit.query.filter_by(user_id=user.id, status="Pendente").all()
 
     return render_template(
-        'wallet.html',
+        "wallet.html",
         total_investido=total_investido,
         total_lucro=total_lucro,
+        total_recebido=total_recebido,
         total_sacado=total_sacado,
         saldo_atual=saldo_atual,
         pendentes=pendentes
