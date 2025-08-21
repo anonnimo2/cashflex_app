@@ -41,9 +41,21 @@ def register():
         form.referred_by.data = ref_code
 
     if form.validate_on_submit():
-        invite_code = generate_unique_code()
         referred_by = form.referred_by.data.strip() if form.referred_by.data else None
 
+        # ✅ Validação: o código de convite deve existir no banco
+        if referred_by:
+            usuario_convite = User.query.filter_by(invite_code=referred_by).first()
+            if not usuario_convite:
+                flash("❌ Código de convite inválido.", "danger")
+                return redirect(url_for('main.register'))
+
+        # Gera código único para o novo usuário
+        invite_code = generate_unique_code()
+        while User.query.filter_by(invite_code=invite_code).first():
+            invite_code = generate_unique_code()
+
+        # Cria o usuário
         hashed_password = generate_password_hash(form.password.data)
         user = User(
             phone=form.phone.data,
@@ -54,7 +66,7 @@ def register():
         db.session.add(user)
         db.session.commit()
 
-        flash('Registro realizado com sucesso. Faça login.')
+        flash('✅ Registro realizado com sucesso. Faça login.')
         return redirect(url_for('main.login'))
 
     return render_template('register.html', form=form)
