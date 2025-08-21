@@ -146,7 +146,7 @@
         <tr>
           <th scope="col">ID</th>
           <th scope="col">Usuário</th>
-          <th scope="col">Número</th> <!-- Novo -->
+          <th scope="col">Número</th>
           <th scope="col">Valor</th>
           <th scope="col">Status</th>
           <th scope="col">Data</th>
@@ -159,7 +159,7 @@
         <tr>
           <td><span class="fw-bold">#{{ deposito.id }}</span></td>
           <td>{{ deposito.user.nome }}</td>
-          <td>{{ deposito.user.phone }}</td> <!-- Mostra número do usuário -->
+          <td>{{ deposito.user.phone }}</td>
           <td><span class="text-success fw-semibold">Kz {{ "{:,.2f}".format(deposito.amount) }}</span></td>
           <td>
             {% if deposito.status.lower() == 'pendente' %}
@@ -173,9 +173,10 @@
             {% endif %}
           </td>
           <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+          <!-- Coluna Comprovativo -->
           <td>
             {% if deposito.proof %}
-              <a href="{{ url_for('static', filename='proofs/' + deposito.proof) }}" 
+              <a href="{{ url_for('static', filename='proofs/' ~ deposito.proof) }}" 
                  target="_blank" 
                  class="btn btn-outline-primary btn-sm">
                  <i class="fas fa-file-alt me-1"></i> Ver
@@ -184,22 +185,21 @@
               <span class="text-muted">-</span>
             {% endif %}
           </td>
+          <!-- Coluna Ações -->
           <td>
             {% if deposito.status.lower() == 'pendente' %}
-              <!-- Botão Aprovar -->
               <button type="button" 
                       class="btn btn-success btn-sm me-1" 
                       onclick="confirmarAcao('aprovar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount }})">
                 <i class="fas fa-check"></i>
               </button>
-              <!-- Botão Rejeitar -->
               <button type="button" 
                       class="btn btn-danger btn-sm" 
                       onclick="confirmarAcao('rejeitar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount }})">
                 <i class="fas fa-times"></i>
               </button>
             {% else %}
-              <span class="text-muted">-</span>
+              <span class="badge bg-secondary">Sem ações</span>
             {% endif %}
           </td>
         </tr>
@@ -214,6 +214,7 @@
     </table>
   </div>
 </div>
+
 
 
 <!-- Aba: Planos -->

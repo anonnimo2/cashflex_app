@@ -113,17 +113,11 @@ def confirmar_plano(plano_id):
         flash('Este plano está indisponível no momento.', 'warning')
         return redirect(url_for('main.dashboard'))
 
-    valor = plano.valor_minimo
+    valor = plano.valor
 
     # 💰 Verifica saldo do usuário
     if current_user.balance < valor:
         flash('Saldo insuficiente para investir neste plano.', 'warning')
-        return redirect(url_for('main.dashboard'))
-
-    # ⛔ Impede duplicidade de planos ativos
-    ativo = UserPlan.query.filter_by(user_id=current_user.id, ativo=True).first()
-    if ativo:
-        flash('Você já possui um plano ativo.', 'warning')
         return redirect(url_for('main.dashboard'))
 
     # ✅ Cria o plano
