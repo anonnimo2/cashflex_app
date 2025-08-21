@@ -86,10 +86,8 @@
           <td>{{ u.iban or 'N/A' }}</td>
           <td>{{ u.iban_owner or 'N/A' }}</td>
           <td>
-            <!-- Botão ativar VIP -->
-            <button 
-              class="btn btn-sm btn-warning"
-              onclick="confirmarVIP('{{ u.id }}', '{{ u.nome }}')">
+           
+            <button class="btn btn-sm btn-warning" onclick="confirmarVIP('{{ u.id }}', '{{ u.nome }}')">
               <i class="fas fa-star"></i> VIP
             </button>
 
@@ -275,69 +273,110 @@
   </div>
 </div>
 
-
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-  // corrigido: uso de confirmarDeposito em vez de confirmarAcao
+  // ✅ Aprovar/Rejeitar depósito
   function confirmarDeposito(acao, id, usuario, valor) {
-  let rota = acao === 'aprovar' 
-    ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace("0", id)
-    : "{{ url_for('admin.recusar_deposito', id=0) }}".replace("0", id);
+    let rota = acao === 'aprovar' 
+      ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace("0", id)
+      : "{{ url_for('admin.recusar_deposito', id=0) }}".replace("0", id);
 
-  Swal.fire({
-    title: (acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito'),
-    html: `
-      <p><b>ID:</b> ${id}</p>
-      <p><b>Usuário:</b> ${usuario}</p>
-      <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
-    `,
-    icon: acao === 'aprovar' ? 'success' : 'warning',
-    showCancelButton: true,
-    confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
-    cancelButtonColor: '#6c757d',
-    confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
-    cancelButtonText: 'Cancelar'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      enviarAcao(rota);
-    }
-  });
-}
-
+    Swal.fire({
+      title: (acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito'),
+      html: `
+        <p><b>ID:</b> ${id}</p>
+        <p><b>Usuário:</b> ${usuario}</p>
+        <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
+      `,
+      icon: acao === 'aprovar' ? 'success' : 'warning',
+      showCancelButton: true,
+      confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        enviarAcao(rota);
+      }
+    });
+  }
 </script>
 
 <script>
-function confirmarSaldo(userId) {
+  // ✅ Adicionar Saldo
+  function confirmarSaldo(userId) {
     Swal.fire({
-        title: "Adicionar Saldo",
-        text: "Informe o valor para adicionar",
-        input: "number",
-        inputAttributes: {
-            min: 1
-        },
-        showCancelButton: true,
-        confirmButtonText: "Adicionar",
-        cancelButtonText: "Cancelar",
-        inputValidator: (value) => {
-            if (!value || value <= 0) {
-                return "❌ Informe um valor válido!";
-            }
+      title: "Adicionar Saldo",
+      text: "Informe o valor para adicionar",
+      input: "number",
+      inputAttributes: {
+        min: 1
+      },
+      showCancelButton: true,
+      confirmButtonText: "Adicionar",
+      cancelButtonText: "Cancelar",
+      inputValidator: (value) => {
+        if (!value || value <= 0) {
+          return "❌ Informe um valor válido!";
         }
+      }
     }).then((result) => {
-        if (result.isConfirmed) {
-            // 🚀 Geramos a rota com valores falsos (0/0)
-            let rotaBase = "{{ url_for('admin.add_balance', user_id=0, valor=0) }}";
-
-            // 🚀 Substituímos os falsos pelos reais
-            rotaBase = rotaBase.replace("/0/0", `/${userId}/${result.value}`);
-
-            // 🚀 Enviamos para o backend
-            enviarAcao(rotaBase);
-        }
+      if (result.isConfirmed) {
+        let rotaBase = "{{ url_for('admin.add_balance', user_id=0, valor=0) }}";
+        rotaBase = rotaBase.replace("/0/0", `/${userId}/${result.value}`);
+        enviarAcao(rotaBase);
+      }
     });
-}
+  }
 </script>
+
+<script>
+  // ✅ Ativar VIP
+  function confirmarVIP(userId, usuario) {
+    // Primeiro buscamos os planos ativos
+    fetch("{{ url_for('admin.get_planos_vip') }}")
+      .then(response => response.json())
+      .then(planos => {
+        if (!planos.length) {
+          Swal.fire("Nenhum plano VIP ativo!", "", "error");
+          return;
+        }
+
+        // monta options
+        let options = planos.map(p => `<option value="${p.id}">${p.nome} - Kz ${p.invest}</option>`).join("");
+
+        Swal.fire({
+          title: `Ativar VIP para ${usuario}`,
+          html: `
+            <label>Escolha um plano:</label>
+            <select id="planoSelect" class="form-select">
+              ${options}
+            </select>
+          `,
+          showCancelButton: true,
+          confirmButtonText: "Ativar",
+          cancelButtonText: "Cancelar",
+          preConfirm: () => {
+            let planoId = document.getElementById("planoSelect").value;
+            if (!planoId) {
+              Swal.showValidationMessage("Selecione um plano!");
+            }
+            return planoId;
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            let planoId = result.value;
+            let rotaBase = "{{ url_for('admin.ativar_vip', user_id=0, plano_id=0) }}";
+            rotaBase = rotaBase.replace("/0/0", `/${userId}/${planoId}`);
+            enviarAcao(rotaBase);
+          }
+        });
+      });
+  }
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
