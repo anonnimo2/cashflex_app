@@ -337,34 +337,36 @@ def activate_vip():
         return redirect(url_for('main.login'))
 
     user_id = request.form.get('user_id')
-    try:
-        investimento = float(request.form.get('investimento', 0))
-        rendimento_diario = float(request.form.get('rendimento_diario', 0))
-        retorno_total = float(request.form.get('retorno_total', 0))
-    except ValueError:
-        flash("❌ Valores inválidos.", "danger")
-        return redirect(url_for('admin.dashboard'))
+    plano_id = request.form.get('plano_id')
 
-    if investimento <= 0 or rendimento_diario <= 0 or retorno_total <= 0:
-        flash("❌ Todos os valores devem ser positivos.", "danger")
+    if not user_id or not plano_id:
+        flash("❌ Dados inválidos.", "danger")
         return redirect(url_for('admin.dashboard'))
 
     user = User.query.get(user_id)
-    if not user:
-        flash("❌ Usuário não encontrado.", "danger")
+    plano = InvestmentPlan.query.get(plano_id)
+
+    if not user or not plano:
+        flash("❌ Usuário ou plano não encontrado.", "danger")
         return redirect(url_for('admin.dashboard'))
 
-    vip_plan = UserPlan(
+    # Evitar ativar o mesmo plano 2x para o mesmo usuário
+    plano_existente = Investment.query.filter_by(user_id=user.id, plan_id=plano.id, status="aprovado").first()
+    if plano_existente:
+        flash("⚠️ Este usuário já tem este plano ativo.", "warning")
+        return redirect(url_for('admin.dashboard'))
+
+    # Criar investimento
+    investment = Investment(
         user_id=user.id,
-        nome="VIP",
-        investimento=investimento,
-        rendimento_diario=rendimento_diario,
-        retorno_total=retorno_total,
-        ativo=True
+        plan_id=plano.id,
+        amount=plano.valor,
+        status="aprovado"
     )
 
-    db.session.add(vip_plan)
+    db.session.add(investment)
     db.session.commit()
 
-    flash(f"✅ Plano VIP ativado para {user.phone}.", "success")
+    flash(f"✅ Plano {plano.nome} ativado para {user.phone}.", "success")
     return redirect(url_for('admin.dashboard'))
+

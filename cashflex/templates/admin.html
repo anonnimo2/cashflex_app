@@ -357,39 +357,45 @@
 }
 
 
-  function confirmarVIP(userId, usuario) {
-    Swal.fire({
-      title: 'Ativar VIP',
-      html: `
-        <p><b>Usuário:</b> ${usuario}</p>
-        <select id="planoVip" class="form-select mt-2">
-          {% for p in planos %}
-            <option value="{{ p.id }}">{{ p.nome }} - Kz {{ p.valor }}</option>
-          {% endfor %}
-        </select>
-      `,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonColor: '#198754',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Ativar',
-      cancelButtonText: 'Cancelar',
-      preConfirm: () => {
-        const plano = document.getElementById('planoVip').value;
-        if (!plano) {
-          Swal.showValidationMessage('Selecione um plano!');
-          return false;
-        }
-        return plano;
+function confirmarVIP(userId, usuario) {
+  Swal.fire({
+    title: 'Ativar VIP',
+    html: `
+      <p><b>Usuário:</b> ${usuario}</p>
+      <select id="planoVip" class="form-select mt-2">
+        {% for p in planos %}
+          <option value="{{ p.id }}">{{ p.nome }} - Kz {{ p.valor }}</option>
+        {% endfor %}
+      </select>
+    `,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: '#198754',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Ativar',
+    cancelButtonText: 'Cancelar',
+    preConfirm: () => {
+      const plano = document.getElementById('planoVip').value;
+      if (!plano) {
+        Swal.showValidationMessage('Selecione um plano!');
+        return false;
       }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        let rota = "{{ url_for('admin.activate_vip') }}";
-        rota = rota.replace('0', userId).replace('0', result.value);
-        enviarAcao(rota);
-      }
-    });
-  }
+      return plano;
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      const formData = new FormData();
+      formData.append("user_id", userId);
+      formData.append("plano_id", result.value);
+
+      fetch("/admin/activate_vip", {
+        method: "POST",
+        body: formData
+      })
+      .then(() => location.reload());
+    }
+  });
+}
 
   // função genérica para enviar POST com CSRF
   function enviarAcao(rota) {
