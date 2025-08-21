@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_auth.html' %}
 {% block content %}
 
 <div class="container mt-4 mb-5">
@@ -134,8 +134,136 @@
       </div>
     </div>
 
-    <!-- Demais abas (Investimentos, Depósitos, Planos) continuam como no teu código,
-         só aplicar o mesmo estilo de tabela com `table-hover shadow-sm rounded` e badges -->
+
+    <div class="tab-content mt-4">
+
+  <!-- Aba: Depósitos -->
+<div class="tab-pane fade" id="deposits" role="tabpanel">
+  <h5 class="mb-3">📥 Depósitos</h5>
+
+  <div class="table-responsive shadow-sm rounded">
+    <table class="table table-hover align-middle">
+      <thead class="table-light">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Usuário</th>
+          <th scope="col">Número</th> <!-- Novo -->
+          <th scope="col">Valor</th>
+          <th scope="col">Status</th>
+          <th scope="col">Data</th>
+          <th scope="col">Comprovativo</th>
+          <th scope="col">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for deposito in deposits %}
+        <tr>
+          <td><span class="fw-bold">#{{ deposito.id }}</span></td>
+          <td>{{ deposito.user.nome }}</td>
+          <td>{{ deposito.user.phone }}</td> <!-- Mostra número do usuário -->
+          <td><span class="text-success fw-semibold">Kz {{ "{:,.2f}".format(deposito.amount) }}</span></td>
+          <td>
+            {% if deposito.status.lower() == 'pendente' %}
+              <span class="badge bg-warning text-dark"><i class="fas fa-clock me-1"></i> Pendente</span>
+            {% elif deposito.status.lower() == 'aprovado' %}
+              <span class="badge bg-success"><i class="fas fa-check-circle me-1"></i> Aprovado</span>
+            {% elif deposito.status.lower() == 'recusado' %}
+              <span class="badge bg-danger"><i class="fas fa-times-circle me-1"></i> Recusado</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ deposito.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td>
+            {% if deposito.proof %}
+              <a href="{{ url_for('static', filename='proofs/' + deposito.proof) }}" 
+                 target="_blank" 
+                 class="btn btn-outline-primary btn-sm">
+                 <i class="fas fa-file-alt me-1"></i> Ver
+              </a>
+            {% else %}
+              <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if deposito.status.lower() == 'pendente' %}
+              <!-- Botão Aprovar -->
+              <button type="button" 
+                      class="btn btn-success btn-sm me-1" 
+                      onclick="confirmarAcao('aprovar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount }})">
+                <i class="fas fa-check"></i>
+              </button>
+              <!-- Botão Rejeitar -->
+              <button type="button" 
+                      class="btn btn-danger btn-sm" 
+                      onclick="confirmarAcao('rejeitar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount }})">
+                <i class="fas fa-times"></i>
+              </button>
+            {% else %}
+              <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="text-center text-muted py-3">
+            Nenhum depósito registrado
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+<!-- Aba: Planos -->
+<div class="tab-pane fade" id="plans" role="tabpanel">
+
+  <h5 class="mb-3">📊 Planos Existentes</h5>
+
+  <div class="table-responsive shadow-sm rounded">
+    <table class="table table-hover align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Investimento</th>
+          <th>Rendimento</th>
+          <th>Retorno</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in planos %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td><strong>{{ p.nome }}</strong></td>
+          <td><span class="badge bg-info">Kz {{ p.invest }}</span></td>
+          <td><span class="badge bg-success">+{{ p.rendimento }}%</span></td>
+          <td><span class="badge bg-primary">{{ p.retorno }} dias</span></td>
+          <td>
+            <span class="badge {{ 'bg-success' if p.ativo else 'bg-secondary' }}">
+              {{ 'Ativo' if p.ativo else 'Inativo' }}
+            </span>
+          </td>
+          <td>
+            <a href="{{ url_for('admin.editar_plano', id=p.id) }}" class="btn btn-primary btn-sm">
+              <i class="fas fa-edit"></i> Editar
+            </a>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="7" class="text-center text-muted">Nenhum plano cadastrado</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
 
   </div>
 </div>
