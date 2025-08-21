@@ -281,9 +281,9 @@
 <script>
   // corrigido: uso de confirmarDeposito em vez de confirmarAcao
   function confirmarDeposito(acao, id, usuario, valor) {
-    let rota = acao === 'aprovar'
-      ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace('0', id)
-      : "{{ url_for('admin.recusar_deposito', id=0) }}".replace('0', id);
+    let rota = "{{ url_for('admin.add_balance', user_id='USER_ID', valor='VALOR') }}";
+    rota = rota.replace('USER_ID', userId).replace('VALOR', result.value);
+    enviarAcao(rota);
 
     Swal.fire({
       title: (acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito'),
