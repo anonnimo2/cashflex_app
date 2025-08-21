@@ -290,10 +290,20 @@ def add_balance():
         return redirect(url_for('main.login'))
 
     user_id = request.form.get('user_id')
+    amount_str = request.form.get('amount', '').strip()
+
+    # Verifica se o valor foi informado
+    if not amount_str:
+        flash("❌ Informe um valor para adicionar.", "danger")
+        return redirect(url_for('admin.dashboard'))
+
+    # Permite vírgula como separador decimal
+    amount_str = amount_str.replace(',', '.')
+
     try:
-        amount = float(request.form.get('amount', 0))
+        amount = float(amount_str)
     except ValueError:
-        flash("❌ Valor inválido.", "danger")
+        flash("❌ Valor inválido. Digite um número válido.", "danger")
         return redirect(url_for('admin.dashboard'))
 
     if amount <= 0:
@@ -305,6 +315,7 @@ def add_balance():
         flash("❌ Usuário não encontrado.", "danger")
         return redirect(url_for('admin.dashboard'))
 
+    # Adiciona ao saldo
     user.balance += amount
     db.session.commit()
 
