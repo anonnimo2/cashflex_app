@@ -44,7 +44,7 @@
   <ul class="nav nav-pills justify-content-center mb-3" id="adminTab" role="tablist">
     <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#users">👤 Usuários</a></li>
     <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#withdrawals">💸 Retiradas</a></li>
-    <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#investments">📑 Investimentos</a></li>
+  li>
     <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#deposits">🏦 Depósitos</a></li>
     <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#plans">📋 Planos</a></li>
   </ul>
@@ -267,5 +267,51 @@
 
   </div>
 </div>
+
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  function confirmarAcao(acao, id, usuario, valor) {
+    let rota = acao === 'aprovar'
+      ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace('0', id)
+      : "{{ url_for('admin.recusar_deposito', id=0) }}".replace('0', id);
+
+    Swal.fire({
+      title: (acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito'),
+      html: `
+        <p><b>ID:</b> ${id}</p>
+        <p><b>Usuário:</b> ${usuario}</p>
+        <p><b>Valor:</b> Kz ${valor.toFixed(2)}</p>
+        <p style="color:${acao === 'aprovar' ? 'green' : 'red'}">
+          Tem certeza que deseja ${acao === 'aprovar' ? 'aprovar' : 'rejeitar'} este depósito?
+        </p>
+      `,
+      icon: acao === 'aprovar' ? 'success' : 'warning',
+      showCancelButton: true,
+      confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Cria formulário dinâmico e envia
+        let form = document.createElement('form');
+        form.method = 'POST';
+        form.action = rota;
+
+        let csrf = document.createElement('input');
+        csrf.type = 'hidden';
+        csrf.name = 'csrf_token';
+        csrf.value = "{{ simple_action_form.csrf_token._value() }}";
+        form.appendChild(csrf);
+
+        document.body.appendChild(form);
+        form.submit();
+      }
+    });
+  }
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 {% endblock %}
