@@ -84,13 +84,13 @@ class UserPlan(db.Model):
     dias_pagamentos = db.Column(db.Integer, default=0)
     recebido = db.Column(db.Float, default=0.0)
 
-@property
-def profit(self):
-    dias = (datetime.utcnow() - self.data_inicio).days
-    lucro_acumulado = self.rendimento_diario * dias
-    # limite máximo pelo retorno total
-    lucro_acumulado = min(lucro_acumulado, self.retorno_total - self.recebido)
-    return round(lucro_acumulado, 2)
+    @property
+    def profit(self):
+     dias = (datetime.utcnow() - self.data_inicio).days
+     lucro_acumulado = self.rendimento_diario * dias
+     # limite máximo pelo retorno total
+     lucro_acumulado = min(lucro_acumulado, self.retorno_total - self.recebido)
+     return round(lucro_acumulado, 2)
 
 
     def __repr__(self):
