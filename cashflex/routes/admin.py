@@ -287,29 +287,29 @@ def editar_plano(id):
 def add_balance():
     if not current_user.is_admin:
         flash("❌ Acesso negado.", "danger")
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('main.login'))
 
     user_id = request.form.get('user_id')
     try:
         amount = float(request.form.get('amount', 0))
     except ValueError:
         flash("❌ Valor inválido.", "danger")
-        return redirect(url_for('main.admin_panel'))
+        return redirect(url_for('admin.dashboard'))
 
     if amount <= 0:
         flash("❌ O valor deve ser maior que zero.", "danger")
-        return redirect(url_for('main.admin_panel'))
+        return redirect(url_for('admin.dashboard'))
 
     user = User.query.get(user_id)
     if not user:
         flash("❌ Usuário não encontrado.", "danger")
-        return redirect(url_for('main.admin_panel'))
+        return redirect(url_for('admin.dashboard'))
 
     user.balance += amount
     db.session.commit()
 
     flash(f"✅ {amount:.2f} AOA adicionados ao usuário {user.phone}.", "success")
-    return redirect(url_for('main.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
 
 
 @admin.route('/admin/activate_vip', methods=['POST'])
@@ -317,7 +317,7 @@ def add_balance():
 def activate_vip():
     if not current_user.is_admin:
         flash("❌ Acesso negado.", "danger")
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('main.login'))
 
     user_id = request.form.get('user_id')
     try:
@@ -326,16 +326,16 @@ def activate_vip():
         retorno_total = float(request.form.get('retorno_total', 0))
     except ValueError:
         flash("❌ Valores inválidos.", "danger")
-        return redirect(url_for('main.admin_panel'))
+        return redirect(url_for('admin.dashboard'))
 
     if investimento <= 0 or rendimento_diario <= 0 or retorno_total <= 0:
         flash("❌ Todos os valores devem ser positivos.", "danger")
-        return redirect(url_for('main.admin_panel'))
+        return redirect(url_for('admin.dashboard'))
 
     user = User.query.get(user_id)
     if not user:
         flash("❌ Usuário não encontrado.", "danger")
-        return redirect(url_for('main.admin_panel'))
+        return redirect(url_for('admin.dashboard'))
 
     vip_plan = UserPlan(
         user_id=user.id,
@@ -350,4 +350,4 @@ def activate_vip():
     db.session.commit()
 
     flash(f"✅ Plano VIP ativado para {user.phone}.", "success")
-    return redirect(url_for('main.admin_panel'))
+    return redirect(url_for('admin.dashboard'))
