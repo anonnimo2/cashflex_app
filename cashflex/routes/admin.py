@@ -32,6 +32,7 @@ def refresh_csrf():
 def dashboard():
     if not current_user.is_admin:
         abort(403)
+
     search = request.args.get('search')
     if search:
         users = User.query.filter(User.phone.contains(search)).all()
@@ -51,10 +52,14 @@ def dashboard():
     total_investido = sum(i.amount for i in investments if i.status.lower() == 'aprovado')
     total_sacado = sum(w.amount for w in withdrawals if w.status.lower() == 'aprovado')
     saldo_total = sum(u.balance for u in users)
+
     simple_action_form = SimpleActionForm()
     form_plan = PlanForm()
     form_deposit = DepositForm()
-    
+
+    # 🔥 Buscar os planos cadastrados no banco
+    planos = InvestmentPlan.query.filter_by(ativo=True).all()
+
     return render_template(
         'admin.html',
         users=users,
@@ -70,7 +75,8 @@ def dashboard():
         saldo_total=saldo_total,
         simple_action_form=simple_action_form, 
         form_plan=form_plan,
-        form=form_deposit
+        form=form_deposit,
+        planos=planos   # 👈 aqui passa para o template
     )
 
 @admin.route('/aprovar_deposito/<int:id>', methods=['POST'])

@@ -327,34 +327,35 @@
   }
 
   function confirmarSaldo(userId, usuario) {
-    Swal.fire({
-      title: 'Adicionar Saldo',
-      html: `
-        <p><b>Usuário:</b> ${usuario}</p>
-        <input type="number" id="valorSaldo" class="form-control mt-2" placeholder="Digite o valor em Kz">
-      `,
-      icon: 'info',
-      showCancelButton: true,
-      confirmButtonColor: '#198754',
-      cancelButtonColor: '#6c757d',
-      confirmButtonText: 'Adicionar',
-      cancelButtonText: 'Cancelar',
-      preConfirm: () => {
-        const valor = document.getElementById('valorSaldo').value;
-        if (!valor || valor <= 0) {
-          Swal.showValidationMessage('Informe um valor válido!');
-          return false;
-        }
-        return valor;
+  Swal.fire({
+    title: 'Adicionar Saldo',
+    html: `
+      <p><b>Usuário:</b> ${usuario}</p>
+      <input type="number" id="valorSaldo" class="form-control mt-2" placeholder="Digite o valor em Kz">
+    `,
+    icon: 'info',
+    showCancelButton: true,
+    confirmButtonColor: '#198754',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: 'Adicionar',
+    cancelButtonText: 'Cancelar',
+    preConfirm: () => {
+      const valor = document.getElementById('valorSaldo').value;
+      if (!valor || valor <= 0) {
+        Swal.showValidationMessage('Informe um valor válido!');
+        return false;
       }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        let rota = "{{ url_for('admin.add_balance', user_id=0, valor=0) }}";
-        rota = rota.replace('0', userId).replace('0', result.value);
-        enviarAcao(rota);
-      }
-    });
-  }
+      return valor;
+    }
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let rota = "{{ url_for('admin.add_balance', user_id='USER_ID', valor='VALOR') }}";
+      rota = rota.replace('USER_ID', userId).replace('VALOR', result.value);
+      enviarAcao(rota);
+    }
+  });
+}
+
 
   function confirmarVIP(userId, usuario) {
     Swal.fire({
