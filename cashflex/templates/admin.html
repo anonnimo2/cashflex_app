@@ -349,7 +349,7 @@
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        let rota = "{{ url_for('admin.adicionar_saldo', user_id=0, valor=0) }}";
+        let rota = "{{ url_for('admin.add_balance', user_id=0, valor=0) }}";
         rota = rota.replace('0', userId).replace('0', result.value);
         enviarAcao(rota);
       }
@@ -383,7 +383,7 @@
       }
     }).then((result) => {
       if (result.isConfirmed) {
-        let rota = "{{ url_for('admin.ativar_vip', user_id=0, plano_id=0) }}";
+        let rota = "{{ url_for('admin.ativate_vip', user_id=0, plano_id=0) }}";
         rota = rota.replace('0', userId).replace('0', result.value);
         enviarAcao(rota);
       }

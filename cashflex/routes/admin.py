@@ -130,6 +130,7 @@ def approve_investment(id):
     # 📌 Definição dos planos VIP
     planos_vip = [
     {"nome": "VIP-1", "valor": 5000, "invest": 5000, "rendimento_diario": 1000, "retorno_total": 50000},
+    {"nome": "VIP-2", "valor": 10000, "invest": 10000, "rendimento_diario": 2000, "retorno_total": 100000},
     {"nome": "VIP-2", "valor": 15000, "invest": 15000, "rendimento_diario": 3000, "retorno_total": 150000},
     {"nome": "VIP-3", "valor": 30000, "invest": 30000, "rendimento_diario": 6000, "retorno_total": 300000},
     {"nome": "VIP-4", "valor": 60000, "invest": 60000, "rendimento_diario": 12000, "retorno_total": 600000},
