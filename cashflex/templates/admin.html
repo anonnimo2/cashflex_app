@@ -326,7 +326,7 @@
     });
   }
 
-  function confirmarSaldo(userId, usuario) {
+ function confirmarSaldo(userId, usuario) {
   Swal.fire({
     title: 'Adicionar Saldo',
     html: `
@@ -349,9 +349,19 @@
     }
   }).then((result) => {
     if (result.isConfirmed) {
-      let rota = "{{ url_for('admin.add_balance', user_id='USER_ID', valor='VALOR') }}";
-      rota = rota.replace('USER_ID', userId).replace('VALOR', result.value);
-      enviarAcao(rota);
+      // cria um form oculto e envia via POST
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = "{{ url_for('admin.add_balance', user_id='USER_ID') }}".replace('USER_ID', userId);
+
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'valor';
+      input.value = result.value;
+      form.appendChild(input);
+
+      document.body.appendChild(form);
+      form.submit();
     }
   });
 }

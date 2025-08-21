@@ -288,32 +288,15 @@ def editar_plano(id):
     return render_template('admin/editar_plano.html', form=form, plano=plano)
 
 
-@admin.route('/admin/add_balance', methods=['POST'])
+@admin.route('/add_balance/<int:user_id>', methods=['POST'])
 @login_required
-def add_balance():
+def add_balance(user_id):
     if not current_user.is_admin:
-        flash("❌ Acesso negado.", "danger")
-        return redirect(url_for('main.login'))
+        abort(403)
 
-    user_id = request.form.get('user_id')
-    amount_str = request.form.get('amount', '').strip()
-
-    # Verifica se o valor foi informado
-    if not amount_str:
-        flash("❌ Informe um valor para adicionar.", "danger")
-        return redirect(url_for('admin.dashboard'))
-
-    # Permite vírgula como separador decimal
-    amount_str = amount_str.replace(',', '.')
-
-    try:
-        amount = float(amount_str)
-    except ValueError:
-        flash("❌ Valor inválido. Digite um número válido.", "danger")
-        return redirect(url_for('admin.dashboard'))
-
-    if amount <= 0:
-        flash("❌ O valor deve ser maior que zero.", "danger")
+    valor = request.form.get("valor", type=float)
+    if not valor or valor <= 0:
+        flash("❌ Informe um valor válido.", "danger")
         return redirect(url_for('admin.dashboard'))
 
     user = User.query.get(user_id)
@@ -321,11 +304,10 @@ def add_balance():
         flash("❌ Usuário não encontrado.", "danger")
         return redirect(url_for('admin.dashboard'))
 
-    # Adiciona ao saldo
-    user.balance += amount
+    user.balance += valor
     db.session.commit()
 
-    flash(f"✅ {amount:.2f} AOA adicionados ao usuário {user.phone}.", "success")
+    flash(f"✅ {valor:.2f} Kz adicionados ao saldo de {user.phone}", "success")
     return redirect(url_for('admin.dashboard'))
 
 

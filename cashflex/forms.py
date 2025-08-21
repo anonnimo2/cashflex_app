@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, FloatField, SelectField, BooleanField, DecimalField
 from wtforms.validators import DataRequired, Length, NumberRange, Regexp, Optional
 from flask_wtf.file import FileField, FileAllowed
 
@@ -86,8 +86,6 @@ class ProfileForm(FlaskForm):
     ])
     submit = SubmitField('Salvar')
     
-    
-# forms.py
 class PlanForm(FlaskForm):
     nome = StringField('Nome do Plano', validators=[DataRequired()])
     invest = FloatField('Valor de Investimento', validators=[DataRequired()])
@@ -98,7 +96,15 @@ class PlanForm(FlaskForm):
 
 
 class SimpleActionForm(FlaskForm):
-    submit = SubmitField('Enviar')
+    valor = DecimalField(
+        'Valor',
+        validators=[
+            DataRequired(message="❌ Informe um valor para adicionar."),
+            NumberRange(min=0.01, message="❌ O valor deve ser maior que 0.")
+        ]
+    )
+    submit = SubmitField('Adicionar')
+
     
     
     
