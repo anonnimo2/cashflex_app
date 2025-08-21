@@ -88,7 +88,7 @@
           <td>
            
             <!-- Botão adicionar VIP -->
-            <button class="btn btn-sm btn-warning" onclick="confirmarVIP('{{ u.id }}', '{{ u.nome }}')">
+            <button class="btn btn-sm btn-warning" onclick="confirmarVIP('{{ u.id }}', '{{ u.nome|escapejs }}')">
               <i class="fas fa-star"></i> VIP
             </button>
 
@@ -305,33 +305,40 @@
   }
 </script>
 
-<script>
-  // ✅ Adicionar Saldo
-  function confirmarSaldo(userId) {
+function confirmarSaldo(userId) {
     Swal.fire({
-      title: "Adicionar Saldo",
-      text: "Informe o valor para adicionar",
-      input: "number",
-      inputAttributes: {
-        min: 1
-      },
-      showCancelButton: true,
-      confirmButtonText: "Adicionar",
-      cancelButtonText: "Cancelar",
-      inputValidator: (value) => {
-        if (!value || value <= 0) {
-          return "❌ Informe um valor válido!";
+        title: "Adicionar Saldo",
+        text: "Informe o valor para adicionar",
+        input: "number",
+        inputAttributes: { min: 1 },
+        showCancelButton: true,
+        confirmButtonText: "Adicionar",
+        cancelButtonText: "Cancelar",
+        inputValidator: (value) => {
+            if (!value || value <= 0) return "❌ Informe um valor válido!";
         }
-      }
     }).then((result) => {
-      if (result.isConfirmed) {
-        let rotaBase = "{{ url_for('admin.add_balance', user_id=0, valor=0) }}";
-        rotaBase = rotaBase.replace("/0/0", `/${userId}/${result.value}`);
-        enviarAcao(rotaBase);
-      }
+        if (result.isConfirmed) {
+            let valor = result.value;
+            let rota = `/admin/add_balance/${userId}/${valor}`;
+
+            fetch(rota, { method: "POST" })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire("✅ Sucesso!", data.success, "success")
+                            .then(() => location.reload());
+                    } else {
+                        Swal.fire("❌ Erro", data.error || "Algo deu errado!", "error");
+                    }
+                })
+                .catch(err => {
+                    Swal.fire("❌ Erro", "Não foi possível conectar ao servidor.", "error");
+                    console.error(err);
+                });
+        }
     });
-  }
-</script>
+}
 
 <script>
   // ✅ Ativar VIP

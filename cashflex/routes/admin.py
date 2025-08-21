@@ -288,41 +288,26 @@ def editar_plano(id):
     return render_template('admin/editar_plano.html', form=form, plano=plano)
 
 
-@admin.route('/add_balance/<int:user_id>', methods=['POST'])
+@admin.route('/add_balance/<int:user_id>/<float:valor>', methods=['POST'])
 @login_required
-def add_balance(user_id):
+def add_balance(user_id, valor):
     if not current_user.is_admin:
-        abort(403)
-
-    valor = request.form.get("valor", type=float)
-    if not valor or valor <= 0:
-        flash("❌ Informe um valor válido.", "danger")
-        return redirect(url_for('admin.dashboard'))
+        return jsonify({"error": "Acesso negado"}), 403
 
     user = User.query.get(user_id)
     if not user:
-        flash("❌ Usuário não encontrado.", "danger")
-        return redirect(url_for('admin.dashboard'))
+        return jsonify({"error": "Usuário não encontrado"}), 404
+
+    if valor <= 0:
+        return jsonify({"error": "Valor inválido"}), 400
 
     user.balance += valor
     db.session.commit()
 
-    flash(f"✅ {valor:.2f} Kz adicionados ao saldo de {user.phone}", "success")
-    return redirect(url_for('admin.dashboard'))
-
-
-# 📌 Rota para retornar planos em JSON
-@admin.route('/planos_vip')
-@login_required
-def planos_vip():
-    if not current_user.is_admin:
-        return jsonify([])
-
-    planos = InvestmentPlan.query.filter_by(active=True).all()
-    return jsonify([
-        {"id": p.id, "nome": p.name, "price": p.price}
-        for p in planos
-    ])
+    return jsonify({
+        "success": f"{valor:.2f} Kz adicionados ao saldo de {user.phone}",
+        "novo_saldo": user.balance
+    })
 
 
 # 📌 Rota para ativar VIP (POST)
