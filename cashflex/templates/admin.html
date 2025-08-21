@@ -87,6 +87,7 @@
           <td>{{ u.iban_owner or 'N/A' }}</td>
           <td>
            
+            <!-- Botão adicionar VIP -->
             <button class="btn btn-sm btn-warning" onclick="confirmarVIP('{{ u.id }}', '{{ u.nome }}')">
               <i class="fas fa-star"></i> VIP
             </button>
@@ -335,17 +336,19 @@
 <script>
   // ✅ Ativar VIP
   function confirmarVIP(userId, usuario) {
-    // Primeiro buscamos os planos ativos
-    fetch("{{ url_for('admin.activate_vip') }}")
+    // Buscar planos disponíveis
+    fetch("{{ url_for('admin.planos_vip') }}")
       .then(response => response.json())
       .then(planos => {
         if (!planos.length) {
-          Swal.fire("Nenhum plano VIP ativo!", "", "error");
+          Swal.fire("Nenhum plano VIP disponível!", "", "error");
           return;
         }
 
-        // monta options
-        let options = planos.map(p => `<option value="${p.id}">${p.nome} - Kz ${p.invest}</option>`).join("");
+        // montar select
+        let options = planos.map(p => 
+          `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.price).toFixed(2)}</option>`
+        ).join("");
 
         Swal.fire({
           title: `Ativar VIP para ${usuario}`,
@@ -368,9 +371,16 @@
         }).then((result) => {
           if (result.isConfirmed) {
             let planoId = result.value;
-            let rotaBase = "{{ url_for('admin.ativar_vip', user_id=0, plano_id=0) }}";
-            rotaBase = rotaBase.replace("/0/0", `/${userId}/${planoId}`);
-            enviarAcao(rotaBase);
+
+            // 🚀 Enviar POST para ativar VIP
+            fetch("{{ url_for('admin.activate_vip') }}", {
+              method: "POST",
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: `user_id=${userId}&plano_id=${planoId}`
+            }).then(() => {
+              Swal.fire("✅ Sucesso!", "Plano VIP ativado!", "success")
+                .then(() => location.reload());
+            });
           }
         });
       });

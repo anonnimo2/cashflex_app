@@ -311,44 +311,52 @@ def add_balance(user_id):
     return redirect(url_for('admin.dashboard'))
 
 
-@admin.route('/admin/activate_vip', methods=['POST'])
+# 📌 Rota para retornar planos em JSON
+@admin.route('/planos_vip')
+@login_required
+def planos_vip():
+    if not current_user.is_admin:
+        return jsonify([])
+
+    planos = InvestmentPlan.query.filter_by(active=True).all()
+    return jsonify([
+        {"id": p.id, "nome": p.name, "price": p.price}
+        for p in planos
+    ])
+
+
+# 📌 Rota para ativar VIP (POST)
+@admin.route('/activate_vip', methods=['POST'])
 @login_required
 def activate_vip():
     if not current_user.is_admin:
         flash("❌ Acesso negado.", "danger")
         return redirect(url_for('main.login'))
 
-    user_id = request.form.get('user_id')
-    plano_id = request.form.get('plano_id')
+    user_id = request.form.get("user_id", type=int)
+    plano_id = request.form.get("plano_id", type=int)
 
     if not user_id or not plano_id:
         flash("❌ Dados inválidos.", "danger")
-        return redirect(url_for('admin.dashboard'))
+        return redirect(url_for("admin.dashboard"))
 
     user = User.query.get(user_id)
     plano = InvestmentPlan.query.get(plano_id)
 
     if not user or not plano:
         flash("❌ Usuário ou plano não encontrado.", "danger")
-        return redirect(url_for('admin.dashboard'))
-
-    # Evitar ativar o mesmo plano 2x para o mesmo usuário
-    plano_existente = Investment.query.filter_by(user_id=user.id, plan_id=plano.id, status="aprovado").first()
-    if plano_existente:
-        flash("⚠️ Este usuário já tem este plano ativo.", "warning")
-        return redirect(url_for('admin.dashboard'))
+        return redirect(url_for("admin.dashboard"))
 
     # Criar investimento
     investment = Investment(
         user_id=user.id,
         plan_id=plano.id,
-        amount=plano.valor,
+        amount=plano.price,
         status="aprovado"
     )
-
     db.session.add(investment)
     db.session.commit()
 
-    flash(f"✅ Plano {plano.nome} ativado para {user.phone}.", "success")
-    return redirect(url_for('admin.dashboard'))
+    flash(f"✅ Plano {plano.name} ativado para {user.phone}.", "success")
+    return redirect(url_for("admin.dashboard"))
 
