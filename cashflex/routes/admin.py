@@ -281,4 +281,72 @@ def editar_plano(id):
     return render_template('admin/editar_plano.html', form=form, plano=plano)
 
 
+@admin.route('/admin/add_balance', methods=['POST'])
+@login_required
+def add_balance():
+    if not current_user.is_admin:
+        flash("❌ Acesso negado.", "danger")
+        return redirect(url_for('main.dashboard'))
 
+    user_id = request.form.get('user_id')
+    try:
+        amount = float(request.form.get('amount', 0))
+    except ValueError:
+        flash("❌ Valor inválido.", "danger")
+        return redirect(url_for('main.admin_panel'))
+
+    if amount <= 0:
+        flash("❌ O valor deve ser maior que zero.", "danger")
+        return redirect(url_for('main.admin_panel'))
+
+    user = User.query.get(user_id)
+    if not user:
+        flash("❌ Usuário não encontrado.", "danger")
+        return redirect(url_for('main.admin_panel'))
+
+    user.balance += amount
+    db.session.commit()
+
+    flash(f"✅ {amount:.2f} AOA adicionados ao usuário {user.phone}.", "success")
+    return redirect(url_for('main.admin_panel'))
+
+
+@admin.route('/admin/activate_vip', methods=['POST'])
+@login_required
+def activate_vip():
+    if not current_user.is_admin:
+        flash("❌ Acesso negado.", "danger")
+        return redirect(url_for('main.dashboard'))
+
+    user_id = request.form.get('user_id')
+    try:
+        investimento = float(request.form.get('investimento', 0))
+        rendimento_diario = float(request.form.get('rendimento_diario', 0))
+        retorno_total = float(request.form.get('retorno_total', 0))
+    except ValueError:
+        flash("❌ Valores inválidos.", "danger")
+        return redirect(url_for('main.admin_panel'))
+
+    if investimento <= 0 or rendimento_diario <= 0 or retorno_total <= 0:
+        flash("❌ Todos os valores devem ser positivos.", "danger")
+        return redirect(url_for('main.admin_panel'))
+
+    user = User.query.get(user_id)
+    if not user:
+        flash("❌ Usuário não encontrado.", "danger")
+        return redirect(url_for('main.admin_panel'))
+
+    vip_plan = UserPlan(
+        user_id=user.id,
+        nome="VIP",
+        investimento=investimento,
+        rendimento_diario=rendimento_diario,
+        retorno_total=retorno_total,
+        ativo=True
+    )
+
+    db.session.add(vip_plan)
+    db.session.commit()
+
+    flash(f"✅ Plano VIP ativado para {user.phone}.", "success")
+    return redirect(url_for('main.admin_panel'))

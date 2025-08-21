@@ -5,13 +5,14 @@ app = create_app()
 
 planos = [
     {"nome": "VIP-1", "invest": 5000},
-    {"nome": "VIP-2", "invest": 15000},
-    {"nome": "VIP-3", "invest": 30000},
-    {"nome": "VIP-4", "invest": 60000},
-    {"nome": "VIP-5", "invest": 120000},
-    {"nome": "VIP-6", "invest": 300000},
-    {"nome": "VIP-7", "invest": 500000},
-    {"nome": "VIP-8", "invest": 1000000},
+    {"nome": "VIP-2", "invest": 10000},
+    {"nome": "VIP-3", "invest": 15000},
+    {"nome": "VIP-4", "invest": 30000},
+    {"nome": "VIP-5", "invest": 60000},
+    {"nome": "VIP-6", "invest": 120000},
+    {"nome": "VIP-7", "invest": 300000},
+    {"nome": "VIP-8", "invest": 500000},
+    {"nome": "VIP-9", "invest": 1000000},
 ]
 
 with app.app_context():

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h3 class="mb-3">Ativar Plano VIP</h3>
+
+  <form method="POST">
+    <div class="mb-3">
+      <label for="user_id" class="form-label">Usuário</label>
+      <select name="user_id" id="user_id" class="form-select" required>
+        <option value="">-- Selecione um usuário --</option>
+        {% for u in users %}
+          <option value="{{ u.id }}">{{ u.phone }} - {{ u.username }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label for="investimento" class="form-label">Investimento (AOA)</label>
+      <input type="number" step="0.01" min="1000" class="form-control" name="investimento" id="investimento" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="rendimento_diario" class="form-label">Rendimento Diário (%)</label>
+      <input type="number" step="0.1" min="0.1" class="form-control" name="rendimento_diario" id="rendimento_diario" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="retorno_total" class="form-label">Retorno Total (AOA)</label>
+      <input type="number" step="0.01" min="1000" class="form-control" name="retorno_total" id="retorno_total" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">Ativar VIP</button>
+  </form>
+</div>
+{% endblock %}

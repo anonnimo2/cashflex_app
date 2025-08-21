@@ -50,38 +50,64 @@
 
   <div class="tab-content mt-3">
 
-    <!-- Usuários -->
-    <div class="tab-pane fade show active" id="users">
-      <form method="GET" class="mb-3 d-flex">
-        <input type="text" name="search" class="form-control me-2" placeholder="Buscar por telefone" value="{{ request.args.get('search', '') }}">
-        <button class="btn btn-outline-primary" type="submit">🔍 Buscar</button>
-      </form>
-      <div class="table-responsive shadow-sm rounded">
-        <table class="table table-hover align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th><th>Telefone</th><th>Saldo</th><th>Código</th>
-              <th>Banco</th><th>IBAN</th><th>Titular</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for u in users %}
-            <tr>
-              <td>{{ u.id }}</td>
-              <td>{{ u.phone }}</td>
-              <td><span class="badge bg-success">Kz {{ u.balance }}</span></td>
-              <td>{{ u.invite_code }}</td>
-              <td>{{ u.bank or 'N/A' }}</td>
-              <td>{{ u.iban or 'N/A' }}</td>
-              <td>{{ u.iban_owner or 'N/A' }}</td>
-            </tr>
-            {% else %}
-            <tr><td colspan="7" class="text-center text-muted">Nenhum usuário encontrado</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
+   <!-- Usuários -->
+<div class="tab-pane fade show active" id="users">
+  <form method="GET" class="mb-3 d-flex">
+    <input type="text" name="search" class="form-control me-2" placeholder="Buscar por telefone" value="{{ request.args.get('search', '') }}">
+    <button class="btn btn-outline-primary" type="submit">🔍 Buscar</button>
+  </form>
+
+  <div class="table-responsive shadow-sm rounded">
+    <table class="table table-hover align-middle text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>Saldo</th>
+          <th>Código</th>
+          <th>Banco</th>
+          <th>IBAN</th>
+          <th>Titular</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td>{{ u.id }}</td>
+          <td>{{ u.nome }}</td>
+          <td>{{ u.phone }}</td>
+          <td><span class="badge bg-success">Kz {{ "%.2f"|format(u.balance) }}</span></td>
+          <td>{{ u.invite_code }}</td>
+          <td>{{ u.bank or 'N/A' }}</td>
+          <td>{{ u.iban or 'N/A' }}</td>
+          <td>{{ u.iban_owner or 'N/A' }}</td>
+          <td>
+            <!-- Botão ativar VIP -->
+            <button 
+              class="btn btn-sm btn-warning"
+              onclick="confirmarVIP('{{ u.id }}', '{{ u.nome }}')">
+              <i class="fas fa-star"></i> VIP
+            </button>
+
+            <!-- Botão adicionar saldo -->
+            <button 
+              class="btn btn-sm btn-success"
+              onclick="confirmarSaldo('{{ u.id }}', '{{ u.nome }}')">
+              <i class="fas fa-plus-circle"></i> Saldo
+            </button>
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="9" class="text-center text-muted">Nenhum usuário encontrado</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
     <!-- Retiradas -->
     <div class="tab-pane fade" id="withdrawals">
@@ -272,7 +298,7 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  function confirmarAcao(acao, id, usuario, valor) {
+  function confirmarDeposito(acao, id, usuario, valor) {
     let rota = acao === 'aprovar'
       ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace('0', id)
       : "{{ url_for('admin.recusar_deposito', id=0) }}".replace('0', id);
@@ -295,21 +321,89 @@
       cancelButtonText: 'Cancelar'
     }).then((result) => {
       if (result.isConfirmed) {
-        // Cria formulário dinâmico e envia
-        let form = document.createElement('form');
-        form.method = 'POST';
-        form.action = rota;
-
-        let csrf = document.createElement('input');
-        csrf.type = 'hidden';
-        csrf.name = 'csrf_token';
-        csrf.value = "{{ simple_action_form.csrf_token._value() }}";
-        form.appendChild(csrf);
-
-        document.body.appendChild(form);
-        form.submit();
+        enviarAcao(rota);
       }
     });
+  }
+
+  function confirmarSaldo(userId, usuario) {
+    Swal.fire({
+      title: 'Adicionar Saldo',
+      html: `
+        <p><b>Usuário:</b> ${usuario}</p>
+        <input type="number" id="valorSaldo" class="form-control mt-2" placeholder="Digite o valor em Kz">
+      `,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonColor: '#198754',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Adicionar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => {
+        const valor = document.getElementById('valorSaldo').value;
+        if (!valor || valor <= 0) {
+          Swal.showValidationMessage('Informe um valor válido!');
+          return false;
+        }
+        return valor;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let rota = "{{ url_for('admin.adicionar_saldo', user_id=0, valor=0) }}";
+        rota = rota.replace('0', userId).replace('0', result.value);
+        enviarAcao(rota);
+      }
+    });
+  }
+
+  function confirmarVIP(userId, usuario) {
+    Swal.fire({
+      title: 'Ativar VIP',
+      html: `
+        <p><b>Usuário:</b> ${usuario}</p>
+        <select id="planoVip" class="form-select mt-2">
+          {% for p in planos %}
+            <option value="{{ p.id }}">{{ p.nome }} - Kz {{ p.valor }}</option>
+          {% endfor %}
+        </select>
+      `,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#198754',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: 'Ativar',
+      cancelButtonText: 'Cancelar',
+      preConfirm: () => {
+        const plano = document.getElementById('planoVip').value;
+        if (!plano) {
+          Swal.showValidationMessage('Selecione um plano!');
+          return false;
+        }
+        return plano;
+      }
+    }).then((result) => {
+      if (result.isConfirmed) {
+        let rota = "{{ url_for('admin.ativar_vip', user_id=0, plano_id=0) }}";
+        rota = rota.replace('0', userId).replace('0', result.value);
+        enviarAcao(rota);
+      }
+    });
+  }
+
+  // função genérica para enviar POST com CSRF
+  function enviarAcao(rota) {
+    let form = document.createElement('form');
+    form.method = 'POST';
+    form.action = rota;
+
+    let csrf = document.createElement('input');
+    csrf.type = 'hidden';
+    csrf.name = 'csrf_token';
+    csrf.value = "{{ simple_action_form.csrf_token._value() }}";
+    form.appendChild(csrf);
+
+    document.body.appendChild(form);
+    form.submit();
   }
 </script>
 
