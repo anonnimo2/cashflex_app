@@ -336,7 +336,7 @@
   // ✅ Ativar VIP
   function confirmarVIP(userId, usuario) {
     // Primeiro buscamos os planos ativos
-    fetch("{{ url_for('admin.get_planos_vip') }}")
+    fetch("{{ url_for('admin.activate_vip') }}")
       .then(response => response.json())
       .then(planos => {
         if (!planos.length) {
