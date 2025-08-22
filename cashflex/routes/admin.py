@@ -275,13 +275,14 @@ def gerenciar_planos():
 @login_required
 def planos_vip():
     if not current_user.is_admin:
-        return jsonify([])
+        return jsonify({"error": "Acesso negado"}), 403
 
     planos = InvestmentPlan.query.filter_by(ativo=True).all()
     return jsonify([
-        {"id": p.id, "nome": p.nome, "price": p.invest}
+        {"id": p.id, "nome": p.nome, "price": float(p.valor)}
         for p in planos
     ])
+
 
 
 
@@ -328,35 +329,35 @@ def add_balance():
         "novo_saldo": user.balance
     })
 
-
 @admin.route('/activate_vip', methods=['POST'])
 @login_required
 def activate_vip():
     if not current_user.is_admin:
         return jsonify({"error": "Acesso negado"}), 403
+    try:
+        data = request.get_json() or {}
+        user_id = int(data.get("user_id", 0))
+        plano_id = int(data.get("plano_id", 0))
 
-    data = request.get_json() or {}
-    user_id = data.get("user_id")
-    plano_id = data.get("plano_id")
+        if user_id <= 0 or plano_id <= 0:
+            return jsonify({"error": "Dados inválidos"}), 400
 
-    if not user_id or not plano_id:
-        return jsonify({"error": "Dados inválidos"}), 400
+        user = User.query.get(user_id)
+        plano = InvestmentPlan.query.get(plano_id)
+        if not user or not plano:
+            return jsonify({"error": "Usuário ou plano não encontrado"}), 404
 
-    user = User.query.get(user_id)
-    plano = InvestmentPlan.query.get(plano_id)
+        investment = Investment(
+            user_id=user.id,
+            plan_id=plano.id,
+            amount=plano.valor,  # ou plano.invest, se for o correto
+            status="aprovado"
+        )
+        db.session.add(investment)
+        db.session.commit()
 
-    if not user or not plano:
-        return jsonify({"error": "Usuário ou plano não encontrado"}), 404
-
-    investment = Investment(
-        user_id=user.id,
-        plan_id=plano.id,
-        amount=plano.valor,  # Use o campo correto
-        status="aprovado"
-    )
-    db.session.add(investment)
-    db.session.commit()
-
-    return jsonify({"success": f"Plano {plano.nome} ativado para {user.phone}!"})
-
-
+        return jsonify({"success": f"Plano {plano.nome} ativado para {user.phone}!"})
+    except Exception as e:
+        # Log real do erro para depuração
+        import traceback; traceback.print_exc()
+        return jsonify({"error": "Erro interno no servidor", "detalhe": str(e)}), 500
