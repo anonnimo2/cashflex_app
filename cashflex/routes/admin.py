@@ -6,7 +6,9 @@ from flask import current_app
 from werkzeug.utils import secure_filename
 from datetime import datetime
 from cashflex.forms import PlanForm, DepositForm, SimpleActionForm
+import traceback
 import os
+
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
 
@@ -271,21 +273,6 @@ def gerenciar_planos():
 
     return render_template('admin/planos.html', planos=planos, form=form)
 
-@admin.route('/planos_vip')
-@login_required
-def planos_vip():
-    if not current_user.is_admin:
-        return jsonify({"error": "Acesso negado"}), 403
-
-    planos = InvestmentPlan.query.filter_by(ativo=True).all()
-    return jsonify([
-        {"id": p.id, "nome": p.nome, "price": float(p.valor)}
-        for p in planos
-    ])
-
-
-
-
 
 @admin.route('/planos/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -304,35 +291,41 @@ def editar_plano(id):
     return render_template('admin/editar_plano.html', form=form, plano=plano)
 
 
+# --- Adicionar saldo ---
 @admin.route('/add_balance', methods=['POST'])
 @login_required
 def add_balance():
-    if not current_user.is_admin:
+    if not getattr(current_user, 'is_admin', False):
         return jsonify({"error": "Acesso negado"}), 403
+    try:
+        data = request.get_json() or {}
+        user_id = int(data.get("user_id", 0))
+        valor = float(data.get("valor", 0))
 
-    data = request.get_json()
-    user_id = data.get("user_id")
-    valor = data.get("valor")
+        if user_id <= 0 or valor <= 0:
+            return jsonify({"error": "Dados inválidos"}), 400
 
-    if not user_id or not valor or valor <= 0:
-        return jsonify({"error": "Dados inválidos"}), 400
+        user = User.query.get(user_id)
+        if not user:
+            return jsonify({"error": "Usuário não encontrado"}), 404
 
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"error": "Usuário não encontrado"}), 404
+        user.balance = (user.balance or 0) + valor
+        db.session.commit()
 
-    user.balance += valor
-    db.session.commit()
+        return jsonify({
+            "success": f"{valor:.2f} Kz adicionados ao saldo de {user.phone}",
+            "novo_saldo": user.balance
+        })
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({"error": "Erro interno no servidor", "detalhe": str(e)}), 500
 
-    return jsonify({
-        "success": f"{valor:.2f} Kz adicionados ao saldo de {user.phone}",
-        "novo_saldo": user.balance
-    })
 
+# --- Ativar VIP ---
 @admin.route('/activate_vip', methods=['POST'])
 @login_required
 def activate_vip():
-    if not current_user.is_admin:
+    if not getattr(current_user, 'is_admin', False):
         return jsonify({"error": "Acesso negado"}), 403
     try:
         data = request.get_json() or {}
@@ -347,10 +340,13 @@ def activate_vip():
         if not user or not plano:
             return jsonify({"error": "Usuário ou plano não encontrado"}), 404
 
+        # Usar campo coerente do modelo: valor ou invest. Ajuste conforme a sua regra.
+        amount = plano.valor  
+
         investment = Investment(
             user_id=user.id,
             plan_id=plano.id,
-            amount=plano.valor,  # ou plano.invest, se for o correto
+            amount=amount,
             status="aprovado"
         )
         db.session.add(investment)
@@ -358,6 +354,22 @@ def activate_vip():
 
         return jsonify({"success": f"Plano {plano.nome} ativado para {user.phone}!"})
     except Exception as e:
-        # Log real do erro para depuração
-        import traceback; traceback.print_exc()
+        traceback.print_exc()
+        return jsonify({"error": "Erro interno no servidor", "detalhe": str(e)}), 500
+
+
+# --- Listar planos VIP ---
+@admin.route('/planos_vip', methods=['GET'])
+@login_required
+def planos_vip():
+    if not getattr(current_user, 'is_admin', False):
+        return jsonify({"error": "Acesso negado"}), 403
+    try:
+        planos = InvestmentPlan.query.filter_by(ativo=True).all()
+        return jsonify([
+            {"id": p.id, "nome": p.nome, "price": float(p.valor)}
+            for p in planos
+        ])
+    except Exception as e:
+        traceback.print_exc()
         return jsonify({"error": "Erro interno no servidor", "detalhe": str(e)}), 500
