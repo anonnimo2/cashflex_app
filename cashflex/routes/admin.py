@@ -271,6 +271,21 @@ def gerenciar_planos():
 
     return render_template('admin/planos.html', planos=planos, form=form)
 
+@admin.route('/planos_vip')
+@login_required
+def planos_vip():
+    if not current_user.is_admin:
+        return jsonify([])
+
+    planos = InvestmentPlan.query.filter_by(ativo=True).all()
+    return jsonify([
+        {"id": p.id, "nome": p.nome, "price": p.invest}
+        for p in planos
+    ])
+
+
+
+
 @admin.route('/planos/editar/<int:id>', methods=['GET', 'POST'])
 @login_required
 def editar_plano(id):
