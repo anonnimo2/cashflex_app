@@ -270,6 +270,20 @@ def depositar():
     planos = InvestmentPlan.query.all()
     return render_template('deposit.html', form=form, planos=planos)
 
+@main.route('/planos')
+def planos_publicos():
+    planos = [
+        {"nome": "VIP-1", "valor": 5000, "invest": 5000, "rendimento_diario": 1000, "retorno_total": 50000},
+        {"nome": "VIP-2", "valor": 10000, "invest": 10000, "rendimento_diario": 2000, "retorno_total": 100000},
+        {"nome": "VIP-3", "valor": 15000, "invest": 15000, "rendimento_diario": 3000, "retorno_total": 150000},
+        {"nome": "VIP-4", "valor": 30000, "invest": 30000, "rendimento_diario": 6000, "retorno_total": 300000},
+        {"nome": "VIP-5", "valor": 60000, "invest": 60000, "rendimento_diario": 12000, "retorno_total": 600000},
+        {"nome": "VIP-6", "valor": 120000, "invest": 120000, "rendimento_diario": 24000, "retorno_total": 1200000},
+        {"nome": "VIP-7", "valor": 300000, "invest": 300000, "rendimento_diario": 60000, "retorno_total": 3000000},
+        {"nome": "VIP-8", "valor": 500000, "invest": 500000, "rendimento_diario": 100000, "retorno_total": 5000000},
+        {"nome": "VIP-9", "valor": 1000000, "invest": 1000000, "rendimento_diario": 200000, "retorno_total": 10000000},
+    ]
+    return render_template('tabela_plans.html', planos=planos)
 
 
 
