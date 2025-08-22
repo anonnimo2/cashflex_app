@@ -311,108 +311,54 @@
 </script>
 
 <script>
-function confirmarSaldo(userId) {
+function confirmarSaldo(userId, nome) {
     Swal.fire({
-        title: "Adicionar Saldo",
-        text: "Informe o valor para adicionar",
-        input: "number",
+        title: `Adicionar saldo para ${nome}`,
+        input: 'number',
+        inputLabel: 'Valor (Kz)',
         inputAttributes: { min: 1 },
-        showCancelButton: true,
-        confirmButtonText: "Adicionar",
-        cancelButtonText: "Cancelar",
-        inputValidator: (value) => {
-            if (!value || value <= 0) return "❌ Informe um valor válido!";
-        }
-    }).then((result) => {
-        if (result.isConfirmed) {
-            let valor = parseFloat(result.value);
-
-            fetch("/admin/add_balance", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id: userId, valor: valor })
+        showCancelButton: true
+    }).then(result => {
+        if(result.isConfirmed) {
+            fetch('/admin/add_balance', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({user_id: userId, valor: parseFloat(result.value)})
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    Swal.fire("✅ Sucesso!", data.success, "success")
-                        .then(() => location.reload());
-                } else {
-                    Swal.fire("❌ Erro", data.error || "Algo deu errado!", "error");
-                }
-            })
-            .catch(err => {
-                Swal.fire("❌ Erro", "Falha de conexão com o servidor.", "error");
-                console.error(err);
-            });
+            .then(r => r.json())
+            .then(data => Swal.fire(data.message).then(() => location.reload()))
+            .catch(() => Swal.fire('Erro no servidor'));
         }
     });
 }
-</script>
 
+function confirmarVIP(userId, nome) {
+    fetch('/admin/planos_vip')
+    .then(r => r.json())
+    .then(planos => {
+        if(!planos.length) return Swal.fire('Nenhum plano VIP disponível', '', 'error');
 
-<script>
-  // ✅ Ativar VIP
-  function confirmarVIP(userId, usuario) {
-    // Buscar planos disponíveis
-    fetch("{{ url_for('admin.planos_vip') }}")
-      .then(response => response.json())
-      .then(planos => {
-        if (!planos.length) {
-          Swal.fire("Nenhum plano VIP disponível!", "", "error");
-          return;
-        }
-
-        // montar select
-        let options = planos.map(p => 
-          `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.price).toFixed(2)}</option>`
-        ).join("");
+        let options = planos.map(p => `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.price)}</option>`).join('');
 
         Swal.fire({
-          title: `Ativar VIP para ${usuario}`,
-          html: `
-            <label>Escolha um plano:</label>
-            <select id="planoSelect" class="form-select">
-              ${options}
-            </select>
-          `,
-          showCancelButton: true,
-          confirmButtonText: "Ativar",
-          cancelButtonText: "Cancelar",
-          preConfirm: () => {
-            let planoId = document.getElementById("planoSelect").value;
-            if (!planoId) {
-              Swal.showValidationMessage("Selecione um plano!");
+            title: `Ativar VIP para ${nome}`,
+            html: `<select id="planoSelect" class="form-select">${options}</select>`,
+            showCancelButton: true,
+            preConfirm: () => document.getElementById('planoSelect').value
+        }).then(result => {
+            if(result.isConfirmed) {
+                fetch('/admin/activate_vip', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user_id: userId, plano_id: result.value})
+                })
+                .then(r => r.json())
+                .then(data => Swal.fire(data.message).then(() => location.reload()))
+                .catch(() => Swal.fire('Erro no servidor'));
             }
-            return planoId;
-          }
-        }).then((result) => {
-          if (result.isConfirmed) {
-            let planoId = result.value;
-
-fetch("{{ url_for('admin.activate_vip') }}", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ user_id: userId, plano_id: planoId })
-})
-.then(res => res.json())
-.then(data => {
-  if (data.success) {
-    Swal.fire("✅ Sucesso!", data.success, "success").then(() => location.reload());
-  } else {
-    Swal.fire("❌ Erro", data.error || "Algo deu errado!", "error");
-  }
-})
-.catch(err => {
-  Swal.fire("❌ Erro", "Falha de conexão com o servidor.", "error");
-  console.error(err);
-});
-
-
-          }
         });
-      });
-  }
+    });
+}
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

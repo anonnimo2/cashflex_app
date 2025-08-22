@@ -291,85 +291,61 @@ def editar_plano(id):
     return render_template('admin/editar_plano.html', form=form, plano=plano)
 
 
-# --- Adicionar saldo ---
+# Adicionar saldo
 @admin.route('/add_balance', methods=['POST'])
 @login_required
 def add_balance():
-    if not getattr(current_user, 'is_admin', False):
-        return jsonify({"error": "Acesso negado"}), 403
+    if not current_user.is_admin:
+        return jsonify({"success": False, "message": "Acesso negado"}), 403
+
+    data = request.get_json()
     try:
-        data = request.get_json() or {}
-        user_id = int(data.get("user_id", 0))
-        valor = float(data.get("valor", 0))
+        user_id = int(data.get('user_id'))
+        valor = float(data.get('valor'))
+    except:
+        return jsonify({"success": False, "message": "Dados inválidos"}), 400
 
-        if user_id <= 0 or valor <= 0:
-            return jsonify({"error": "Dados inválidos"}), 400
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"success": False, "message": "Usuário não encontrado"}), 404
 
-        user = User.query.get(user_id)
-        if not user:
-            return jsonify({"error": "Usuário não encontrado"}), 404
+    user.balance = (user.balance or 0) + valor
+    db.session.commit()
 
-        user.balance = (user.balance or 0) + valor
-        db.session.commit()
-
-        return jsonify({
-            "success": f"{valor:.2f} Kz adicionados ao saldo de {user.phone}",
-            "novo_saldo": user.balance
-        })
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"error": "Erro interno no servidor", "detalhe": str(e)}), 500
-
-
-# --- Ativar VIP ---
+    return jsonify({"success": True, "message": f"Saldo de {user.nome} atualizado: +{valor:.2f} Kz"})
+    
+# Ativar VIP
 @admin.route('/activate_vip', methods=['POST'])
 @login_required
 def activate_vip():
-    if not getattr(current_user, 'is_admin', False):
-        return jsonify({"error": "Acesso negado"}), 403
+    if not current_user.is_admin:
+        return jsonify({"success": False, "message": "Acesso negado"}), 403
+
+    data = request.get_json()
     try:
-        data = request.get_json() or {}
-        user_id = int(data.get("user_id", 0))
-        plano_id = int(data.get("plano_id", 0))
+        user_id = int(data.get('user_id'))
+        plano_id = int(data.get('plano_id'))
+    except:
+        return jsonify({"success": False, "message": "Dados inválidos"}), 400
 
-        if user_id <= 0 or plano_id <= 0:
-            return jsonify({"error": "Dados inválidos"}), 400
+    user = User.query.get(user_id)
+    plano = InvestmentPlan.query.get(plano_id)
 
-        user = User.query.get(user_id)
-        plano = InvestmentPlan.query.get(plano_id)
-        if not user or not plano:
-            return jsonify({"error": "Usuário ou plano não encontrado"}), 404
+    if not user or not plano:
+        return jsonify({"success": False, "message": "Usuário ou plano não encontrado"}), 404
 
-        # Usar campo coerente do modelo: valor ou invest. Ajuste conforme a sua regra.
-        amount = plano.valor  
+    # Aqui você define como ativar o VIP
+    user.plano_vip_id = plano.id
+    db.session.commit()
 
-        investment = Investment(
-            user_id=user.id,
-            plan_id=plano.id,
-            amount=amount,
-            status="aprovado"
-        )
-        db.session.add(investment)
-        db.session.commit()
+    return jsonify({"success": True, "message": f"{user.nome} ativado no plano VIP {plano.nome}!"})
 
-        return jsonify({"success": f"Plano {plano.nome} ativado para {user.phone}!"})
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"error": "Erro interno no servidor", "detalhe": str(e)}), 500
-
-
-# --- Listar planos VIP ---
-@admin.route('/planos_vip', methods=['GET'])
+# Listar planos VIP para o JS
+@admin.route('/planos_vip')
 @login_required
 def planos_vip():
-    if not getattr(current_user, 'is_admin', False):
-        return jsonify({"error": "Acesso negado"}), 403
-    try:
-        planos = InvestmentPlan.query.filter_by(ativo=True).all()
-        return jsonify([
-            {"id": p.id, "nome": p.nome, "price": float(p.valor)}
-            for p in planos
-        ])
-    except Exception as e:
-        traceback.print_exc()
-        return jsonify({"error": "Erro interno no servidor", "detalhe": str(e)}), 500
+    planos = InvestmentPlan.query.filter_by(ativo=True).all()
+    return jsonify([{"id": p.id, "nome": p.nome, "price": float(p.invest)} for p in planos])
+
+
+    
