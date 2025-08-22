@@ -303,18 +303,22 @@ def editar_plano(id):
     return render_template('admin/editar_plano.html', form=form, plano=plano)
 
 
-@admin.route('/add_balance/<int:user_id>/<float:valor>', methods=['POST'])
+@admin.route('/add_balance', methods=['POST'])
 @login_required
-def add_balance(user_id, valor):
+def add_balance():
     if not current_user.is_admin:
         return jsonify({"error": "Acesso negado"}), 403
+
+    data = request.get_json()
+    user_id = data.get("user_id")
+    valor = data.get("valor")
+
+    if not user_id or not valor or valor <= 0:
+        return jsonify({"error": "Dados inválidos"}), 400
 
     user = User.query.get(user_id)
     if not user:
         return jsonify({"error": "Usuário não encontrado"}), 404
-
-    if valor <= 0:
-        return jsonify({"error": "Valor inválido"}), 400
 
     user.balance += valor
     db.session.commit()
@@ -331,8 +335,9 @@ def activate_vip():
     if not current_user.is_admin:
         return jsonify({"error": "Acesso negado"}), 403
 
-    user_id = request.form.get("user_id", type=int)
-    plano_id = request.form.get("plano_id", type=int)
+    data = request.get_json() or {}
+    user_id = data.get("user_id", None)
+    plano_id = data.get("plano_id", None)
 
     if not user_id or not plano_id:
         return jsonify({"error": "Dados inválidos"}), 400
@@ -343,7 +348,7 @@ def activate_vip():
     if not user or not plano:
         return jsonify({"error": "Usuário ou plano não encontrado"}), 404
 
-
+    # Cria o investimento aprovado diretamente
     investment = Investment(
         user_id=user.id,
         plan_id=plano.id,
@@ -353,6 +358,5 @@ def activate_vip():
     db.session.add(investment)
     db.session.commit()
 
-    return jsonify({
-        "success": f"Plano {plano.name} ativado para {user.phone}!"
-    })
+    return jsonify({"success": f"Plano {plano.nome} ativado para {user.phone}!"})
+

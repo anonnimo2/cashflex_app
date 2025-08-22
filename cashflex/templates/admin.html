@@ -325,27 +325,32 @@ function confirmarSaldo(userId) {
         }
     }).then((result) => {
         if (result.isConfirmed) {
-            let valor = result.value;
-            let rota = `/admin/add_balance/${userId}/${valor}`;
+            let valor = parseFloat(result.value);
 
-            fetch(rota, { method: "POST" })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        Swal.fire("✅ Sucesso!", data.success, "success")
-                            .then(() => location.reload());
-                    } else {
-                        Swal.fire("❌ Erro", data.error || "Algo deu errado!", "error");
-                    }
-                })
-                .catch(err => {
-                    Swal.fire("❌ Erro", "Não foi possível conectar ao servidor.", "error");
-                    console.error(err);
-                });
+            fetch("/admin/add_balance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id: userId, valor: valor })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    Swal.fire("✅ Sucesso!", data.success, "success")
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire("❌ Erro", data.error || "Algo deu errado!", "error");
+                }
+            })
+            .catch(err => {
+                Swal.fire("❌ Erro", "Falha de conexão com o servidor.", "error");
+                console.error(err);
+            });
         }
     });
 }
 </script>
+
+
 <script>
   // ✅ Ativar VIP
   function confirmarVIP(userId, usuario) {
@@ -385,15 +390,25 @@ function confirmarSaldo(userId) {
           if (result.isConfirmed) {
             let planoId = result.value;
 
-            // 🚀 Enviar POST para ativar VIP
-            fetch("{{ url_for('admin.activate_vip') }}", {
-              method: "POST",
-              headers: { "Content-Type": "application/x-www-form-urlencoded" },
-              body: `user_id=${userId}&plano_id=${planoId}`
-            }).then(() => {
-              Swal.fire("✅ Sucesso!", "Plano VIP ativado!", "success")
-                .then(() => location.reload());
-            });
+           fetch("{{ url_for('admin.activate_vip') }}", {
+  method: "POST",
+  headers: { "Content-Type": "application/x-www-form-urlencoded" },
+  body: `user_id=${userId}&plano_id=${planoId}`
+})
+.then(res => res.json())
+.then(data => {
+  if (data.success) {
+    Swal.fire("✅ Sucesso!", data.success, "success")
+      .then(() => location.reload());
+  } else {
+    Swal.fire("❌ Erro", data.error || "Algo deu errado!", "error");
+  }
+})
+.catch(err => {
+  Swal.fire("❌ Erro", "Falha de conexão com o servidor.", "error");
+  console.error(err);
+});
+
           }
         });
       });
