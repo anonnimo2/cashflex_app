@@ -310,29 +310,25 @@ def add_balance(user_id, valor):
     })
 
 
-# 📌 Rota para ativar VIP (POST)
 @admin.route('/activate_vip', methods=['POST'])
 @login_required
 def activate_vip():
     if not current_user.is_admin:
-        flash("❌ Acesso negado.", "danger")
-        return redirect(url_for('main.login'))
+        return jsonify({"error": "Acesso negado"}), 403
 
     user_id = request.form.get("user_id", type=int)
     plano_id = request.form.get("plano_id", type=int)
 
     if not user_id or not plano_id:
-        flash("❌ Dados inválidos.", "danger")
-        return redirect(url_for("admin.dashboard"))
+        return jsonify({"error": "Dados inválidos"}), 400
 
     user = User.query.get(user_id)
     plano = InvestmentPlan.query.get(plano_id)
 
     if not user or not plano:
-        flash("❌ Usuário ou plano não encontrado.", "danger")
-        return redirect(url_for("admin.dashboard"))
+        return jsonify({"error": "Usuário ou plano não encontrado"}), 404
 
-    # Criar investimento
+
     investment = Investment(
         user_id=user.id,
         plan_id=plano.id,
@@ -342,6 +338,6 @@ def activate_vip():
     db.session.add(investment)
     db.session.commit()
 
-    flash(f"✅ Plano {plano.name} ativado para {user.phone}.", "success")
-    return redirect(url_for("admin.dashboard"))
-
+    return jsonify({
+        "success": f"Plano {plano.name} ativado para {user.phone}!"
+    })
