@@ -336,8 +336,8 @@ def activate_vip():
         return jsonify({"error": "Acesso negado"}), 403
 
     data = request.get_json() or {}
-    user_id = data.get("user_id", None)
-    plano_id = data.get("plano_id", None)
+    user_id = data.get("user_id")
+    plano_id = data.get("plano_id")
 
     if not user_id or not plano_id:
         return jsonify({"error": "Dados inválidos"}), 400
@@ -348,15 +348,15 @@ def activate_vip():
     if not user or not plano:
         return jsonify({"error": "Usuário ou plano não encontrado"}), 404
 
-    # Cria o investimento aprovado diretamente
     investment = Investment(
         user_id=user.id,
         plan_id=plano.id,
-        amount=plano.price,
+        amount=plano.valor,  # Use o campo correto
         status="aprovado"
     )
     db.session.add(investment)
     db.session.commit()
 
     return jsonify({"success": f"Plano {plano.nome} ativado para {user.phone}!"})
+
 
