@@ -87,19 +87,21 @@
           <td>{{ u.iban_owner or 'N/A' }}</td>
           <td>
            
-           <!-- Botão adicionar VIP -->
-    <button 
-      class="btn btn-sm btn-warning" 
-      onclick='confirmarVIP({{ u.id }}, {{ u.nome|tojson }})'>
-       <i class="fas fa-star"></i> VIP
-    </button>
+           
+   <!-- Botão adicionar VIP -->
+<button 
+  class="btn btn-sm btn-warning" 
+  onclick='confirmarVIP({{ u.id }}, "{{ u.nome | e }}")'>
+  <i class="fas fa-star"></i> VIP
+</button>
 
-       <!-- Botão adicionar saldo -->
-    <button 
-      class="btn btn-sm btn-success"
-      onclick='confirmarSaldo({{ u.id }}, {{ u.nome|tojson }})'>
-       <i class="fas fa-plus-circle"></i> Saldo
-    </button>
+<!-- Botão adicionar saldo -->
+<button 
+  class="btn btn-sm btn-success"
+  onclick='confirmarSaldo({{ u.id }}, "{{ u.nome | e }}")'>
+  <i class="fas fa-plus-circle"></i> Saldo
+</button>
+
 
           </td>
         </tr>
