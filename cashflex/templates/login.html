@@ -3,17 +3,24 @@
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 100vh;">
 
   <!-- Card Login -->
-  <div class="card shadow-lg border-0 p-4" style="max-width: 430px; width: 100%; border-radius: 1.25rem;">
+<div class="card shadow-lg border-0 p-4" style="max-width: 430px; width: 100%; border-radius: 1.25rem;">
+  <div class="text-center mb-4">
+    <!-- Imagem circular com animação -->
+    <img src="{{ url_for('static', filename='img/cashflex.jpeg') }}" 
+         alt="Logo CashFlex" 
+         class="img-fluid shadow animate__animated animate__zoomIn"
+         style="width: 90px; height: 90px; object-fit: cover; border-radius: 50%; border: 3px solid #0d6efd;">
+  </div>
+</div>
 
-    <!-- Cabeçalho -->
-    <div class="text-center mb-4">
-      <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto mb-3" 
-           style="width:70px; height:70px;">
-        <i class="bi bi-box-arrow-in-right text-white fs-2"></i>
-      </div>
-      <h3 class="fw-bold text-primary">Entrar</h3>
-      <p class="text-muted small">Acesse sua conta <span class="fw-bold text-primary">Cash Flex</span> e continue investindo.</p>
-    </div>
+
+  <h3 class="fw-bold text-primary">Entrar</h3>
+  <p class="text-muted small">
+    Acesse sua conta <span class="fw-bold text-primary">Cash Flex</span> e continue investindo.
+  </p>
+</div>
+
+
 
     <!-- Formulário -->
     <form method="POST">
@@ -76,4 +83,5 @@
 
 <!-- Ícones Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
 {% endblock %}
