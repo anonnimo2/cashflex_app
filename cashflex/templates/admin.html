@@ -322,11 +322,9 @@
 
     Swal.fire({
       title: acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito',
-      html: `
-        <p><b>ID:</b> ${id}</p>
-        <p><b>Usuário:</b> ${usuario}</p>
-        <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
-      `,
+      html: `<p><b>ID:</b> ${id}</p>
+             <p><b>Usuário:</b> ${usuario}</p>
+             <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>`,
       icon: acao === 'aprovar' ? 'success' : 'warning',
       showCancelButton: true,
       confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
@@ -346,11 +344,9 @@
 
     Swal.fire({
       title: acao === 'aprovar' ? 'Aprovar Retirada' : 'Rejeitar Retirada',
-      html: `
-        <p><b>ID:</b> ${id}</p>
-        <p><b>Usuário:</b> ${usuario}</p>
-        <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
-      `,
+      html: `<p><b>ID:</b> ${id}</p>
+             <p><b>Usuário:</b> ${usuario}</p>
+             <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>`,
       icon: acao === 'aprovar' ? 'success' : 'warning',
       showCancelButton: true,
       confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
@@ -382,16 +378,17 @@
     });
   }
 
-  // Ativar VIP
+  // Ativar VIP - corrigido para NaN
   async function confirmarVIP(userId, phone) {
     try {
       const res = await fetch('/admin/planos_vip');
       const planos = await res.json();
       if (!planos.length) return Swal.fire('Nenhum plano VIP disponível', '', 'error');
 
-      const optionsHtml = planos.map(p => 
-        `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.valor).toFixed(2)}</option>`
-      ).join('');
+      const optionsHtml = planos.map(p => {
+        const valor = parseFloat(p.valor) || 0; // garante número válido
+        return `<option value="${p.id}">${p.nome} - Kz ${valor.toFixed(2)}</option>`;
+      }).join('');
 
       Swal.fire({
         title: `Ativar VIP para ${phone}`,
@@ -414,6 +411,7 @@
     tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
   });
 </script>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
