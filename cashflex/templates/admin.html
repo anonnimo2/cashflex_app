@@ -313,9 +313,9 @@
   }
 
   // ✅ Adicionar saldo
-  function confirmarSaldo(userId, nome) {
+  function confirmarSaldo(userId, phone) {
     Swal.fire({
-      title: `Adicionar saldo para ${nome}`,
+      title: `Adicionar saldo para ${phone}`,
       input: 'number',
       inputLabel: 'Valor (Kz)',
       inputAttributes: { min: 1 },
@@ -347,16 +347,16 @@
   }
 
   // ✅ Ativar VIP
-  function confirmarVIP(userId, nome) {
+  function confirmarVIP(userId, phone) {
     fetch('/admin/planos_vip')
     .then(r => r.json())
     .then(planos => {
       if(!planos.length) return Swal.fire('Nenhum plano VIP disponível', '', 'error');
 
-      let options = planos.map(p => `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.valor)}</option>`).join('');
+      let options = planos.map(p => `<option value="${p.id}">${p.phone} - Kz ${parseFloat(p.valor)}</option>`).join('');
 
       Swal.fire({
-        title: `Ativar VIP para ${nome}`,
+        title: `Ativar VIP para ${phone}`,
         html: `<select id="planoSelect" class="form-select">${options}</select>`,
         showCancelButton: true,
         preConfirm: () => document.getElementById('planoSelect').value
