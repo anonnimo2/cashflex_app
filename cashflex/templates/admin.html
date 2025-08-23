@@ -90,18 +90,20 @@
            
            
    <!-- Botão adicionar VIP -->
+<!-- Botão adicionar VIP -->
 <button 
   class="btn btn-sm btn-warning" 
-  onclick='confirmarVIP({{ u.id }}, "{{ u.nome | e }}")'>
+  onclick='confirmarVIP({{ u.id }}, "{{ u.phone | e }}")'>
   <i class="fas fa-star"></i> VIP
 </button>
 
 <!-- Botão adicionar saldo -->
 <button 
   class="btn btn-sm btn-success"
-  onclick='confirmarSaldo({{ u.id }}, "{{ u.nome | e }}")'>
+  onclick='confirmarSaldo({{ u.id }}, "{{ u.phone | e }}")'>
   <i class="fas fa-plus-circle"></i> Saldo
 </button>
+
 
 
           </td>
@@ -284,47 +286,37 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-// ✅ Aprovar/Rejeitar depósito
-function confirmarDeposito(acao, id, usuario, valor) {
+  // ✅ Aprovar/Rejeitar depósito
+  function confirmarDeposito(acao, id, usuario, valor) {
     let rota = acao === 'aprovar' 
       ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace("0", id)
       : "{{ url_for('admin.recusar_deposito', id=0) }}".replace("0", id);
 
     Swal.fire({
-        title: (acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito'),
-        html: `
-            <p><b>ID:</b> ${id}</p>
-            <p><b>Usuário:</b> ${usuario}</p>
-            <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
-        `,
-        icon: acao === 'aprovar' ? 'success' : 'warning',
-        showCancelButton: true,
-        confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
-        cancelButtonText: 'Cancelar'
+      title: (acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito'),
+      html: `
+        <p><b>ID:</b> ${id}</p>
+        <p><b>Usuário:</b> ${usuario}</p>
+        <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
+      `,
+      icon: acao === 'aprovar' ? 'success' : 'warning',
+      showCancelButton: true,
+      confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
+      cancelButtonText: 'Cancelar'
     }).then((result) => {
-        if (result.isConfirmed) {
-            fetch(rota, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                }
-            })
-            .then(r => r.json())
-            .then(data => Swal.fire(data.message || 'Ação concluída').then(() => location.reload()))
-            .catch(() => Swal.fire('Erro no servidor'));
-        }
+      if (result.isConfirmed) {
+        enviarAcao(rota);
+      }
     });
-}
+  }
+</script>
 
-// ✅ Adicionar saldo
-function confirmarSaldo(userId, nome) {
+<script>
+function confirmarSaldo(userId, telefone) {
     Swal.fire({
-        title: `Adicionar saldo para ${nome}`,
+        title: `Adicionar saldo para ${telefone}`,
         input: 'number',
         inputLabel: 'Valor (Kz)',
         inputAttributes: { min: 1 },
@@ -333,30 +325,32 @@ function confirmarSaldo(userId, nome) {
         if(result.isConfirmed) {
             fetch('/admin/add_balance', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': csrfToken
-                },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({user_id: userId, valor: parseFloat(result.value)})
             })
             .then(r => r.json())
-            .then(data => Swal.fire(data.message || 'Saldo adicionado').then(() => location.reload()))
-            .catch(() => Swal.fire('Erro no servidor'));
+            .then(data => {
+                if(data.success) {
+                    Swal.fire('✅ Sucesso!', data.message, 'success').then(() => location.reload());
+                } else {
+                    Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
+                }
+            })
+            .catch(() => Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
         }
     });
 }
 
-// ✅ Ativar VIP
-function confirmarVIP(userId, nome) {
+function confirmarVIP(userId, telefone) {
     fetch('/admin/planos_vip')
     .then(r => r.json())
     .then(planos => {
         if(!planos.length) return Swal.fire('Nenhum plano VIP disponível', '', 'error');
 
-        let options = planos.map(p => `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.price).toFixed(2)}</option>`).join('');
+        let options = planos.map(p => `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.valor)}</option>`).join('');
 
         Swal.fire({
-            title: `Ativar VIP para ${nome}`,
+            title: `Ativar VIP para ${telefone}`,
             html: `<select id="planoSelect" class="form-select">${options}</select>`,
             showCancelButton: true,
             preConfirm: () => document.getElementById('planoSelect').value
@@ -364,15 +358,18 @@ function confirmarVIP(userId, nome) {
             if(result.isConfirmed) {
                 fetch('/admin/activate_vip', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrfToken
-                    },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({user_id: userId, plano_id: result.value})
                 })
                 .then(r => r.json())
-                .then(data => Swal.fire(data.message || 'VIP ativado').then(() => location.reload()))
-                .catch(() => Swal.fire('Erro no servidor'));
+                .then(data => {
+                    if(data.success) {
+                        Swal.fire('✅ Sucesso!', data.message, 'success').then(() => location.reload());
+                    } else {
+                        Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
+                    }
+                })
+                .catch(() => Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
             }
         });
     });
