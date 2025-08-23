@@ -290,57 +290,56 @@ def editar_plano(id):
 
     return render_template('admin/editar_plano.html', form=form, plano=plano)
 
-
-# Adicionar saldo
+# Adicionar saldo 
 @admin.route('/add_balance', methods=['POST'])
 @login_required
 def add_balance():
-    if not current_user.is_admin:
-        return jsonify({"success": False, "message": "Acesso negado"}), 403
-
     data = request.get_json()
-    try:
-        user_id = int(data.get('user_id'))
-        valor = float(data.get('valor'))
-    except:
-        return jsonify({"success": False, "message": "Dados inválidos"}), 400
+    user_id = data.get('user_id')
+    valor = data.get('valor')
 
     user = User.query.get(user_id)
     if not user:
         return jsonify({"success": False, "message": "Usuário não encontrado"}), 404
 
-    user.balance = (user.balance or 0) + valor
-    db.session.commit()
+    try:
+        user.balance += float(valor)
+        db.session.commit()
+        return jsonify({"success": True, "message": f"Saldo atualizado para {user.phone}!"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": "Erro ao atualizar saldo"}), 500
 
-    return jsonify({"success": True, "message": f"Saldo de {user.nome} atualizado: +{valor:.2f} Kz"})
-    
-# Ativar VIP
+    #Ativar vip
 @admin.route('/activate_vip', methods=['POST'])
+@login_required
 def activate_vip():
     data = request.get_json()
     user_id = data.get('user_id')
     plano_id = data.get('plano_id')
 
-    user = User.query.get_or_404(user_id)
-    plano = InvestmentPlan.query.get_or_404(plano_id)
+    user = User.query.get(user_id)
+    plano = InvestmentPlan.query.get(plano_id)
 
-    # Aqui você pode criar o UserPlan
-    novo_plano = UserPlan(
-        user_id=user.id,
-        nome=plano.nome,
-        investimento=plano.invest,
-        rendimento_diario=plano.rendimento_diario,
-        retorno_total=plano.retorno_total,
-        ativo=True
-    )
-    db.session.add(novo_plano)
-    db.session.commit()
+    if not user or not plano:
+        return jsonify({"success": False, "message": "Usuário ou plano não encontrado"}), 404
 
-    # Use user.phone ou user.iban_owner para a mensagem
-    return jsonify({
-        "success": True,
-        "message": f"Usuário {user.phone} ativado no plano VIP {plano.nome}!"
-    })
+    try:
+        user_plan = UserPlan(
+            user_id=user.id,
+            nome=plano.nome,
+            investimento=plano.invest,
+            rendimento_diario=plano.rendimento_diario,
+            retorno_total=plano.retorno_total,
+            data_inicio=datetime.utcnow(),
+            ativo=True
+        )
+        db.session.add(user_plan)
+        db.session.commit()
+        return jsonify({"success": True, "message": f"{user.phone} ativado no plano VIP {plano.nome}!"})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"success": False, "message": "Erro ao ativar plano VIP"}), 500
 
 
 # Listar planos VIP para o JS
@@ -349,6 +348,5 @@ def activate_vip():
 def planos_vip():
     planos = InvestmentPlan.query.filter_by(ativo=True).all()
     return jsonify([{"id": p.id, "nome": p.nome, "price": float(p.invest)} for p in planos])
-
 
     
