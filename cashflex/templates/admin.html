@@ -52,17 +52,17 @@
   <!-- Conteúdo das Abas -->
   <div class="tab-content mt-3">
 
-   
-   <!-- Usuários -->
-<div class="tab-pane fade show active" id="users">
-  <form method="GET" class="mb-3 d-flex">
-    <input type="text" name="search" class="form-control me-2" placeholder="Buscar por telefone" value="{{ request.args.get('search', '') }}">
+  <div class="tab-pane fade show active" id="users">
+  <!-- Formulário de busca -->
+  <form method="GET" class="mb-3 d-flex flex-wrap gap-2">
+    <input type="text" name="search" class="form-control flex-grow-1" placeholder="Buscar por telefone" value="{{ request.args.get('search', '') }}">
     <button class="btn btn-outline-primary" type="submit">🔍 Buscar</button>
   </form>
 
-  <div class="table-responsive shadow-sm rounded">
-    <table class="table table-hover align-middle text-center">
-      <thead class="table-dark">
+  <!-- Users -->
+  <div class="table-responsive shadow-sm rounded" style="max-height:500px; overflow-y:auto;">
+    <table class="table table-hover align-middle text-center table-striped table-bordered">
+      <thead class="table-dark position-sticky top-0" style="z-index:1;">
         <tr>
           <th>ID</th>
           <th>Nome</th>
@@ -86,26 +86,18 @@
           <td>{{ u.bank or 'N/A' }}</td>
           <td>{{ u.iban or 'N/A' }}</td>
           <td>{{ u.iban_owner or 'N/A' }}</td>
-          <td>
-           
-           
-   <!-- Botão adicionar VIP -->
-<!-- Botão adicionar VIP -->
-<button 
-  class="btn btn-sm btn-warning" 
-  onclick='confirmarVIP({{ u.id }}, "{{ u.phone | e }}")'>
-  <i class="fas fa-star"></i> VIP
-</button>
+          <td class="d-flex flex-wrap justify-content-center gap-1">
+            <!-- Botão VIP -->
+            <button class="btn btn-sm btn-warning" data-bs-toggle="tooltip" title="Ativar VIP"
+              onclick='confirmarVIP({{ u.id }}, "{{ u.phone | e }}")'>
+              <i class="fas fa-star"></i>
+            </button>
 
-<!-- Botão adicionar saldo -->
-<button 
-  class="btn btn-sm btn-success"
-  onclick='confirmarSaldo({{ u.id }}, "{{ u.phone | e }}")'>
-  <i class="fas fa-plus-circle"></i> Saldo
-</button>
-
-
-
+            <!-- Botão adicionar saldo -->
+            <button class="btn btn-sm btn-success" data-bs-toggle="tooltip" title="Adicionar saldo"
+              onclick='confirmarSaldo({{ u.id }}, "{{ u.phone | e }}")'>
+              <i class="fas fa-plus-circle"></i>
+            </button>
           </td>
         </tr>
         {% else %}
@@ -118,127 +110,144 @@
   </div>
 </div>
 
+
+
     <!-- Retiradas -->
-    <div class="tab-pane fade" id="withdrawals">
-      <div class="table-responsive shadow-sm rounded">
-        <table class="table table-hover align-middle">
-          <thead class="table-dark">
-            <tr>
-              <th>ID</th><th>Usuário</th><th>Valor</th><th>Status</th>
-              <th>Banco</th><th>IBAN</th><th>Titular</th><th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for w in withdrawals %}
-            <tr>
-              <td>{{ w.id }}</td>
-              <td>{{ w.user_id }}</td>
-              <td><span class="badge bg-info">Kz {{ w.amount }}</span></td>
-              <td>
-                <span class="badge 
-                  {% if w.status == 'Pendente' %}bg-warning
-                  {% elif w.status == 'Aprovado' %}bg-success
-                  {% else %}bg-danger{% endif %}">
-                  {{ w.status }}
-                </span>
-              </td>
-              <td>{{ w.user.bank or 'N/A' }}</td>
-              <td>{{ w.user.iban or 'N/A' }}</td>
-              <td>{{ w.user.iban_owner or 'N/A' }}</td>
-              <td>
-                {% if w.status == "Pendente" %}
-                  <form action="{{ url_for('admin.approve_withdraw', id=w.id) }}" method="post" class="d-inline">
-                    {{ simple_action_form.hidden_tag() }}
-                    <button type="submit" class="btn btn-success btn-sm">✔️</button>
-                  </form>
-                  <form action="{{ url_for('admin.reject_withdraw', id=w.id) }}" method="post" class="d-inline">
-                    {{ simple_action_form.hidden_tag() }}
-                    <button type="submit" class="btn btn-danger btn-sm">❌</button>
-                  </form>
-                {% else %}
-                  <span class="text-muted">--</span>
-                {% endif %}
-              </td>
-            </tr>
+   <div class="tab-pane fade" id="withdrawals">
+  <div class="table-responsive shadow-sm rounded" style="max-height:500px; overflow-y:auto;">
+    <table class="table table-hover align-middle table-striped table-bordered text-center">
+      <thead class="table-dark position-sticky top-0" style="z-index:1;">
+        <tr>
+          <th>ID</th>
+          <th>Usuário</th>
+          <th>Valor</th>
+          <th>Status</th>
+          <th>Banco</th>
+          <th>IBAN</th>
+          <th>Titular</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for w in withdrawals %}
+        <tr>
+          <td>{{ w.id }}</td>
+          <td>{{ w.user_id }}</td>
+          <td><span class="badge bg-info">Kz {{ w.amount }}</span></td>
+          <td>
+            <span class="badge 
+              {% if w.status == 'Pendente' %}bg-warning
+              {% elif w.status == 'Aprovado' %}bg-success
+              {% else %}bg-danger{% endif %}">
+              {{ w.status }}
+            </span>
+          </td>
+          <td>{{ w.user.bank or 'N/A' }}</td>
+          <td>{{ w.user.iban or 'N/A' }}</td>
+          <td>{{ w.user.iban_owner or 'N/A' }}</td>
+          <td class="d-flex flex-wrap justify-content-center gap-1">
+            {% if w.status == "Pendente" %}
+              <button class="btn btn-success btn-sm"
+                onclick="confirmarAcao('aprovar', {{ w.id }}, '{{ w.user_id }}', {{ w.amount|float }})">
+                ✔️
+              </button>
+              <button class="btn btn-danger btn-sm"
+                onclick="confirmarAcao('rejeitar', {{ w.id }}, '{{ w.user_id }}', {{ w.amount|float }})">
+                ❌
+              </button>
             {% else %}
-            <tr><td colspan="8" class="text-center text-muted">Nenhum saque registrado</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
+              <span class="text-muted">--</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="text-center text-muted">Nenhum saque registrado</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
-    <!-- Depósitos -->
-    <div class="tab-pane fade" id="deposits" role="tabpanel">
-      <h5 class="mb-3">📥 Depósitos</h5>
-      <div class="table-responsive shadow-sm rounded">
-        <table class="table table-hover align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>ID</th><th>Usuário</th><th>Número</th><th>Valor</th>
-              <th>Status</th><th>Data</th><th>Comprovativo</th><th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for deposito in deposits %}
-            <tr>
-              <td>#{{ deposito.id }}</td>
-              <td>{{ deposito.user.nome }}</td>
-              <td>{{ deposito.user.phone }}</td>
-              <td><span class="text-success fw-semibold">Kz {{ "{:,.2f}".format(deposito.amount) }}</span></td>
-              <td>
-                {% if deposito.status.lower() == 'pendente' %}
-                  <span class="badge bg-warning text-dark">⏳ Pendente</span>
-                {% elif deposito.status.lower() == 'aprovado' %}
-                  <span class="badge bg-success">✔️ Aprovado</span>
-                {% elif deposito.status.lower() == 'recusado' %}
-                  <span class="badge bg-danger">❌ Recusado</span>
-                {% else %}
-                  <span class="badge bg-secondary">{{ deposito.status }}</span>
-                {% endif %}
-              </td>
-              <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
-              <td>
-                {% if deposito.proof %}
-                  <a href="{{ url_for('static', filename='proofs/' ~ deposito.proof) }}" target="_blank" class="btn btn-outline-primary btn-sm">
-                    📄 Ver
-                  </a>
-                {% else %}
-                  <span class="text-muted">-</span>
-                {% endif %}
-              </td>
-              <td>
-                {% if deposito.status.lower() == 'pendente' %}
-                  <button type="button" class="btn btn-success btn-sm me-1" 
-                          onclick="confirmarDeposito('aprovar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount|float }})">
-                    ✔️
-                  </button>
-                  <button type="button" class="btn btn-danger btn-sm" 
-                          onclick="confirmarDeposito('rejeitar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount|float }})">
-                    ❌
-                  </button>
-                {% else %}
-                  <span class="badge bg-secondary">Sem ações</span>
-                {% endif %}
-              </td>
-            </tr>
+      <!-- Depósitos -->
+   <div class="tab-pane fade" id="deposits" role="tabpanel">
+  <h5 class="mb-3">📥 Depósitos</h5>
+
+  <div class="table-responsive shadow-sm rounded" style="max-height:500px; overflow-y:auto;">
+    <table class="table table-hover align-middle table-striped table-bordered text-center">
+      <thead class="table-light position-sticky top-0" style="z-index:1;">
+        <tr>
+          <th>ID</th>
+          <th>Usuário</th>
+          <th>Número</th>
+          <th>Valor</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th>Comprovativo</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for deposito in deposits %}
+        <tr>
+          <td>#{{ deposito.id }}</td>
+          <td>{{ deposito.user.nome }}</td>
+          <td>{{ deposito.user.phone }}</td>
+          <td><span class="text-success fw-semibold">Kz {{ "{:,.2f}".format(deposito.amount) }}</span></td>
+          <td>
+            {% if deposito.status.lower() == 'pendente' %}
+              <span class="badge bg-warning text-dark">⏳ Pendente</span>
+            {% elif deposito.status.lower() == 'aprovado' %}
+              <span class="badge bg-success">✔️ Aprovado</span>
+            {% elif deposito.status.lower() == 'recusado' %}
+              <span class="badge bg-danger">❌ Recusado</span>
             {% else %}
-            <tr><td colspan="8" class="text-center text-muted">Nenhum depósito registrado</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    </div>
+              <span class="badge bg-secondary">{{ deposito.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ deposito.timestamp.strftime('%d/%m/%Y %H:%M') }}</td>
+          <td>
+            {% if deposito.proof %}
+              <a href="{{ url_for('static', filename='proofs/' ~ deposito.proof) }}" target="_blank"
+                 class="btn btn-outline-primary btn-sm">📄 Ver</a>
+            {% else %}
+              <span class="text-muted">-</span>
+            {% endif %}
+          </td>
+          <td class="d-flex flex-wrap justify-content-center gap-1">
+            {% if deposito.status.lower() == 'pendente' %}
+              <button class="btn btn-success btn-sm"
+                      onclick="confirmarDeposito('aprovar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount|float }})">
+                ✔️
+              </button>
+              <button class="btn btn-danger btn-sm"
+                      onclick="confirmarDeposito('rejeitar', {{ deposito.id }}, '{{ deposito.user.nome }}', {{ deposito.amount|float }})">
+                ❌
+              </button>
+            {% else %}
+              <span class="badge bg-secondary">Sem ações</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="8" class="text-center text-muted">Nenhum depósito registrado</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
-
-<!-- Aba: Planos -->
+         
+ <!-- Depósitos -->
 <div class="tab-pane fade" id="plans" role="tabpanel">
-
   <h5 class="mb-3">📊 Planos Existentes</h5>
 
-  <div class="table-responsive shadow-sm rounded">
-    <table class="table table-hover align-middle">
-      <thead class="table-dark">
+  <div class="table-responsive shadow-sm rounded" style="max-height:500px; overflow-y:auto;">
+    <table class="table table-hover align-middle table-striped table-bordered text-center">
+      <thead class="table-dark position-sticky top-0" style="z-index:1;">
         <tr>
           <th>ID</th>
           <th>Nome</th>
@@ -276,24 +285,43 @@
       </tbody>
     </table>
   </div>
-
-</div>
-
-  </div>
 </div>
 
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  // ✅ Aprovar/Rejeitar depósito
+  // Função genérica para enviar POST com CSRF e tratar resposta
+  async function sendPost(url, payload, successMsg = 'Sucesso!') {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+      if (data.success) {
+        Swal.fire('✅ Sucesso!', data.message || successMsg, 'success')
+          .then(() => location.reload());
+      } else {
+        Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
+      }
+    } catch {
+      Swal.fire('❌ Erro', 'Falha no servidor', 'error');
+    }
+  }
+
+  // Aprovar ou rejeitar depósito
   function confirmarDeposito(acao, id, usuario, valor) {
-    let rota = acao === 'aprovar' 
-      ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace("0", id)
-      : "{{ url_for('admin.recusar_deposito', id=0) }}".replace("0", id);
+    const url = acao === 'aprovar' 
+      ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace('0', id)
+      : "{{ url_for('admin.recusar_deposito', id=0) }}".replace('0', id);
 
     Swal.fire({
-      title: (acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito'),
+      title: acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito',
       html: `
         <p><b>ID:</b> ${id}</p>
         <p><b>Usuário:</b> ${usuario}</p>
@@ -305,14 +333,12 @@
       cancelButtonColor: '#6c757d',
       confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
       cancelButtonText: 'Cancelar'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        enviarAcao(rota);
-      }
+    }).then(result => {
+      if (result.isConfirmed) sendPost(url, {});
     });
   }
 
-  // ✅ Adicionar saldo
+  // Adicionar saldo
   function confirmarSaldo(userId, phone) {
     Swal.fire({
       title: `Adicionar saldo para ${phone}`,
@@ -321,69 +347,123 @@
       inputAttributes: { min: 1 },
       showCancelButton: true
     }).then(result => {
-      if(result.isConfirmed) {
-        let valor = parseFloat(result.value);
-        if(isNaN(valor) || valor <= 0) return Swal.fire('Valor inválido', '', 'error');
-
-        fetch('/admin/add_balance', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': '{{ csrf_token() }}'
-          },
-          body: JSON.stringify({user_id: userId, valor: valor})
-        })
-        .then(r => r.json())
-        .then(data => {
-          if(data.success) {
-            Swal.fire('✅ Sucesso!', data.message, 'success').then(() => location.reload());
-          } else {
-            Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
-          }
-        })
-        .catch(() => Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
+      if (result.isConfirmed) {
+        const valor = parseFloat(result.value);
+        if (isNaN(valor) || valor <= 0) {
+          Swal.fire('Valor inválido', '', 'error');
+        } else {
+          sendPost('/admin/add_balance', { user_id: userId, valor });
+        }
       }
     });
   }
 
-  // ✅ Ativar VIP
-  function confirmarVIP(userId, phone) {
-    fetch('/admin/planos_vip')
-    .then(r => r.json())
-    .then(planos => {
-      if(!planos.length) return Swal.fire('Nenhum plano VIP disponível', '', 'error');
+  // Ativar VIP
+  async function confirmarVIP(userId, phone) {
+    try {
+      const res = await fetch('/admin/planos_vip');
+      const planos = await res.json();
+      if (!planos.length) return Swal.fire('Nenhum plano VIP disponível', '', 'error');
 
-      let options = planos.map(p => `<option value="${p.id}">${p.phone} - Kz ${parseFloat(p.valor)}</option>`).join('');
+      const optionsHtml = planos.map(p => `<option value="${p.id}">Plano #${p.id} - Kz ${parseFloat(p.valor)}</option>`).join('');
 
       Swal.fire({
         title: `Ativar VIP para ${phone}`,
-        html: `<select id="planoSelect" class="form-select">${options}</select>`,
+        html: `<select id="planoSelect" class="form-select">${optionsHtml}</select>`,
         showCancelButton: true,
         preConfirm: () => document.getElementById('planoSelect').value
       }).then(result => {
-        if(result.isConfirmed) {
-          fetch('/admin/activate_vip', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'X-CSRFToken': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({user_id: userId, plano_id: result.value})
-          })
-          .then(r => r.json())
-          .then(data => {
-            if(data.success) {
-              Swal.fire('✅ Sucesso!', data.message, 'success').then(() => location.reload());
-            } else {
-              Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
-            }
-          })
-          .catch(() => Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
+        if (result.isConfirmed) {
+          sendPost('/admin/activate_vip', { user_id: userId, plano_id: result.value });
         }
       });
-    });
+    } catch {
+      Swal.fire('❌ Erro', 'Falha ao carregar planos VIP', 'error');
+    }
   }
+
+  // Ativar tooltips do Bootstrap
+  document.addEventListener('DOMContentLoaded', () => {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
+  });
+
+  // Aprovar/rejeitar retiradas
+function confirmarAcao(acao, id, usuario, valor) {
+  let rota = acao === 'aprovar' 
+    ? "{{ url_for('admin.approve_withdraw', id=0) }}".replace("0", id)
+    : "{{ url_for('admin.reject_withdraw', id=0) }}".replace("0", id);
+
+  Swal.fire({
+    title: acao === 'aprovar' ? 'Aprovar Retirada' : 'Rejeitar Retirada',
+    html: `
+      <p><b>ID:</b> ${id}</p>
+      <p><b>Usuário:</b> ${usuario}</p>
+      <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
+    `,
+    icon: acao === 'aprovar' ? 'success' : 'warning',
+    showCancelButton: true,
+    confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(rota, { method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token() }}' } })
+        .then(r => r.json())
+        .then(data => {
+          if(data.success){
+            Swal.fire('✅ Sucesso!', data.message, 'success').then(()=> location.reload());
+          } else {
+            Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
+          }
+        })
+        .catch(()=> Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
+    }
+  });
+}
+
+function confirmarDeposito(acao, id, usuario, valor) {
+  let rota = acao === 'aprovar' 
+    ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace("0", id)
+    : "{{ url_for('admin.recusar_deposito', id=0) }}".replace("0", id);
+
+  Swal.fire({
+    title: acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito',
+    html: `
+      <p><b>ID:</b> ${id}</p>
+      <p><b>Usuário:</b> ${usuario}</p>
+      <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
+    `,
+    icon: acao === 'aprovar' ? 'success' : 'warning',
+    showCancelButton: true,
+    confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
+    cancelButtonColor: '#6c757d',
+    confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
+    cancelButtonText: 'Cancelar'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(rota, { method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token() }}' } })
+        .then(r => r.json())
+        .then(data => {
+          if(data.success){
+            Swal.fire('✅ Sucesso!', data.message, 'success').then(()=> location.reload());
+          } else {
+            Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
+          }
+        })
+        .catch(()=> Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
+    }
+  });
+}
+
+
+
+
+
 </script>
+ 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 {% endblock %}
