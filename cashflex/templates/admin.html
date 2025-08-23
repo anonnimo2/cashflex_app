@@ -291,7 +291,7 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-  // Função genérica para enviar POST com CSRF e tratar resposta
+  // Função genérica para enviar POST com CSRF
   async function sendPost(url, payload, successMsg = 'Sucesso!') {
     try {
       const res = await fetch(url, {
@@ -314,7 +314,7 @@
     }
   }
 
-  // Aprovar ou rejeitar depósito
+  // Aprovar/rejeitar depósitos
   function confirmarDeposito(acao, id, usuario, valor) {
     const url = acao === 'aprovar' 
       ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace('0', id)
@@ -322,6 +322,30 @@
 
     Swal.fire({
       title: acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito',
+      html: `
+        <p><b>ID:</b> ${id}</p>
+        <p><b>Usuário:</b> ${usuario}</p>
+        <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
+      `,
+      icon: acao === 'aprovar' ? 'success' : 'warning',
+      showCancelButton: true,
+      confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
+      cancelButtonColor: '#6c757d',
+      confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
+      cancelButtonText: 'Cancelar'
+    }).then(result => {
+      if (result.isConfirmed) sendPost(url, {});
+    });
+  }
+
+  // Aprovar/rejeitar retiradas
+  function confirmarAcao(acao, id, usuario, valor) {
+    const url = acao === 'aprovar' 
+      ? "{{ url_for('admin.approve_withdraw', id=0) }}".replace('0', id)
+      : "{{ url_for('admin.reject_withdraw', id=0) }}".replace('0', id);
+
+    Swal.fire({
+      title: acao === 'aprovar' ? 'Aprovar Retirada' : 'Rejeitar Retirada',
       html: `
         <p><b>ID:</b> ${id}</p>
         <p><b>Usuário:</b> ${usuario}</p>
@@ -347,9 +371,9 @@
       inputAttributes: { min: 1 },
       showCancelButton: true
     }).then(result => {
-      if (result.isConfirmed) {
+      if(result.isConfirmed) {
         const valor = parseFloat(result.value);
-        if (isNaN(valor) || valor <= 0) {
+        if(isNaN(valor) || valor <= 0) {
           Swal.fire('Valor inválido', '', 'error');
         } else {
           sendPost('/admin/add_balance', { user_id: userId, valor });
@@ -365,7 +389,9 @@
       const planos = await res.json();
       if (!planos.length) return Swal.fire('Nenhum plano VIP disponível', '', 'error');
 
-      const optionsHtml = planos.map(p => `<option value="${p.id}">Plano #${p.id} - Kz ${parseFloat(p.valor)}</option>`).join('');
+      const optionsHtml = planos.map(p => 
+        `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.valor).toFixed(2)}</option>`
+      ).join('');
 
       Swal.fire({
         title: `Ativar VIP para ${phone}`,
@@ -373,7 +399,7 @@
         showCancelButton: true,
         preConfirm: () => document.getElementById('planoSelect').value
       }).then(result => {
-        if (result.isConfirmed) {
+        if(result.isConfirmed) {
           sendPost('/admin/activate_vip', { user_id: userId, plano_id: result.value });
         }
       });
@@ -387,83 +413,7 @@
     const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
     tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
   });
-
-  // Aprovar/rejeitar retiradas
-function confirmarAcao(acao, id, usuario, valor) {
-  let rota = acao === 'aprovar' 
-    ? "{{ url_for('admin.approve_withdraw', id=0) }}".replace("0", id)
-    : "{{ url_for('admin.reject_withdraw', id=0) }}".replace("0", id);
-
-  Swal.fire({
-    title: acao === 'aprovar' ? 'Aprovar Retirada' : 'Rejeitar Retirada',
-    html: `
-      <p><b>ID:</b> ${id}</p>
-      <p><b>Usuário:</b> ${usuario}</p>
-      <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
-    `,
-    icon: acao === 'aprovar' ? 'success' : 'warning',
-    showCancelButton: true,
-    confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
-    cancelButtonColor: '#6c757d',
-    confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
-    cancelButtonText: 'Cancelar'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      fetch(rota, { method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token() }}' } })
-        .then(r => r.json())
-        .then(data => {
-          if(data.success){
-            Swal.fire('✅ Sucesso!', data.message, 'success').then(()=> location.reload());
-          } else {
-            Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
-          }
-        })
-        .catch(()=> Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
-    }
-  });
-}
-
-function confirmarDeposito(acao, id, usuario, valor) {
-  let rota = acao === 'aprovar' 
-    ? "{{ url_for('admin.aprovar_deposito', id=0) }}".replace("0", id)
-    : "{{ url_for('admin.recusar_deposito', id=0) }}".replace("0", id);
-
-  Swal.fire({
-    title: acao === 'aprovar' ? 'Aprovar Depósito' : 'Rejeitar Depósito',
-    html: `
-      <p><b>ID:</b> ${id}</p>
-      <p><b>Usuário:</b> ${usuario}</p>
-      <p><b>Valor:</b> Kz ${parseFloat(valor).toFixed(2)}</p>
-    `,
-    icon: acao === 'aprovar' ? 'success' : 'warning',
-    showCancelButton: true,
-    confirmButtonColor: acao === 'aprovar' ? '#198754' : '#d33',
-    cancelButtonColor: '#6c757d',
-    confirmButtonText: acao === 'aprovar' ? 'Sim, aprovar' : 'Sim, rejeitar',
-    cancelButtonText: 'Cancelar'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      fetch(rota, { method: 'POST', headers: {'X-CSRFToken': '{{ csrf_token() }}' } })
-        .then(r => r.json())
-        .then(data => {
-          if(data.success){
-            Swal.fire('✅ Sucesso!', data.message, 'success').then(()=> location.reload());
-          } else {
-            Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
-          }
-        })
-        .catch(()=> Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
-    }
-  });
-}
-
-
-
-
-
 </script>
- 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 {% endblock %}
