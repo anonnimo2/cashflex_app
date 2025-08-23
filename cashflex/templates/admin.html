@@ -311,71 +311,79 @@
       }
     });
   }
-</script>
 
-<script>
-function confirmarSaldo(userId, telefone) {
+  // ✅ Adicionar saldo
+  function confirmarSaldo(userId, nome) {
     Swal.fire({
-        title: `Adicionar saldo para ${telefone}`,
-        input: 'number',
-        inputLabel: 'Valor (Kz)',
-        inputAttributes: { min: 1 },
-        showCancelButton: true
+      title: `Adicionar saldo para ${nome}`,
+      input: 'number',
+      inputLabel: 'Valor (Kz)',
+      inputAttributes: { min: 1 },
+      showCancelButton: true
     }).then(result => {
-        if(result.isConfirmed) {
-            fetch('/admin/add_balance', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({user_id: userId, valor: parseFloat(result.value)})
-            })
-            .then(r => r.json())
-            .then(data => {
-                if(data.success) {
-                    Swal.fire('✅ Sucesso!', data.message, 'success').then(() => location.reload());
-                } else {
-                    Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
-                }
-            })
-            .catch(() => Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
-        }
-    });
-}
+      if(result.isConfirmed) {
+        let valor = parseFloat(result.value);
+        if(isNaN(valor) || valor <= 0) return Swal.fire('Valor inválido', '', 'error');
 
-function confirmarVIP(userId, telefone) {
+        fetch('/admin/add_balance', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+          },
+          body: JSON.stringify({user_id: userId, valor: valor})
+        })
+        .then(r => r.json())
+        .then(data => {
+          if(data.success) {
+            Swal.fire('✅ Sucesso!', data.message, 'success').then(() => location.reload());
+          } else {
+            Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
+          }
+        })
+        .catch(() => Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
+      }
+    });
+  }
+
+  // ✅ Ativar VIP
+  function confirmarVIP(userId, nome) {
     fetch('/admin/planos_vip')
     .then(r => r.json())
     .then(planos => {
-        if(!planos.length) return Swal.fire('Nenhum plano VIP disponível', '', 'error');
+      if(!planos.length) return Swal.fire('Nenhum plano VIP disponível', '', 'error');
 
-        let options = planos.map(p => `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.valor)}</option>`).join('');
+      let options = planos.map(p => `<option value="${p.id}">${p.nome} - Kz ${parseFloat(p.valor)}</option>`).join('');
 
-        Swal.fire({
-            title: `Ativar VIP para ${telefone}`,
-            html: `<select id="planoSelect" class="form-select">${options}</select>`,
-            showCancelButton: true,
-            preConfirm: () => document.getElementById('planoSelect').value
-        }).then(result => {
-            if(result.isConfirmed) {
-                fetch('/admin/activate_vip', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({user_id: userId, plano_id: result.value})
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if(data.success) {
-                        Swal.fire('✅ Sucesso!', data.message, 'success').then(() => location.reload());
-                    } else {
-                        Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
-                    }
-                })
-                .catch(() => Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
+      Swal.fire({
+        title: `Ativar VIP para ${nome}`,
+        html: `<select id="planoSelect" class="form-select">${options}</select>`,
+        showCancelButton: true,
+        preConfirm: () => document.getElementById('planoSelect').value
+      }).then(result => {
+        if(result.isConfirmed) {
+          fetch('/admin/activate_vip', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({user_id: userId, plano_id: result.value})
+          })
+          .then(r => r.json())
+          .then(data => {
+            if(data.success) {
+              Swal.fire('✅ Sucesso!', data.message, 'success').then(() => location.reload());
+            } else {
+              Swal.fire('❌ Erro', data.message || 'Algo deu errado', 'error');
             }
-        });
+          })
+          .catch(() => Swal.fire('❌ Erro', 'Falha no servidor', 'error'));
+        }
+      });
     });
-}
+  }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
 {% endblock %}
