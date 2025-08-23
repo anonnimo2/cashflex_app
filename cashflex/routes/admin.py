@@ -316,29 +316,32 @@ def add_balance():
     
 # Ativar VIP
 @admin.route('/activate_vip', methods=['POST'])
-@login_required
 def activate_vip():
-    if not current_user.is_admin:
-        return jsonify({"success": False, "message": "Acesso negado"}), 403
-
     data = request.get_json()
-    try:
-        user_id = int(data.get('user_id'))
-        plano_id = int(data.get('plano_id'))
-    except:
-        return jsonify({"success": False, "message": "Dados inválidos"}), 400
+    user_id = data.get('user_id')
+    plano_id = data.get('plano_id')
 
-    user = User.query.get(user_id)
-    plano = InvestmentPlan.query.get(plano_id)
+    user = User.query.get_or_404(user_id)
+    plano = InvestmentPlan.query.get_or_404(plano_id)
 
-    if not user or not plano:
-        return jsonify({"success": False, "message": "Usuário ou plano não encontrado"}), 404
-
-    # Aqui você define como ativar o VIP
-    user.plano_vip_id = plano.id
+    # Aqui você pode criar o UserPlan
+    novo_plano = UserPlan(
+        user_id=user.id,
+        nome=plano.nome,
+        investimento=plano.invest,
+        rendimento_diario=plano.rendimento_diario,
+        retorno_total=plano.retorno_total,
+        ativo=True
+    )
+    db.session.add(novo_plano)
     db.session.commit()
 
-    return jsonify({"success": True, "message": f"{user.nome} ativado no plano VIP {plano.nome}!"})
+    # Use user.phone ou user.iban_owner para a mensagem
+    return jsonify({
+        "success": True,
+        "message": f"Usuário {user.phone} ativado no plano VIP {plano.nome}!"
+    })
+
 
 # Listar planos VIP para o JS
 @admin.route('/planos_vip')
